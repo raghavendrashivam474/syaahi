@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ──────────────────────────────────────────────
+// USER
+// ──────────────────────────────────────────────
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  username     String   @unique
+  displayName  String
+  passwordHash String
+  bio          String?
+  avatarUrl    String?
+
+  poems     Poem[]
+  reactions Reaction[]
+  followers Follow[]   @relation("following")
+  following Follow[]   @relation("follower")
+  rooms     RoomMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([username])
+}
+
+// ──────────────────────────────────────────────
+// POEM
+// ──────────────────────────────────────────────
+model Poem {
+  id          String   @id @default(uuid())
+  authorId    String
+  title       String?
+  content     String   @db.Text
+  language    Language @default(ENGLISH)
+  emotion     Emotion?
+  theme       String?
+  audioUrl    String?
+  isPublished Boolean  @default(true)
+
+  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactions Reaction[]
+  rooms     PoemRoom[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([authorId])
+  @@index([language, emotion])
+  @@index([createdAt])
+}
+
+// ──────────────────────────────────────────────
+// REACTION (Meaningful Reactions)
+// ──────────────────────────────────────────────
+model Reaction {
+  id     String       @id @default(uuid())
+  userId String
+  poemId String
+  type   ReactionType
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  poem Poem @relation(fields: [poemId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, poemId, type])
+  @@index([poemId])
+}
+
+// ──────────────────────────────────────────────
+// FOLLOW
+// ──────────────────────────────────────────────
+model Follow {
+  followerId  String
+  followingId String
+
+  follower  User @relation("follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("following", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
+
+// ──────────────────────────────────────────────
+// ROOM (Poetry Rooms)
+// ──────────────────────────────────────────────
+model Room {
+  id          String  @id @default(uuid())
+  slug        String  @unique
+  name        String
+  description String?
+  theme       String
+  coverUrl    String?
+
+  members RoomMember[]
+  poems   PoemRoom[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RoomMember {
+  userId String
+  roomId String
+  role   RoomRole @default(MEMBER)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  joinedAt DateTime @default(now())
+
+  @@id([userId, roomId])
+}
+
+model PoemRoom {
+  poemId String
+  roomId String
+
+  poem Poem @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  addedAt DateTime @default(now())
+
+  @@id([poemId, roomId])
+}
+
+// ──────────────────────────────────────────────
+// ENUMS
+// ──────────────────────────────────────────────
+enum Language {
+  ENGLISH
+  HINDI
+  URDU
+}
+
+enum Emotion {
+  LOVE
+  LONGING
+  HOPE
+  SOLITUDE
+  ANGER
+  GRATITUDE
+}
+
+enum ReactionType {
+  FELT_THIS
+  STAYED_WITH_ME
+  BEAUTIFUL_IMAGERY
+  MADE_ME_THINK
+}
+
+enum RoomRole {
+  MEMBER
+  MODERATOR
+}
