@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.env
+.env.local
+.env.production
+
+coverage/
+
+*.log
+
+.vscode/settings.json
+
+.prisma/client
+
+generated/
+
+.DS_Store
