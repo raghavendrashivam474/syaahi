@@ -6,6 +6,7 @@ import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './modules/auth/auth.routes';
 import poemRoutes from './modules/poems/poems.routes';
+import userRoutes from './modules/users/users.routes';
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.get('/health', (_req, res) => {
 
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/poems', poemRoutes);
+app.use('/api/v1/users', userRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
