@@ -77,3 +77,20 @@ export const me = async (req: Request, res: Response) => {
   if (!user) throw new ApiError(404, 'User not found');
   res.json({ success: true, data: { user } });
 };
+
+/**
+ * POST /api/v1/auth/logout
+ * Symbolic logout — client must discard the token.
+ * (Real token invalidation requires a blacklist; deferred to post-MVP.)
+ */
+export const logout = async (req: Request, res: Response) => {
+  // Future: persist a "revoked tokens" record here when we add Redis.
+  console.log(`👋 User ${req.user!.email} logged out`);
+
+  res.json({
+    success: true,
+    data: {
+      message: 'Logged out. Please discard the token on the client.',
+    },
+  });
+};
