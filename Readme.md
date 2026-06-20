@@ -1,155 +1,127 @@
-# 🪶 Syaahi Backend
+# 🪶 Syaahi
 
-Backend service for **Syaahi** — a platform for poetry, letters, journals, and human expression.
+> Where emotions become words.
 
-## Overview
+Syaahi is a platform for poetry, letters, journals, and memory preservation.
 
-Syaahi aims to provide a thoughtful digital space where people can write, discover, preserve, and revisit their emotions through words.
+It is not a social media platform.
+It is a calm digital space where people can write, reflect, revisit memories,
+and connect through meaningful words.
 
-This repository contains the backend API and database layer powering the Syaahi ecosystem.
+---
+
+## What is Syaahi?
+
+Most digital platforms reward performance over expression.
+
+Syaahi is different.
+
+- Write a poem today
+- Journal tomorrow
+- Send an anonymous letter at midnight
+- Seal a time capsule for your future self
+- Come back years later and rediscover your own words
+
+The most meaningful feature of Syaahi is not what you write today.
+It is the moment, years from now, when you read what you wrote
+and remember exactly who you were.
 
 ---
 
 ## Current Status
 
-🚧 Early Development Phase
+**v0.2.0 — MVP Complete**
 
-### Implemented
-
-* Express.js server setup
-* TypeScript configuration
-* Prisma ORM integration
-* PostgreSQL database connection (Supabase)
-* Environment configuration
-* Modular project architecture
-* Health check endpoint
-
-### In Progress
-
-* Authentication module
-* Poems module
-* User module
-
-### Planned
-
-* Letters
-* Journals
-* Time Capsules
-* Emotional Discovery
-* Communities (Circles)
-* Audio Poetry
-* Creator Profiles
+| Feature              | Status        |
+|----------------------|---------------|
+| User Registration    | ✅ Complete   |
+| Login / Session      | ✅ Complete   |
+| Poem Feed            | ✅ Complete   |
+| Poem Reader          | ✅ Complete   |
+| Poem Writer          | ✅ Complete   |
+| Journals             | 🔜 Sprint 3   |
+| Personal Archive     | 🔜 Planned    |
+| Letters After Midnight | 🔜 Planned  |
+| Time Capsules        | 🔜 Planned    |
+| Community Circles    | 🔜 Planned    |
 
 ---
 
-## Tech Stack
-
-* Node.js
-* Express.js
-* TypeScript
-* Prisma
-* PostgreSQL (Supabase)
-* JWT Authentication (Planned)
-
----
-
-## Project Structure
+## Repository Structure
 
 ```text
-src/
-├── config/
-├── middleware/
-├── modules/
-│   ├── auth/
-│   ├── poems/
-│   └── users/
-├── utils/
-├── app.ts
-└── server.ts
-```
+syaahi/
+├── syaahi-backend/          # Express.js API
+├── syaahi-app/              # Flutter application
+├── docs/                    # Project documentation
+│   ├── ARCHITECTURE.md      # System design
+│   ├── ROADMAP.md           # Feature roadmap
+│   ├── DECISIONS.md         # Architecture decision records
+│   ├── PROGRESS.md          # Engineering diary
+│   ├── VISION.md            # Product vision
+│   └── CONTRIBUTING.md      # Contribution guide
+├── README.md                # This file
+└── LICENSE
+Tech Stack
+Backend
 
-## Getting Started
+Layer	Technology
+Runtime	Node.js v20+
+Framework	Express.js v5
+Language	TypeScript
+ORM	Prisma
+Database	PostgreSQL (Supabase)
+Authentication	JWT
+Validation	Zod
+Frontend
 
-### Install Dependencies
+Layer	Technology
+Framework	Flutter
+Language	Dart
+State Management	Riverpod
+Navigation	go_router
+HTTP Client	Dio
+Secure Storage	flutter_secure_storage
+Getting Started
+Backend
+Bash
 
-```bash
+cd syaahi-backend
 npm install
-```
-
-### Configure Environment
-
-Create a `.env` file:
-
-```env
-DATABASE_URL=
-DIRECT_URL=
-JWT_SECRET=
-```
-
-### Run Development Server
-
-```bash
+cp .env.example .env
+# Fill in .env values
+npm run prisma:generate
 npm run dev
-```
+Runs at http://localhost:4000
 
-Server runs at:
+Full setup guide: syaahi-backend/README.md
 
-```text
-http://localhost:4000
-```
+Flutter App
+Bash
 
----
+cd syaahi-app
+flutter pub get
+flutter run -d chrome
+Full setup guide: syaahi-app/README.md
 
-## Health Check
+Documentation
+Document	Description
+docs/ARCHITECTURE.md	System design and data flow
+docs/ROADMAP.md	Planned features by phase
+docs/DECISIONS.md	Why things were built this way
+docs/PROGRESS.md	Engineering diary
+docs/VISION.md	Product vision and principles
+docs/CONTRIBUTING.md	How to contribute
+syaahi-backend/API_CONTRACT.md	API endpoint reference
+Guiding Principle
+Before any feature is built, ask:
 
-```http
-GET /
-```
+"Does this help people express, preserve, or revisit emotions?"
 
-Response:
+If the answer is no, it does not belong in Syaahi.
 
-```json
-{
-  "name": "Syaahi API",
-  "version": "0.1.0",
-  "status": "ok"
-}
-```
+License
+MIT — see LICENSE
 
----
-
-## Development Roadmap
-
-### Phase 1
-
-* Poems CRUD
-* User Management
-* Basic Authentication
-
-### Phase 2
-
-* Emotional Discovery
-* User Profiles
-* Archive System
-
-### Phase 3
-
-* Letters After Midnight
-* Time Capsules
-* Audio Poetry
-
----
-
-## Vision
-
-> Where emotions become words.
-
-Syaahi is being built as a home for poetry, reflection, memories, and meaningful human expression.
-
----
-
-## Author
-
-**Raghavendra Singh**
-
-Built with ☕, midnight thoughts, and a love for words.
+Built with coffee, midnight thoughts, and a love for words.
+— Raghavendra Singh
