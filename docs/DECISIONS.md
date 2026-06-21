@@ -227,3 +227,27 @@ Speed. Staging is not public-facing and exists only for MVP validation.
 Consequences
 This must be replaced before any production deployment.
 When FRONTEND_URL is known, update app.ts to use it explicitly.
+
+## ADR-010: Development CORS Strategy
+
+Date: 2026-06
+Status: Active
+
+### Context
+Flutter Web runs on a dynamic localhost port during development.
+The port changes every time the app is launched.
+Hardcoding specific ports in CORS_ORIGIN was not practical.
+
+### Decision
+In development mode, all localhost origins are permitted automatically.
+In production, only origins listed in the CORS_ORIGIN environment variable are allowed.
+
+### Reasoning
+- Eliminates the need to update .env every time Flutter picks a new port
+- No security risk in development
+- Production remains strictly controlled via environment variable
+
+### Consequences
+CORS_ORIGIN must be set correctly on Railway before any production deployment.
+The Vercel frontend URL must be the only allowed origin in production.
+

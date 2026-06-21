@@ -17,7 +17,23 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(
   cors({
-    origin: env.CORS_ORIGIN.split(',').map((o) => o.trim()),
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile, Postman)
+      if (!origin) return callback(null, true);
+
+      // In development, allow all localhost origins
+      if (env.NODE_ENV === 'development' && origin.startsWith('http://localhost')) {
+        return callback(null, true);
+      }
+
+      // In production, check against allowed origins
+      const allowed = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+      if (allowed.includes(origin)) {
+        return callback(null, true);
+      }
+
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
   })
 );
