@@ -6,26 +6,129 @@ final poemsRepositoryProvider = Provider<PoemsRepository>((ref) {
   return PoemsRepository();
 });
 
-// Feed: list of poems
-final feedProvider = FutureProvider.autoDispose<List<Poem>>((ref) async {
-  final repo = ref.watch(poemsRepositoryProvider);
-  return repo.listPoems();
+// ─────────────────────────────────────────
+// Feed State
+// ─────────────────────────────────────────
+
+class FeedState {
+  final List<Poem> poems;
+  final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final String? nextCursor;
+  final String? error;
+
+  const FeedState({
+    this.poems = const [],
+    this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
+    this.nextCursor,
+    this.error,
+  });
+
+  FeedState copyWith({
+    List<Poem>? poems,
+    bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
+    String? nextCursor,
+    String? error,
+    bool clearError = false,
+  }) {
+    return FeedState(
+      poems: poems ?? this.poems,
+      isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
+      nextCursor: nextCursor ?? this.nextCursor,
+      error: clearError ? null : (error ?? this.error),
+    );
+  }
+}
+
+class FeedNotifier extends StateNotifier<FeedState> {
+  final PoemsRepository _repository;
+
+  FeedNotifier(this._repository) : super(const FeedState()) {
+    load();
+  }
+
+  Future<void> load() async {
+    if (state.isLoading) return;
+
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final result = await _repository.listPoems(limit: 10);
+      state = state.copyWith(
+        poems: result.poems,
+        nextCursor: result.nextCursor,
+        hasMore: result.nextCursor != null,
+        isLoading: false,
+      );
+    } on PoemsException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoadingMore || !state.hasMore || state.nextCursor == null) {
+      return;
+    }
+
+    state = state.copyWith(isLoadingMore: true);
+
+    try {
+      final result = await _repository.listPoems(
+        cursor: state.nextCursor,
+        limit: 10,
+      );
+      state = state.copyWith(
+        poems: [...state.poems, ...result.poems],
+        nextCursor: result.nextCursor,
+        hasMore: result.nextCursor != null,
+        isLoadingMore: false,
+      );
+    } on PoemsException catch (e) {
+      state = state.copyWith(isLoadingMore: false, error: e.message);
+    }
+  }
+
+  Future<void> refresh() async {
+    state = const FeedState();
+    await load();
+  }
+}
+
+final feedProvider = StateNotifierProvider.autoDispose<FeedNotifier, FeedState>((ref) {
+  return FeedNotifier(ref.watch(poemsRepositoryProvider));
 });
 
-// Single poem by id
+// ─────────────────────────────────────────
+// Single poem
+// ─────────────────────────────────────────
+
 final poemByIdProvider =
     FutureProvider.autoDispose.family<Poem, String>((ref, id) async {
   final repo = ref.watch(poemsRepositoryProvider);
   return repo.getPoem(id);
 });
 
-// Writer state
+// ─────────────────────────────────────────
+// Writer
+// ─────────────────────────────────────────
+
 class WriterState {
   final bool isPublishing;
   final String? error;
   const WriterState({this.isPublishing = false, this.error});
 
-  WriterState copyWith({bool? isPublishing, String? error, bool clearError = false}) =>
+  WriterState copyWith({
+    bool? isPublishing,
+    String? error,
+    bool clearError = false,
+  }) =>
       WriterState(
         isPublishing: isPublishing ?? this.isPublishing,
         error: clearError ? null : (error ?? this.error),
@@ -55,8 +158,7 @@ class WriterNotifier extends StateNotifier<WriterState> {
         theme: theme,
       );
       state = state.copyWith(isPublishing: false);
-      // Refresh the feed so the new poem appears
-      _ref.invalidate(feedProvider);
+      _ref.read(feedProvider.notifier).refresh();
       return poem;
     } on PoemsException catch (e) {
       state = state.copyWith(isPublishing: false, error: e.message);
@@ -67,6 +169,7 @@ class WriterNotifier extends StateNotifier<WriterState> {
   void clearError() => state = state.copyWith(clearError: true);
 }
 
-final writerProvider = StateNotifierProvider<WriterNotifier, WriterState>((ref) {
+final writerProvider =
+    StateNotifierProvider<WriterNotifier, WriterState>((ref) {
   return WriterNotifier(ref.watch(poemsRepositoryProvider), ref);
 });

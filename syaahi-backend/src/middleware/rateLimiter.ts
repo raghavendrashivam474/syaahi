@@ -23,7 +23,9 @@ export const loginLimiter = rateLimit({
   max: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  skipSuccessfulRequests: true, // don't count successful logins
+  skipSuccessfulRequests: true,
+  // Skip rate limiting in development (allows seeding)
+  skip: () => process.env.NODE_ENV === 'development',
   message: {
     success: false,
     message: 'Too many login attempts. Try again in 15 minutes.',
@@ -35,10 +37,12 @@ export const loginLimiter = rateLimit({
  * 5 signups per hour per IP.
  */
 export const signupLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
+  windowMs: 60 * 60 * 1000,
   max: 5,
   standardHeaders: true,
   legacyHeaders: false,
+  // Skip rate limiting in development (allows seeding)
+  skip: () => process.env.NODE_ENV === 'development',
   message: {
     success: false,
     message: 'Too many signup attempts. Try again in an hour.',

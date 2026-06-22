@@ -11,12 +11,19 @@ class PoemsException implements Exception {
   String toString() => message;
 }
 
+class PoemFeedResult {
+  final List<Poem> poems;
+  final String? nextCursor;
+
+  const PoemFeedResult({required this.poems, this.nextCursor});
+}
+
 class PoemsRepository {
   final Dio _dio;
 
   PoemsRepository({Dio? dio}) : _dio = dio ?? ApiClient().dio;
 
-  Future<List<Poem>> listPoems({String? cursor, int limit = 20}) async {
+  Future<PoemFeedResult> listPoems({String? cursor, int limit = 10}) async {
     try {
       final response = await _dio.get('/poems', queryParameters: {
         if (cursor != null) 'cursor': cursor,
@@ -24,9 +31,11 @@ class PoemsRepository {
       });
       final data = response.data['data'] as Map<String, dynamic>;
       final list = data['poems'] as List<dynamic>;
-      return list
+      final poems = list
           .map((j) => Poem.fromJson(j as Map<String, dynamic>))
           .toList();
+      final nextCursor = data['nextCursor'] as String?;
+      return PoemFeedResult(poems: poems, nextCursor: nextCursor);
     } on DioException catch (e) {
       throw _handle(e);
     }

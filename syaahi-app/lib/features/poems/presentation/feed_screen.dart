@@ -2,15 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/sizes.dart';
 import '../../../shared/models/poem.dart';
 import '../../auth/state/auth_providers.dart';
 import '../state/poems_providers.dart';
 
-class FeedScreen extends ConsumerWidget {
+class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
+
+  @override
+  ConsumerState<FeedScreen> createState() => _FeedScreenState();
+}
+
+class _FeedScreenState extends ConsumerState<FeedScreen> {
+  final _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final position = _scrollController.position;
+    final threshold = position.maxScrollExtent * 0.85;
+
+    if (position.pixels >= threshold) {
+      ref.read(feedProvider.notifier).loadMore();
+    }
+  }
 
   String _greeting() {
     final hour = DateTime.now().hour;
@@ -21,8 +48,8 @@ class FeedScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final feedAsync = ref.watch(feedProvider);
+  Widget build(BuildContext context) {
+    final feedState = ref.watch(feedProvider);
     final user = ref.watch(authProvider).user;
 
     return Scaffold(
@@ -50,84 +77,138 @@ class FeedScreen extends ConsumerWidget {
         ),
       ),
       body: RefreshIndicator(
-        onRefresh: () async => ref.invalidate(feedProvider),
+        onRefresh: () => ref.read(feedProvider.notifier).refresh(),
         color: SyaahiColors.goldBase,
-        child: feedAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(color: SyaahiColors.goldBase),
+        child: _buildBody(feedState, user?.displayName),
+      ),
+    );
+  }
+
+  Widget _buildBody(FeedState feedState, String? displayName) {
+    // Initial loading
+    if (feedState.isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: SyaahiColors.goldBase),
+      );
+    }
+
+    // Initial error
+    if (feedState.error != null && feedState.poems.isEmpty) {
+      return _ErrorView(
+        message: feedState.error!,
+        onRetry: () => ref.read(feedProvider.notifier).load(),
+      );
+    }
+
+    // Empty
+    if (feedState.poems.isEmpty) {
+      return _EmptyFeed(onWrite: () => context.push('/write'));
+    }
+
+    return CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        // Header
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            SyaahiSizes.xl,
+            SyaahiSizes.lg,
+            SyaahiSizes.xl,
+            SyaahiSizes.md,
           ),
-          error: (err, _) => _ErrorView(
-            message: err.toString(),
-            onRetry: () => ref.invalidate(feedProvider),
-          ),
-          data: (poems) {
-            if (poems.isEmpty) {
-              return _EmptyFeed(onWrite: () => context.push('/write'));
-            }
-            return CustomScrollView(
-              slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(
-                    SyaahiSizes.xl,
-                    SyaahiSizes.lg,
-                    SyaahiSizes.xl,
-                    SyaahiSizes.md,
-                  ),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${_greeting()},',
-                          style: GoogleFonts.inter(
-                            color: SyaahiColors.textMuted,
-                            fontSize: 14,
-                            letterSpacing: 0.3,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          user?.displayName ?? 'Poet',
-                          style: GoogleFonts.cormorantGaramond(
-                            color: SyaahiColors.goldBase,
-                            fontSize: 32,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: SyaahiSizes.lg),
-                        Text(
-                          'Recent Poems',
-                          style: GoogleFonts.inter(
-                            color: SyaahiColors.textSecondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 1.5,
-                          ),
-                        ),
-                      ],
-                    ),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${_greeting()},',
+                  style: GoogleFonts.inter(
+                    color: SyaahiColors.textMuted,
+                    fontSize: 14,
+                    letterSpacing: 0.3,
                   ),
                 ),
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(
-                    SyaahiSizes.xl,
-                    0,
-                    SyaahiSizes.xl,
-                    SyaahiSizes.xxxl,
+                const SizedBox(height: 4),
+                Text(
+                  displayName ?? 'Poet',
+                  style: GoogleFonts.cormorantGaramond(
+                    color: SyaahiColors.goldBase,
+                    fontSize: 32,
+                    fontWeight: FontWeight.w600,
                   ),
-                  sliver: SliverList.separated(
-                    itemCount: poems.length,
-                    separatorBuilder: (_, __) =>
-                        const SizedBox(height: SyaahiSizes.md),
-                    itemBuilder: (_, i) => _PoemCard(poem: poems[i]),
+                ),
+                const SizedBox(height: SyaahiSizes.lg),
+                Text(
+                  'Recent Poems',
+                  style: GoogleFonts.inter(
+                    color: SyaahiColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 1.5,
                   ),
                 ),
               ],
-            );
-          },
+            ),
+          ),
         ),
-      ),
+
+        // Poem list
+        SliverPadding(
+          padding: const EdgeInsets.fromLTRB(
+            SyaahiSizes.xl,
+            0,
+            SyaahiSizes.xl,
+            SyaahiSizes.md,
+          ),
+          sliver: SliverList.separated(
+            itemCount: feedState.poems.length,
+            separatorBuilder: (_, __) =>
+                const SizedBox(height: SyaahiSizes.md),
+            itemBuilder: (_, i) => _PoemCard(poem: feedState.poems[i]),
+          ),
+        ),
+
+        // Load more indicator
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: SyaahiSizes.xxxl),
+            child: _buildFooter(feedState),
+          ),
+        ),
+      ],
     );
+  }
+
+  Widget _buildFooter(FeedState feedState) {
+    if (feedState.isLoadingMore) {
+      return const Padding(
+        padding: EdgeInsets.all(SyaahiSizes.lg),
+        child: Center(
+          child: CircularProgressIndicator(
+            color: SyaahiColors.goldBase,
+            strokeWidth: 2,
+          ),
+        ),
+      );
+    }
+
+    if (!feedState.hasMore && feedState.poems.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(SyaahiSizes.lg),
+        child: Center(
+          child: Text(
+            '— you have read everything —',
+            style: GoogleFonts.cormorantGaramond(
+              color: SyaahiColors.textMuted,
+              fontSize: 14,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return const SizedBox.shrink();
   }
 }
 
@@ -228,7 +309,8 @@ class _EmotionBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: SyaahiColors.goldDark.withValues(alpha: 0.15),
-        border: Border.all(color: SyaahiColors.goldDark.withValues(alpha: 0.4)),
+        border:
+            Border.all(color: SyaahiColors.goldDark.withValues(alpha: 0.4)),
         borderRadius: BorderRadius.circular(SyaahiSizes.radiusFull),
       ),
       child: Text(
@@ -302,7 +384,11 @@ class _ErrorView extends StatelessWidget {
       padding: const EdgeInsets.all(SyaahiSizes.xl),
       children: [
         const SizedBox(height: SyaahiSizes.xxxl),
-        const Icon(Icons.cloud_off_outlined, size: 64, color: SyaahiColors.textMuted),
+        const Icon(
+          Icons.cloud_off_outlined,
+          size: 64,
+          color: SyaahiColors.textMuted,
+        ),
         const SizedBox(height: SyaahiSizes.lg),
         Text(
           'Could not load poems',
@@ -313,7 +399,10 @@ class _ErrorView extends StatelessWidget {
         Text(
           message,
           textAlign: TextAlign.center,
-          style: GoogleFonts.inter(color: SyaahiColors.textMuted, fontSize: 13),
+          style: GoogleFonts.inter(
+            color: SyaahiColors.textMuted,
+            fontSize: 13,
+          ),
         ),
         const SizedBox(height: SyaahiSizes.lg),
         Center(
