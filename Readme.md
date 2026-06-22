@@ -2,126 +2,258 @@
 
 > Where emotions become words.
 
-Syaahi is a platform for poetry, letters, journals, and memory preservation.
+Syaahi is a platform for poetry, journals, letters, memory preservation, and personal reflection.
 
 It is not a social media platform.
-It is a calm digital space where people can write, reflect, revisit memories,
-and connect through meaningful words.
+
+It is a calm digital space where people can write, revisit memories, preserve emotions, and rediscover their own words over time.
 
 ---
 
-## What is Syaahi?
+# What is Syaahi?
 
-Most digital platforms reward performance over expression.
+Most digital platforms optimize for attention.
 
-Syaahi is different.
+Syaahi optimizes for meaning.
 
-- Write a poem today
-- Journal tomorrow
-- Send an anonymous letter at midnight
-- Seal a time capsule for your future self
-- Come back years later and rediscover your own words
+Write a poem today.
 
-The most meaningful feature of Syaahi is not what you write today.
-It is the moment, years from now, when you read what you wrote
-and remember exactly who you were.
+Journal tomorrow.
 
----
+Send a letter when words feel too heavy to speak.
 
-## Current Status
+Seal a time capsule for your future self.
 
-**v0.2.0 — MVP Complete**
+Return years later and rediscover who you once were.
 
-| Feature              | Status        |
-|----------------------|---------------|
-| User Registration    | ✅ Complete   |
-| Login / Session      | ✅ Complete   |
-| Poem Feed            | ✅ Complete   |
-| Poem Reader          | ✅ Complete   |
-| Poem Writer          | ✅ Complete   |
-| Journals             | 🔜 Sprint 3   |
-| Personal Archive     | 🔜 Planned    |
-| Letters After Midnight | 🔜 Planned  |
-| Time Capsules        | 🔜 Planned    |
-| Community Circles    | 🔜 Planned    |
+The goal is not engagement.
+
+The goal is emotional preservation.
 
 ---
 
-## Repository Structure
+# Current Status
+
+**Version:** v0.2.2
+
+**Status:** MVP Complete, Documented, Seeded, Locally Verified
+
+### Available Today
+
+| Feature                | Status |
+| ---------------------- | ------ |
+| User Registration      | ✅      |
+| Login & Authentication | ✅      |
+| Session Persistence    | ✅      |
+| Poem Publishing        | ✅      |
+| Poem Feed              | ✅      |
+| Poem Reader            | ✅      |
+| User Profiles          | ✅      |
+| Cursor Pagination      | ✅      |
+| Infinite Scroll        | ✅      |
+| Pull To Refresh        | ✅      |
+| Seed Content System    | ✅      |
+| Documentation Suite    | ✅      |
+
+---
+
+# Roadmap
+
+| Phase                  | Status     |
+| ---------------------- | ---------- |
+| Foundation             | ✅ Complete |
+| MVP                    | ✅ Complete |
+| Documentation Sprint   | ✅ Complete |
+| Verification Sprint    | ✅ Complete |
+| Deployment Sprint      | ⏳ Next     |
+| Testing Sprint         | ⏳ Planned  |
+| Journals               | ⏳ Planned  |
+| Personal Archive       | ⏳ Planned  |
+| Letters After Midnight | ⏳ Planned  |
+| Time Capsules          | ⏳ Planned  |
+
+---
+
+# Repository Structure
 
 ```text
 syaahi/
-├── syaahi-backend/          # Express.js API
-├── syaahi-app/              # Flutter application
-├── docs/                    # Project documentation
-│   ├── ARCHITECTURE.md      # System design
-│   ├── ROADMAP.md           # Feature roadmap
-│   ├── DECISIONS.md         # Architecture decision records
-│   ├── PROGRESS.md          # Engineering diary
-│   ├── VISION.md            # Product vision
-│   └── CONTRIBUTING.md      # Contribution guide
-├── README.md                # This file
+├── syaahi-backend/
+├── syaahi-app/
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── API_CONTRACT.md
+│   ├── ROADMAP.md
+│   ├── DECISIONS.md
+│   ├── PROGRESS.md
+│   ├── VISION.md
+│   ├── CONTRIBUTING.md
+│   ├── SEED_CONTENT.md
+│   └── FOUNDER_HANDOVER.md
+├── README.md
 └── LICENSE
-Tech Stack
-Backend
+```
 
-Layer	Technology
-Runtime	Node.js v20+
-Framework	Express.js v5
-Language	TypeScript
-ORM	Prisma
-Database	PostgreSQL (Supabase)
-Authentication	JWT
-Validation	Zod
-Frontend
+---
 
-Layer	Technology
-Framework	Flutter
-Language	Dart
-State Management	Riverpod
-Navigation	go_router
-HTTP Client	Dio
-Secure Storage	flutter_secure_storage
-Getting Started
-Backend
-Bash
+# Technology Stack
 
+## Backend
+
+| Layer          | Technology            |
+| -------------- | --------------------- |
+| Runtime        | Node.js               |
+| Framework      | Express.js            |
+| Language       | TypeScript            |
+| ORM            | Prisma                |
+| Database       | PostgreSQL (Supabase) |
+| Authentication | JWT                   |
+| Validation     | Zod                   |
+
+---
+
+## Frontend
+
+| Layer            | Technology             |
+| ---------------- | ---------------------- |
+| Framework        | Flutter Web            |
+| Language         | Dart                   |
+| State Management | Riverpod               |
+| Navigation       | go_router              |
+| HTTP Client      | Dio                    |
+| Secure Storage   | flutter_secure_storage |
+
+---
+
+# Architecture Overview
+
+```text
+Flutter Web
+     ↓
+Riverpod
+     ↓
+Repository
+     ↓
+Dio
+     ↓
+Express API
+     ↓
+Prisma
+     ↓
+PostgreSQL
+```
+
+See:
+
+```text
+docs/ARCHITECTURE.md
+```
+
+for full system details.
+
+---
+
+# Getting Started
+
+## Backend
+
+```bash
 cd syaahi-backend
+
 npm install
+
 cp .env.example .env
-# Fill in .env values
+
+# Configure environment variables
+
 npm run prisma:generate
+
 npm run dev
-Runs at http://localhost:4000
+```
 
-Full setup guide: syaahi-backend/README.md
+Runs at:
 
-Flutter App
-Bash
+```text
+http://localhost:4000
+```
 
+---
+
+## Frontend
+
+```bash
 cd syaahi-app
+
 flutter pub get
+
 flutter run -d chrome
-Full setup guide: syaahi-app/README.md
+```
 
-Documentation
-Document	Description
-docs/ARCHITECTURE.md	System design and data flow
-docs/ROADMAP.md	Planned features by phase
-docs/DECISIONS.md	Why things were built this way
-docs/PROGRESS.md	Engineering diary
-docs/VISION.md	Product vision and principles
-docs/CONTRIBUTING.md	How to contribute
-syaahi-backend/API_CONTRACT.md	API endpoint reference
-Guiding Principle
-Before any feature is built, ask:
+---
 
-"Does this help people express, preserve, or revisit emotions?"
+## Seed Development Data
 
-If the answer is no, it does not belong in Syaahi.
+Create the complete development dataset:
 
-License
-MIT — see LICENSE
+```bash
+cd syaahi-backend
 
-Built with coffee, midnight thoughts, and a love for words.
-— Raghavendra Singh
+npx tsx scripts/cleanup-and-reseed.ts
+```
+
+Current dataset:
+
+```text
+10 Accounts
+30 Poems
+Multiple Authors
+Multiple Emotions
+```
+
+---
+
+# Documentation
+
+| File                | Purpose                |
+| ------------------- | ---------------------- |
+| ARCHITECTURE.md     | System design          |
+| API_CONTRACT.md     | API reference          |
+| ROADMAP.md          | Product roadmap        |
+| DECISIONS.md        | Architecture decisions |
+| PROGRESS.md         | Engineering history    |
+| VISION.md           | Product philosophy     |
+| CONTRIBUTING.md     | Contributor guide      |
+| SEED_CONTENT.md     | Development dataset    |
+| FOUNDER_HANDOVER.md | Long-term continuity   |
+
+---
+
+# Guiding Principle
+
+Before building any feature, ask:
+
+> Does this help people express, preserve, or revisit emotions?
+
+If the answer is no, it probably does not belong in Syaahi.
+
+---
+
+# License
+
+MIT License
+
+See LICENSE for details.
+
+---
+
+# Founder Note
+
+The most meaningful feature in Syaahi is not something users write today.
+
+It is the moment years later when they return, read their own words, and remember exactly who they were.
+
+---
+
+**Built with midnight thoughts, coffee, and a love for words.**
+
+**— Raghavendra Singh**

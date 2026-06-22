@@ -1,260 +1,290 @@
 # 🪶 Syaahi — API Contract
 
-**Version:** v0.2.0
-**Base URL (local):** `http://localhost:4000`
-**Base URL (staging):** TBD after Railway deployment
-**API Prefix:** `/api/v1`
+## Version: v0.2.2
+
+**Local Base URL**
+
+```text
+http://localhost:4000
+```
+
+**Staging Base URL**
+
+```text
+TBD (Railway Deployment)
+```
+
+**API Prefix**
+
+```text
+/api/v1
+```
 
 ---
 
-## Response Envelope
+# Response Envelope
 
-Every response follows this shape.
+All API responses follow a consistent structure.
 
-**Success:**
+## Success
+
 ```json
 {
   "success": true,
-  "data": { ... }
+  "data": {}
 }
-Error:
+```
 
-JSON
+## Error
 
+```json
 {
   "success": false,
   "message": "Human readable message",
-  "details": { ... }
+  "details": {}
 }
-Status Codes
-Code	Meaning
-200	OK
-201	Created
-400	Validation error
-401	Unauthenticated
-403	Forbidden (not your resource)
-404	Not found
-409	Conflict (duplicate email/username)
-429	Rate limited
-500	Server error
-Authentication
-Protected endpoints require a JWT token in the header:
+```
 
-text
+---
 
+# Status Codes
+
+| Code | Meaning               |
+| ---- | --------------------- |
+| 200  | Success               |
+| 201  | Created               |
+| 400  | Validation Error      |
+| 401  | Unauthenticated       |
+| 403  | Forbidden             |
+| 404  | Not Found             |
+| 409  | Conflict              |
+| 429  | Rate Limited          |
+| 500  | Internal Server Error |
+
+---
+
+# Authentication
+
+Protected endpoints require:
+
+```http
 Authorization: Bearer <jwt_token>
-Tokens are returned on signup and login.
-Tokens must be stored securely on the client (flutter_secure_storage).
+```
 
-Endpoints
-System
-text
+JWT tokens are returned by:
 
-GET /
-Returns API name, version, and status.
+* Signup
+* Login
 
-Response:
+Stored client-side using:
 
-JSON
+```text
+flutter_secure_storage
+```
 
+---
+
+# System Endpoints
+
+## GET /
+
+Returns API metadata.
+
+### Response
+
+```json
 {
   "name": "Syaahi API",
-  "version": "0.1.0",
+  "version": "0.2.2",
   "status": "ok"
 }
-text
+```
 
-GET /health
-Health check for Railway uptime monitoring.
+---
 
-Response:
+## GET /health
 
-JSON
+Health endpoint used for deployment verification.
 
+### Response
+
+```json
 {
   "status": "healthy",
   "timestamp": "2026-06-20T10:00:00.000Z"
 }
-Authentication
-text
+```
 
-POST /api/v1/auth/signup
-Register a new user.
+---
 
-Body:
+# Authentication Module
 
-JSON
+## POST /api/v1/auth/signup
 
+Create account.
+
+### Body
+
+```json
 {
   "email": "user@example.com",
   "username": "raghav_writes",
   "displayName": "Raghav",
-  "password": "minimum8chars"
+  "password": "Password123!"
 }
-Validation:
+```
 
-email — valid email format
-username — 3 to 30 characters, lowercase letters, numbers, underscore only
-displayName — 1 to 60 characters
-password — 8 to 100 characters
-Response: 201
+### Response
 
-JSON
-
+```json
 {
   "success": true,
   "data": {
-    "user": {
-      "id": "uuid",
-      "email": "user@example.com",
-      "username": "raghav_writes",
-      "displayName": "Raghav",
-      "bio": null,
-      "avatarUrl": null,
-      "createdAt": "2026-06-20T10:00:00.000Z"
-    },
+    "user": {},
     "token": "jwt_token"
   }
 }
-text
+```
 
-POST /api/v1/auth/login
-Login with email and password.
+---
 
-Body:
+## POST /api/v1/auth/login
 
-JSON
+Authenticate user.
 
+### Body
+
+```json
 {
   "email": "user@example.com",
-  "password": "yourpassword"
+  "password": "Password123!"
 }
-Response: 200
+```
 
-JSON
+### Response
 
+```json
 {
   "success": true,
   "data": {
-    "user": {
-      "id": "uuid",
-      "email": "user@example.com",
-      "username": "raghav_writes",
-      "displayName": "Raghav",
-      "bio": null,
-      "avatarUrl": null,
-      "createdAt": "2026-06-20T10:00:00.000Z"
-    },
+    "user": {},
     "token": "jwt_token"
   }
 }
-text
+```
 
-GET /api/v1/auth/me          [protected]
-Get the currently authenticated user.
+---
 
-Response: 200
+## GET /api/v1/auth/me
 
-JSON
+**Protected**
 
+Returns authenticated user.
+
+### Response
+
+```json
 {
   "success": true,
   "data": {
-    "user": {
-      "id": "uuid",
-      "email": "user@example.com",
-      "username": "raghav_writes",
-      "displayName": "Raghav",
-      "bio": null,
-      "avatarUrl": null,
-      "createdAt": "2026-06-20T10:00:00.000Z",
-      "_count": {
-        "poems": 4,
-        "followers": 0,
-        "following": 0
-      }
-    }
+    "user": {}
   }
 }
-text
+```
 
-POST /api/v1/auth/logout     [protected]
-Logout the current user.
+---
 
-Note: Token revocation is not yet implemented.
-The client must discard the token on logout.
+## POST /api/v1/auth/logout
 
-Response: 200
+**Protected**
 
-JSON
+Current implementation:
 
+```text
+Client-side logout only.
+```
+
+Token revocation is not yet implemented.
+
+---
+
+# Users Module
+
+## GET /api/v1/users/:username
+
+Returns public profile.
+
+### Response
+
+```json
 {
   "success": true,
   "data": {
-    "message": "Logged out. Please discard the token on the client."
+    "user": {}
   }
 }
-Users
-text
+```
 
-GET /api/v1/users/:username
-Get a user profile by username.
+---
 
-Response: 200
+## Planned Endpoints
 
-JSON
+### PATCH /api/v1/users/me
 
-{
-  "success": true,
-  "data": {
-    "user": {
-      "id": "uuid",
-      "username": "raghav_writes",
-      "displayName": "Raghav",
-      "bio": null,
-      "avatarUrl": null,
-      "createdAt": "2026-06-20T10:00:00.000Z",
-      "_count": {
-        "poems": 4,
-        "followers": 0,
-        "following": 0
-      }
-    }
-  }
-}
-text
+Status:
 
-🔜 GET /api/v1/users/:username/poems?cursor&limit
-Get poems by a specific user with pagination.
+```text
+Planned
+```
 
-Status: Planned — not yet implemented.
+### GET /api/v1/users/:username/poems
 
-text
+Status:
 
-🔜 PATCH /api/v1/users/me     [protected]
-Update the authenticated user's profile.
+```text
+Planned
+```
 
-Status: Planned — not yet implemented.
+---
 
-Planned body:
+# Poems Module
 
-JSON
+## GET /api/v1/poems
 
-{
-  "displayName": "New Name",
-  "bio": "A short bio",
-  "avatarUrl": "https://..."
-}
-Poems
-text
+Returns paginated poem feed.
 
-GET /api/v1/poems
-Get the poem feed.
+### Query Parameters
 
-Response: 200
+| Parameter | Type   | Required |
+| --------- | ------ | -------- |
+| cursor    | string | No       |
+| limit     | number | No       |
 
-JSON
+Default:
 
+```text
+limit=10
+```
+
+---
+
+## Example Request
+
+```http
+GET /api/v1/poems?limit=10
+```
+
+Next page:
+
+```http
+GET /api/v1/poems?cursor=abc123&limit=10
+```
+
+---
+
+## Response
+
+```json
 {
   "success": true,
   "data": {
@@ -262,11 +292,9 @@ JSON
       {
         "id": "uuid",
         "title": "Midnight Rain",
-        "content": "the poem content here",
+        "content": "Poem content...",
         "language": "ENGLISH",
         "emotion": "LONGING",
-        "theme": null,
-        "audioUrl": null,
         "isPublished": true,
         "createdAt": "2026-06-20T10:00:00.000Z",
         "author": {
@@ -276,113 +304,183 @@ JSON
           "avatarUrl": null
         }
       }
-    ]
+    ],
+    "nextCursor": "next_poem_id_or_null"
   }
 }
-Note: Pagination is not yet implemented. Returns all published poems.
-Cursor-based pagination is planned before Sprint 3.
+```
 
-text
+---
 
-GET /api/v1/poems/:id
-Get a single poem by ID.
+## Pagination Behaviour
 
-Response: 200
+```text
+Initial Request
+      ↓
+Returns 10 Poems
+      ↓
+Returns nextCursor
+      ↓
+Client requests next page
+      ↓
+More poems returned
+      ↓
+Repeat until nextCursor = null
+```
 
-JSON
+When:
 
+```text
+nextCursor = null
+```
+
+The feed has reached the end.
+
+---
+
+## GET /api/v1/poems/:id
+
+Returns a single poem.
+
+### Response
+
+```json
 {
   "success": true,
   "data": {
-    "poem": {
-      "id": "uuid",
-      "title": "Midnight Rain",
-      "content": "the poem content here",
-      "language": "ENGLISH",
-      "emotion": "LONGING",
-      "theme": null,
-      "audioUrl": null,
-      "isPublished": true,
-      "createdAt": "2026-06-20T10:00:00.000Z",
-      "author": {
-        "id": "uuid",
-        "username": "raghav_writes",
-        "displayName": "Raghav",
-        "avatarUrl": null
-      }
-    }
+    "poem": {}
   }
 }
-text
+```
 
-POST /api/v1/poems            [protected]
-Create a new poem.
+---
 
-Body:
+## POST /api/v1/poems
 
-JSON
+**Protected**
 
+Create a poem.
+
+### Body
+
+```json
 {
   "title": "Midnight Rain",
-  "content": "the poem content here",
+  "content": "Poem content...",
   "language": "ENGLISH",
   "emotion": "LONGING",
   "theme": "nature"
 }
-Validation:
+```
 
-title — optional, max 200 characters
-content — required, non-empty
-language — ENGLISH | HINDI | URDU
-emotion — optional, LOVE | LONGING | HOPE | SOLITUDE | ANGER | GRATITUDE
-theme — optional string
-Response: 201
+### Response
 
-JSON
-
+```json
 {
   "success": true,
   "data": {
-    "poem": {
-      "id": "uuid",
-      "title": "Midnight Rain",
-      "content": "the poem content here",
-      "language": "ENGLISH",
-      "emotion": "LONGING",
-      "theme": "nature",
-      "isPublished": true,
-      "createdAt": "2026-06-20T10:00:00.000Z",
-      "author": {
-        "id": "uuid",
-        "username": "raghav_writes",
-        "displayName": "Raghav",
-        "avatarUrl": null
-      }
-    }
+    "poem": {}
   }
 }
-text
+```
 
-🔜 PATCH /api/v1/poems/:id    [protected, owner only]
-Update a poem.
+---
 
-Status: Planned — not yet implemented.
+# Planned Poem Endpoints
 
-text
+## PATCH /api/v1/poems/:id
 
-🔜 DELETE /api/v1/poems/:id   [protected, owner only]
-Delete a poem.
+Owner only.
 
-Status: Planned — not yet implemented.
+Status:
 
-Rate Limits
-Endpoint	Limit
-POST /auth/signup	5 requests per hour per IP
-POST /auth/login	10 requests per hour per IP
-All /api/ routes	100 requests per 15 min per IP
-Exceeding a limit returns 429 Too Many Requests.
+```text
+Planned
+```
 
-Changelog
-Version	Date	Changes
-v0.1.0	2026-06	Initial contract draft
-v0.2.0	2026-06	Updated to reflect actual implementation, marked planned endpoints
+---
+
+## DELETE /api/v1/poems/:id
+
+Owner only.
+
+Status:
+
+```text
+Planned
+```
+
+---
+
+# Rate Limiting
+
+| Endpoint          | Limit                     |
+| ----------------- | ------------------------- |
+| POST /auth/signup | 5 requests/hour           |
+| POST /auth/login  | 10 requests/hour          |
+| All API routes    | 100 requests / 15 minutes |
+
+Development Mode:
+
+```text
+Rate limits are bypassed for seed scripts and local development workflows.
+```
+
+Production:
+
+```text
+Rate limiting fully enforced.
+```
+
+---
+
+# Seed Content
+
+Current development dataset:
+
+```text
+10 Accounts
+30 Poems
+```
+
+Reset command:
+
+```bash
+npx tsx scripts/cleanup-and-reseed.ts
+```
+
+Purpose:
+
+* Demo content
+* UI validation
+* Pagination testing
+* Local development
+
+---
+
+# Known Limitations
+
+Current technical debt:
+
+```text
+No refresh tokens
+No email verification
+No token revocation
+No poem editing
+No poem deletion
+No automated API tests
+```
+
+---
+
+# Changelog
+
+| Version | Changes                                               |
+| ------- | ----------------------------------------------------- |
+| v0.1.0  | Initial draft                                         |
+| v0.2.0  | MVP endpoints documented                              |
+| v0.2.1  | Auth and verification updates                         |
+| v0.2.2  | Cursor pagination, seed system, feed contract updates |
+
+```
+```

@@ -1,515 +1,272 @@
-# Syaahi
+# 🪶 Syaahi — Next Assignment
 
-## Founder Handover & Continuity Document
+## Assigned To
 
-### Version: v0.2.1
+Junior Developer
 
-### Prepared By: Raghavendra Singh
+## Project Version
 
-### Purpose: Long-Term Project Continuity
+v0.2.2
 
----
+## Current Status
 
-# 1. Executive Summary
+Syaahi MVP is complete.
 
-Syaahi is a platform for emotional expression, memory preservation, poetry, journals, letters, and personal reflection.
+Documentation sprint is complete.
 
-The project exists because modern social platforms optimize for attention.
+Local verification is complete.
 
-Syaahi optimizes for meaning.
+Seed content system is complete.
 
-The objective is not to maximize engagement.
+Cursor pagination and infinite scrolling are complete.
 
-The objective is to help users:
-
-* Express emotions
-* Preserve memories
-* Revisit personal history
-* Create lasting written artifacts
-
-If future development ever drifts away from these goals, it is likely moving away from the intended vision.
+The project is now entering the Deployment Sprint.
 
 ---
 
-# 2. Why Syaahi Exists
+# Objective
 
-The founder observed:
+Deploy Syaahi to a publicly accessible staging environment.
 
-* Social media rewards visibility.
-* Most platforms optimize for reactions.
-* Few platforms help users preserve emotional experiences.
+Target outcome:
 
-People write:
+A new user should be able to visit a public URL and complete the entire journey without local setup.
 
-* Poems
-* Letters
-* Journals
-* Reflections
-
-But those writings become scattered across notebooks, chats, notes apps, and social feeds.
-
-Syaahi exists to become:
-
-> A personal archive of human expression.
-
----
-
-# 3. Product Philosophy
-
-Every feature should satisfy at least one of:
-
-1. Helps users express emotions.
-2. Helps users preserve memories.
-3. Helps users revisit past experiences.
-
-If a feature does not satisfy any of these criteria, it should be questioned.
-
----
-
-# 4. What Syaahi Is Not
-
-Syaahi is NOT:
-
-* Instagram
-* Twitter/X
-* LinkedIn
-* Medium
-* Reddit
-* A creator economy platform
-
-The following are intentionally excluded:
-
-* Follower counts
-* Influencer mechanics
-* Algorithmic feeds
-* Trending pages
-* Engagement farming
-* Virality systems
-
-These are exclusions by design.
-
----
-
-# 5. Current Product State
-
-Version:
-
-v0.2.1
-
-Status:
-
-Locally verified MVP.
-
-Users can:
-
-* Register
-* Login
-* Persist session
-* Publish poem
-* Browse poems
-* Read poems
-
-The first complete user journey has been validated.
-
----
-
-# 6. Technical Architecture
-
-Frontend
-
-Flutter Web
-
-Architecture:
-
-UI
+```text
+Register
 ↓
-Riverpod
+Login
 ↓
-Repository
+Browse Feed
 ↓
-Dio
-
-Backend
-
-Node.js
+Create Poem
 ↓
-Express
+Read Poem
 ↓
-Prisma
-
-Database
-
-Supabase PostgreSQL
-
-Data Flow:
-
-User Action
-↓
-Repository
-↓
-API
-↓
-Prisma
-↓
-Database
-↓
-Response
-↓
-State
-↓
-UI
+Logout
+```
 
 ---
 
-# 7. Architectural Decisions
+# Deliverable 1 — Deployment Readiness Audit
 
-## ADR-001
+Before deployment, verify:
 
-Feature-Based Architecture
+## Backend
 
-Reason:
+```text
+✓ Production build succeeds
+✓ No hardcoded localhost URLs
+✓ Environment variables documented
+✓ Prisma schema synchronized
+✓ Health endpoint operational
+✓ Seed script still functional
+```
 
-Scalability and maintainability.
+## Frontend
 
----
+```text
+✓ Flutter web build succeeds
+✓ API URL configurable via --dart-define
+✓ Session persistence verified
+✓ Browser refresh does not break routing
+✓ Infinite scroll still functions
+```
 
-## ADR-002
+Output:
 
-Repository Pattern
-
-Reason:
-
-UI should never directly call APIs.
-
----
-
-## ADR-003
-
-JWT Authentication
-
-Reason:
-
-Mobile-friendly and stateless.
-
----
-
-## ADR-004
-
-Flutter
-
-Reason:
-
-Single codebase for Web and Mobile.
+```text
+docs/DEPLOYMENT_CHECKLIST.md
+```
 
 ---
 
-## ADR-005
+# Deliverable 2 — Railway Deployment
 
-Supabase + Prisma
+Deploy backend.
 
-Reason:
+Requirements:
 
-Rapid development while maintaining SQL ownership.
+```text
+✓ Create Railway project
+✓ Configure environment variables
+✓ Connect Supabase database
+✓ Verify startup logs
+✓ Verify health endpoint
+✓ Verify authentication endpoints
+✓ Verify poems endpoints
+```
 
----
+Expected Result:
 
-# 8. Current Folder Structure
-
-Backend
-
-src/
-
-config/
-
-middleware/
-
-modules/
-
-auth/
-
-poems/
-
-users/
-
-utils/
-
-Frontend
-
-lib/
-
-core/
-
-features/
-
-auth/
-
-poems/
-
-shared/
-
-Future features should follow the same structure.
+```text
+https://<backend>.up.railway.app
+```
 
 ---
 
-# 9. Known Technical Debt
+# Deliverable 3 — Vercel Deployment
 
-Current accepted limitations:
+Deploy Flutter Web application.
 
-* No refresh tokens
-* No email verification
-* No pagination
-* No profile editing
-* No automated tests
-* Staging CORS relaxation
-* No token blacklist
+Requirements:
 
-These are known and acceptable at current stage.
+```text
+✓ Production Flutter build
+✓ Configure API_BASE_URL
+✓ Deploy to Vercel
+✓ Verify routing
+✓ Verify login flow
+✓ Verify poem creation
+```
 
----
+Expected Result:
 
-# 10. Future Roadmap
-
-## Phase 1
-
-Deployment
-
-Goal:
-
-Public staging environment.
+```text
+https://<frontend>.vercel.app
+```
 
 ---
 
-## Phase 2
+# Deliverable 4 — Production CORS Configuration
 
-Testing
+Current development mode allows localhost origins.
 
-Goal:
+Before staging verification:
 
-Reliability.
+```text
+✓ Remove wildcard-style staging configuration
+✓ Set CORS_ORIGIN to Vercel URL
+✓ Redeploy backend
+✓ Verify frontend connectivity
+```
+
+Result:
+
+Only the staging frontend may access the backend.
 
 ---
 
-## Phase 3
+# Deliverable 5 — End-to-End Staging Verification
 
+Execute and document:
+
+```text
+Open App
+↓
+Register New User
+↓
+Login
+↓
+Create Poem
+↓
+Refresh Browser
+↓
+Verify Session Recovery
+↓
+Read Poem
+↓
+Logout
+↓
+Login Again
+```
+
+Verify:
+
+```text
+✓ Authentication
+✓ Feed
+✓ Pagination
+✓ Infinite Scroll
+✓ Pull To Refresh
+✓ Poem Creation
+✓ Session Persistence
+```
+
+---
+
+# Deliverable 6 — Staging Report
+
+Create:
+
+```text
+docs/STAGING_VERIFICATION.md
+```
+
+Include:
+
+* Frontend URL
+* Backend URL
+* Screenshots
+* Test results
+* Known issues
+* Recommendations
+
+---
+
+# Out Of Scope
+
+Do NOT begin:
+
+```text
 Journals
-
-Goal:
-
-Daily user retention.
-
-Features:
-
-* Create
-* Edit
-* Archive
-* Search
-
-Private by default.
-
----
-
-## Phase 4
-
 Personal Archive
-
-Goal:
-
-Memory preservation.
-
-Features:
-
-* Timeline
-* Memory view
-* Writing history
-
----
-
-## Phase 5
-
 Letters After Midnight
-
-Goal:
-
-Anonymous emotional communication.
-
-Important:
-
-Requires moderation strategy before implementation.
-
----
-
-## Phase 6
-
 Time Capsules
-
-Goal:
-
-Long-term emotional retention.
-
-Users can write messages to their future selves.
-
----
-
-## Phase 7
-
 Community Circles
-
-Goal:
-
-Belonging through shared themes.
-
-Examples:
-
-* Midnight Thoughts
-* Healing
-* Monsoon Poetry
-* First Love
-
-No follower mechanics.
-
----
-
-## Phase 8
-
 Audio Poetry
+```
 
-Goal:
+Do not introduce new product features.
 
-Alternative content format.
+Do not modify the roadmap.
 
----
-
-# 11. Features Requiring Founder Review
-
-Do not implement without explicit review:
-
-* AI-generated poetry
-* AI co-writing
-* Creator monetization
-* NFT integration
-* Blockchain concepts
-* Algorithmic ranking
-* Paid subscriptions
-* Advertising systems
-
-These can fundamentally alter product direction.
+Focus exclusively on deployment and verification.
 
 ---
 
-# 12. Deployment Information
+# Success Criteria
 
-Backend:
+Assignment is complete when:
 
-Railway
-
-Frontend:
-
-Vercel
-
-Database:
-
-Supabase
-
-Required Environment Variables:
-
-Backend:
-
-DATABASE_URL
-DIRECT_URL
-JWT_SECRET
-JWT_EXPIRES_IN
-CORS_ORIGIN
-SUPABASE_URL
-SUPABASE_ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY
-
-Frontend:
-
-API_BASE_URL
+```text
+✓ Backend deployed
+✓ Frontend deployed
+✓ Public URLs available
+✓ Full user journey verified
+✓ Documentation updated
+✓ No critical blockers remain
+```
 
 ---
 
-# 13. Definition of Done
+# Completion Report Required
 
-A feature is complete only if:
+Submit:
 
-✓ Implemented
+1. Frontend URL
+2. Backend URL
+3. Deployment checklist
+4. Staging verification report
+5. Screenshots
+6. Known issues
 
-✓ Validated
-
-✓ Error handling added
-
-✓ Documented
-
-✓ Reviewed
-
-✓ Works on staging
-
-Local-only functionality is not considered complete.
+Only after successful staging verification will v0.4.0 (Testing Sprint) begin.
 
 ---
 
-# 14. Development Rules
+# Founder Note
 
-1. Keep architecture simple.
+The objective is not merely to deploy software.
 
-2. Prefer maintainability over cleverness.
+The objective is to make Syaahi accessible to real users for the first time.
 
-3. Avoid premature optimization.
+Prioritize stability over speed.
 
-4. Document decisions.
-
-5. Commit frequently.
-
-6. Preserve product philosophy.
-
-7. Do not build features because competitors have them.
-
-8. Build features only if they strengthen the mission.
+A working deployment is more valuable than three unfinished features.
 
 ---
 
-# 15. Success Metrics
+**— Raghavendra Singh**
 
-Short Term
-
-* Public staging deployment
-* 10 active users
-* 100 poems
-
-Medium Term
-
-* 100 users
-* 1,000 poems
-* Journal adoption
-
-Long Term
-
-* Meaningful personal archives
-* Returning users revisiting old writing
-* Time Capsule engagement
-
----
-
-# 16. Final Founder Note
-
-The value of Syaahi is not the technology.
-
-Any competent engineer can rebuild the codebase.
-
-The difficult part is preserving the intent.
-
-The project should always feel like a quiet library, a journal, or a box of old letters.
-
-If a future version begins to feel like a social network, something important has been lost.
-
-Protect the experience.
-
-Protect the simplicity.
-
-Protect the reason it exists.
-
-— Raghavendra Singh
-Founder, Syaahi
-
-"Where emotions become words."
+*Syaahi — Where emotions become words.*

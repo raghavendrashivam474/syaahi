@@ -1,164 +1,574 @@
 # 🪶 Syaahi — Architecture
 
-## System Overview
+## Version: v0.2.2
 
-Syaahi is a client-server application.
+## Status: MVP Complete, Seeded & Locally Verified
+
+---
+
+# System Overview
+
+Syaahi is a client-server application designed for emotional expression, poetry, memory preservation, and reflective writing.
 
 ```text
 ┌─────────────────────┐
 │   Flutter Web App   │
-│   (Vercel)          │
+│      (Vercel)       │
 └────────┬────────────┘
          │ HTTPS (REST API)
          ▼
 ┌─────────────────────┐
-│   Express API       │
-│   (Railway)         │
+│    Express API      │
+│      (Railway)      │
 └────────┬────────────┘
          │ Prisma ORM
          ▼
 ┌─────────────────────┐
-│   PostgreSQL        │
-│   (Supabase)        │
+│ PostgreSQL Database │
+│     (Supabase)      │
 └─────────────────────┘
-Frontend Architecture
-text
+```
 
+Current status:
+
+```text
+✓ Authentication
+✓ Session Persistence
+✓ Poetry Feed
+✓ Infinite Scroll Pagination
+✓ Poem Reader
+✓ Poem Publishing
+✓ Seed Content System
+✓ Local Verification
+```
+
+---
+
+# Frontend Architecture
+
+Technology Stack:
+
+```text
 Flutter Web
 │
-├── go_router           → Navigation and routing
-├── Riverpod            → State management
-├── Dio                 → HTTP client
+├── go_router
+├── Riverpod
+├── Dio
+├── flutter_secure_storage
 │
 └── features/
-    ├── auth/
-    │   ├── data/       → AuthRepository (API calls)
-    │   ├── state/      → Auth providers (Riverpod)
-    │   └── presentation/ → Login, Signup screens
-    │
-    └── poems/
-        ├── data/       → PoemRepository (API calls)
-        ├── state/      → Poem providers (Riverpod)
-        └── presentation/ → Feed, Reader, Writer screens
-Key Principle
-UI never calls the API directly.
+```
 
-text
+Directory Structure:
 
-Screen → Provider → Repository → Dio → API
-Backend Architecture
-text
-
-Express App (app.ts)
+```text
+lib/
 │
-├── Middleware (applied globally)
-│   ├── helmet          → Security headers
-│   ├── cors            → Cross-origin requests
-│   ├── morgan          → Request logging
-│   ├── rateLimiter     → Abuse prevention
-│   └── errorHandler    → Centralised error responses
+├── core/
+│   ├── routing/
+│   ├── theme/
+│   ├── constants/
+│   └── network/
+│
+├── features/
+│   │
+│   ├── auth/
+│   │   ├── data/
+│   │   ├── state/
+│   │   └── presentation/
+│   │
+│   └── poems/
+│       ├── data/
+│       ├── state/
+│       └── presentation/
+│
+└── shared/
+```
+
+---
+
+# Frontend Design Principle
+
+UI never communicates directly with the backend.
+
+```text
+Screen
+  ↓
+Riverpod Provider / StateNotifier
+  ↓
+Repository
+  ↓
+Dio
+  ↓
+REST API
+```
+
+Benefits:
+
+* Testability
+* Separation of concerns
+* Easier maintenance
+* Consistent error handling
+
+---
+
+# Feed Architecture
+
+The poem feed uses cursor-based pagination.
+
+State is managed by a dedicated FeedNotifier.
+
+```text
+Feed Screen
+     ↓
+FeedNotifier
+     ↓
+PoemsRepository
+     ↓
+Dio
+     ↓
+GET /api/v1/poems
+```
+
+Feed State:
+
+```text
+poems
+isLoading
+isLoadingMore
+hasMore
+nextCursor
+error
+```
+
+---
+
+# Infinite Scroll Lifecycle
+
+```text
+Initial Load
+      ↓
+Fetch First 10 Poems
+      ↓
+User Scrolls Past 85%
+      ↓
+loadMore()
+      ↓
+Fetch Next Page
+      ↓
+Append Results
+      ↓
+Update Cursor
+      ↓
+Repeat Until hasMore = false
+      ↓
+"You have read everything"
+```
+
+Pull-to-refresh resets state and reloads from the first page.
+
+---
+
+# Backend Architecture
+
+```text
+Express App
+│
+├── Middleware
+│   ├── helmet
+│   ├── cors
+│   ├── morgan
+│   ├── rateLimiter
+│   └── errorHandler
 │
 └── Modules
     ├── auth/
-    │   ├── auth.schemas.ts     → Zod input validation
-    │   ├── auth.controller.ts  → Business logic
-    │   └── auth.routes.ts      → Route definitions
-    │
     ├── poems/
-    │   ├── poems.schemas.ts
-    │   ├── poems.controller.ts
-    │   └── poems.routes.ts
-    │
     └── users/
-        ├── users.schemas.ts
-        ├── users.controller.ts
-        └── users.routes.ts
-Key Principle
-Each module owns its own routes, validation, and logic.
-Shared concerns live in middleware and utils only.
+```
 
-Database Schema
-Core models currently in use:
+Directory Structure:
 
-text
+```text
+src/
+│
+├── config/
+├── middleware/
+├── modules/
+│   ├── auth/
+│   ├── poems/
+│   └── users/
+│
+├── utils/
+└── server.ts
+```
 
+---
+
+# Backend Design Principle
+
+Each module owns:
+
+```text
+Routes
+Validation
+Business Logic
+```
+
+Example:
+
+```text
+auth/
+├── auth.routes.ts
+├── auth.schemas.ts
+└── auth.controller.ts
+```
+
+Shared concerns belong only in:
+
+```text
+middleware/
+utils/
+config/
+```
+
+---
+
+# Database Schema
+
+## User
+
+```text
 User
-├── id           UUID
-├── email        String (unique)
-├── username     String (unique)
-├── displayName  String
-├── passwordHash String
-├── bio          String?
-├── avatarUrl    String?
-└── poems        Poem[]
+├── id
+├── email
+├── username
+├── displayName
+├── passwordHash
+├── bio
+├── avatarUrl
+└── poems[]
+```
 
+---
+
+## Poem
+
+```text
 Poem
-├── id           UUID
-├── authorId     String → User
-├── title        String?
-├── content      Text
-├── language     ENGLISH | HINDI | URDU
-├── emotion      LOVE | LONGING | HOPE | SOLITUDE | ANGER | GRATITUDE
-├── isPublished  Boolean
-└── author       User
-Schema models defined but not yet implemented in API:
+├── id
+├── authorId
+├── title
+├── content
+├── language
+├── emotion
+├── isPublished
+├── createdAt
+└── author
+```
 
-text
+---
 
-Reaction    → Meaningful reactions to poems
-Follow      → User following system
-Room        → Poetry rooms / circles
-RoomMember  → Room membership
-PoemRoom    → Poems shared in rooms
-These exist in the schema to avoid future migrations breaking production.
-They will be activated as features are built.
+# Future Schema Models
 
-Authentication Flow
-text
+Defined but not active:
 
-1. User submits email + password
-2. Server validates input (Zod)
-3. Server checks email exists
-4. Server compares password with bcrypt hash
-5. Server signs JWT with userId and email
-6. Client stores JWT in flutter_secure_storage
-7. Client sends JWT in Authorization header on every request
-8. authenticate middleware verifies JWT on protected routes
-Token expiry is configured via JWT_EXPIRES_IN.
-Token revocation is not yet implemented. Logout is client-side only.
+```text
+Reaction
+Follow
+Room
+RoomMember
+PoemRoom
+```
 
-Request Lifecycle
-text
+Purpose:
 
+Future-proof schema evolution and reduce migration risk.
+
+These models are not currently exposed through APIs.
+
+---
+
+# Authentication Flow
+
+```text
+User Login
+      ↓
+Zod Validation
+      ↓
+Find User
+      ↓
+bcrypt Compare
+      ↓
+JWT Generation
+      ↓
+Return Token
+      ↓
+flutter_secure_storage
+      ↓
+Authorization Header
+      ↓
+Protected Route Access
+```
+
+Current Authentication Features:
+
+```text
+✓ Signup
+✓ Login
+✓ Session Recovery
+✓ Logout
+✓ JWT Authentication
+✓ Password Hashing
+```
+
+Known Limitation:
+
+```text
+✗ Refresh Tokens
+✗ Token Revocation
+✗ Email Verification
+```
+
+Logout currently removes the token from the client only.
+
+---
+
+# Request Lifecycle
+
+```text
 Incoming Request
       ↓
-helmet (security headers)
+helmet
       ↓
-cors (origin check)
+cors
       ↓
-morgan (log request)
+morgan
       ↓
-rateLimiter (abuse check)
+rateLimiter
       ↓
-Router (match route)
+Router
       ↓
-authenticate (if protected route)
+authenticate (protected routes)
       ↓
-asyncHandler (catch async errors)
+Controller
       ↓
-Controller (business logic)
+Prisma
       ↓
-Prisma (database query)
+Database
       ↓
 JSON Response
       ↓
-errorHandler (if anything threw)
-Environment Configuration
-All environment variables are validated at startup using Zod.
+errorHandler (if needed)
+```
 
-If any required variable is missing or invalid, the server refuses to start.
+---
 
-This prevents silent misconfiguration in production.
+# CORS Strategy
 
-See .env.example in the backend for the full variable list.
+Development:
 
+```text
+Allow all localhost origins
+```
+
+Reason:
+
+Flutter Web uses dynamic localhost ports.
+
+Example:
+
+```text
+localhost:3000
+localhost:5000
+localhost:59837
+```
+
+Production:
+
+```text
+Allow only CORS_ORIGIN
+```
+
+Configured through environment variables.
+
+This behaviour is documented in ADR-010.
+
+---
+
+# Seed Content System
+
+Purpose:
+
+Provide realistic data for development, demos, testing, and UI validation.
+
+Current Dataset:
+
+```text
+10 Users
+30 Poems
+2 Languages
+5 Core Emotions
+```
+
+Writer Personas:
+
+```text
+raghav_writes
+midnight_writer
+sara_writes
+arjun_kavya
+zara_lafz
+aarav_thinks
+meera_writes
+kabir_outdoors
+ananya_heals
+rizwan_recalls
+```
+
+---
+
+# Seed Script
+
+Location:
+
+```text
+scripts/cleanup-and-reseed.ts
+```
+
+Usage:
+
+```bash
+npx tsx scripts/cleanup-and-reseed.ts
+```
+
+Actions:
+
+```text
+Delete old seed data
+Create accounts
+Create poems
+Shuffle authors
+Stagger timestamps
+```
+
+Used for development only.
+
+---
+
+# Environment Validation
+
+All environment variables are validated using Zod at startup.
+
+If validation fails:
+
+```text
+Server startup is aborted.
+```
+
+Benefits:
+
+* Prevents misconfiguration
+* Detects missing secrets early
+* Safer deployments
+
+---
+
+# Required Environment Variables
+
+Backend:
+
+```env
+DATABASE_URL=
+DIRECT_URL=
+JWT_SECRET=
+JWT_EXPIRES_IN=
+CORS_ORIGIN=
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+Frontend:
+
+```env
+API_BASE_URL=
+```
+
+---
+
+# Current Limitations
+
+Accepted technical debt:
+
+```text
+No refresh tokens
+No email verification
+No profile editing
+No poem deletion
+No automated tests
+No production deployment yet
+```
+
+These are documented and intentionally deferred.
+
+---
+
+# Deployment Targets
+
+```text
+Frontend → Vercel
+Backend  → Railway
+Database → Supabase
+```
+
+Current Status:
+
+```text
+Deployment Ready
+Not Yet Deployed
+```
+
+---
+
+# Guiding Principles
+
+1. Feature-based architecture.
+2. Repository pattern everywhere.
+3. UI never calls APIs directly.
+4. Validate all inputs.
+5. Validate all environment variables.
+6. Prefer simplicity over complexity.
+7. Preserve emotional-first product philosophy.
+
+---
+
+# Architecture Summary
+
+```text
+Flutter Web
+     ↓
+Riverpod
+     ↓
+Repository
+     ↓
+Dio
+     ↓
+Express API
+     ↓
+Prisma
+     ↓
+PostgreSQL
+```
+
+Current Version:
+
+```text
+v0.2.2
+MVP Complete
+Seeded
+Paginated
+Documented
+Locally Verified
+Deployment Pending
+```

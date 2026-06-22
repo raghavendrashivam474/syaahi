@@ -1,228 +1,430 @@
-
 # 🪶 Syaahi — Contributing Guide
 
 Welcome to Syaahi.
 
-Before contributing, read `VISION.md` to understand what this
-project is and what it is not.
+Before contributing, read:
 
-Every contribution should serve the core question:
+```text
+docs/VISION.md
+```
 
-> "Does this help people express, preserve, or revisit emotions?"
+to understand what this project is and what it is not.
 
----
+Every contribution should support the core question:
 
-## Getting Started
-
-### Prerequisites
-
-| Tool        | Version     |
-|-------------|-------------|
-| Node.js     | v20 or higher |
-| npm         | v10 or higher |
-| Flutter     | Latest stable |
-| Git         | Any recent version |
+> Does this help people express, preserve, or revisit emotions?
 
 ---
 
-### Backend Setup
+# Before You Start
+
+Read these documents first:
+
+1. VISION.md
+2. ROADMAP.md
+3. ARCHITECTURE.md
+4. DECISIONS.md
+
+Only after understanding the product vision should implementation begin.
+
+---
+
+# Development Environment
+
+## Prerequisites
+
+| Tool    | Version        |
+| ------- | -------------- |
+| Node.js | v20+           |
+| npm     | v10+           |
+| Flutter | Latest Stable  |
+| Git     | Recent Version |
+
+---
+
+# Backend Setup
 
 ```bash
-# Clone the repository
-git clone https://github.com/your-org/syaahi.git
+git clone <repository>
+
 cd syaahi/syaahi-backend
 
-# Install dependencies
 npm install
 
-# Configure environment
 cp .env.example .env
-# Open .env and fill in all values
 
-# Generate Prisma client
+# configure environment variables
+
 npm run prisma:generate
 
-# Start development server
 npm run dev
-Server runs at http://localhost:4000
+```
 
-Flutter Setup
-Bash
+Runs at:
 
+```text
+http://localhost:4000
+```
+
+---
+
+# Frontend Setup
+
+```bash
 cd syaahi/syaahi-app
 
-# Install dependencies
 flutter pub get
 
-# Run the app
 flutter run -d chrome
-Branch Strategy
-Never commit directly to main.
+```
 
-All work happens on feature branches.
+---
 
-Bash
+# Development Dataset
 
-# Creating a branch
+Generate development content:
+
+```bash
+npx tsx scripts/cleanup-and-reseed.ts
+```
+
+Current dataset:
+
+```text
+10 Accounts
+30 Poems
+Multiple Authors
+Multiple Emotions
+```
+
+Purpose:
+
+* UI validation
+* Feed testing
+* Pagination testing
+* Demonstrations
+
+See:
+
+```text
+docs/SEED_CONTENT.md
+```
+
+for details.
+
+---
+
+# Branch Strategy
+
+Never commit directly to:
+
+```text
+main
+```
+
+Create a branch first.
+
+Examples:
+
+```bash
 git checkout -b feature/journals
-git checkout -b feature/deployment
+git checkout -b feature/archive
 git checkout -b fix/auth-session
-git checkout -b docs/architecture
-git checkout -b chore/env-cleanup
-Branch naming:
+git checkout -b docs/roadmap
+git checkout -b chore/deployment
+```
 
-Prefix	When to use
-feature/	New feature work
-fix/	Bug fixes
-docs/	Documentation only
-chore/	Config, tooling, cleanup
-refactor/	Code changes with no behaviour change
-Commit Messages
+---
+
+# Branch Prefixes
+
+| Prefix    | Purpose                 |
+| --------- | ----------------------- |
+| feature/  | New functionality       |
+| fix/      | Bug fixes               |
+| docs/     | Documentation           |
+| chore/    | Tooling & configuration |
+| refactor/ | Internal improvements   |
+| test/     | Test implementation     |
+
+---
+
+# Commit Messages
+
 Syaahi uses Conventional Commits.
 
-Bash
+Examples:
 
-# Format
-type: short description in present tense
-
-# Examples
+```bash
 feat: add journal creation endpoint
-fix: resolve token expiry handling in Flutter
-docs: update architecture diagram
-chore: add .env.example for backend
-refactor: extract poem validation into schema file
-test: add auth endpoint regression tests
-Type	When to use
-feat	New feature
-fix	Bug fix
-docs	Documentation changes
-chore	Tooling, config, dependencies
-refactor	Code restructure, no behaviour change
-test	Adding or updating tests
-style	Formatting only, no logic change
+
+fix: resolve session recovery bug
+
+docs: update roadmap
+
+chore: configure railway deployment
+
+test: add auth endpoint tests
+```
+
 Rules:
 
-Use present tense: add not added
-Keep the first line under 72 characters
-No full stop at the end
-Be specific: fix: resolve JWT expiry on Flutter session recovery
-not fix: bug fix
-Code Standards
-Backend
-One file, one purpose.
+* Present tense
+* No full stop
+* Under 72 characters when possible
+* Specific and descriptive
 
-text
+---
 
-auth.routes.ts      → Route definitions only
-auth.controller.ts  → Business logic only
-auth.schemas.ts     → Zod validation schemas only
-Never trust client input.
+# Backend Standards
 
-Every request body must be parsed through a Zod schema
-before any value is accessed.
+## Module Structure
 
-TypeScript
+Each feature owns its own folder.
 
-// Correct
-const data = signupSchema.parse(req.body);
+Example:
 
-// Never do this
+```text
+auth/
+├── auth.routes.ts
+├── auth.controller.ts
+└── auth.schemas.ts
+```
+
+---
+
+## Validation
+
+Never trust user input.
+
+Always validate through Zod.
+
+Correct:
+
+```ts
+const data = schema.parse(req.body);
+```
+
+Incorrect:
+
+```ts
 const { email } = req.body;
-Use asyncHandler for all async routes.
+```
 
-TypeScript
+---
 
-// Correct
-router.post('/signup', asyncHandler(signup));
+## Error Handling
 
-// Never do this
-router.post('/signup', async (req, res) => { ... });
-Throw ApiError for all expected error cases.
+Expected failures should use:
 
-TypeScript
+```ts
+throw new ApiError(...)
+```
 
-// Correct
-throw new ApiError(404, 'User not found');
+Never return inconsistent error shapes.
 
-// Never do this
-res.status(404).json({ message: 'User not found' });
-Flutter
-UI never calls the API directly.
+---
 
-text
+## Async Routes
 
-Screen → Provider → Repository → Dio → API
-One file, one purpose.
+Use:
 
-text
+```ts
+asyncHandler(...)
+```
 
-login_screen.dart     → UI only
-auth_provider.dart    → State only
-auth_repository.dart  → API calls only
-All API calls live in the repository layer.
+for all async controllers.
 
-Adding a New Feature
-Backend
-Create a new folder under src/modules/feature-name/
-Create feature.schemas.ts with Zod validation
-Create feature.controller.ts with business logic
-Create feature.routes.ts with route definitions
-Register routes in src/app.ts
-Update API_CONTRACT.md with new endpoints
-Update docs/PROGRESS.md
-Flutter
-Create a new folder under lib/features/feature-name/
-Create data/ with repository
-Create state/ with Riverpod providers
-Create presentation/ with screens
-Register routes in go_router config
-Update docs/PROGRESS.md
-Environment Variables
-When adding a new environment variable:
+---
 
-Add it to the Zod schema in src/config/env.ts
-Add it to .env.example with a description
-Add it to the Environment Variables table in README.md
-Set it in Railway dashboard before deploying
-Never commit a filled .env file.
-Never hardcode a secret in source code even temporarily.
+# Flutter Standards
 
-Definition of Done
-A feature is complete only when:
+## Layering
 
-text
+UI never calls APIs directly.
 
+Architecture:
+
+```text
+Screen
+ ↓
+Provider
+ ↓
+Repository
+ ↓
+Dio
+ ↓
+API
+```
+
+---
+
+## Feature Structure
+
+```text
+feature/
+├── data/
+├── state/
+└── presentation/
+```
+
+---
+
+## Feed Architecture
+
+Poem feed uses:
+
+```text
+FeedNotifier
+```
+
+Responsibilities:
+
+* Initial loading
+* Pagination
+* Refresh
+* Error handling
+* Infinite scroll state
+
+Do not bypass FeedNotifier for feed-related functionality.
+
+---
+
+# Pagination Standards
+
+Feed endpoints use:
+
+```text
+Cursor Pagination
+```
+
+Preferred format:
+
+```text
+GET /resource?cursor=&limit=
+```
+
+Avoid offset pagination for feed-style content.
+
+Reason:
+
+* Better scalability
+* Better infinite scroll support
+
+---
+
+# Adding A New Feature
+
+## Backend
+
+1. Create module folder
+2. Add schemas
+3. Add controller
+4. Add routes
+5. Register routes
+6. Update API contract
+7. Update progress log
+
+---
+
+## Frontend
+
+1. Create feature folder
+2. Add repository
+3. Add state layer
+4. Add UI layer
+5. Register routes
+6. Update progress log
+
+---
+
+# Environment Variables
+
+Whenever a new variable is introduced:
+
+1. Add to Zod schema
+2. Add to `.env.example`
+3. Document in README
+4. Configure in Railway before deployment
+
+Never commit:
+
+```text
+.env
+```
+
+Never hardcode secrets.
+
+---
+
+# Deployment Rules
+
+Before deployment:
+
+```text
+✓ Production build passes
+✓ Environment variables configured
+✓ No localhost URLs remain
+✓ Documentation updated
+✓ End-to-end flow verified
+```
+
+Code that only works locally is not complete.
+
+---
+
+# Definition Of Done
+
+A task is complete only when:
+
+```text
 ✓ Implemented
-✓ Input validated (Zod on backend, form validation on Flutter)
-✓ Error cases handled
-✓ Tested (at minimum, manually verified end-to-end)
-✓ Documented (PROGRESS.md updated, API_CONTRACT.md updated if needed)
-✓ Committed with proper commit message
-✓ Works on staging, not just locally
-Code that only works locally is not done.
+✓ Validated
+✓ Error handled
+✓ Manually verified
+✓ Documented
+✓ Committed properly
+✓ Works on staging
+```
 
-What Requires Approval
-You do not need approval for:
+---
 
-Observations and findings
-Documentation updates
-Bug fixes
-Refactoring within existing modules
-You do need approval before:
+# Changes Requiring Approval
 
-Adding a new dependency
-Changing the database schema
-Adding a new feature not in the roadmap
-Any infrastructure spending
-Any architectural change
-When in doubt, open a discussion before writing code.
+Approval required before:
 
-Questions
-If something is unclear, check in this order:
+* Adding dependencies
+* Database schema changes
+* New roadmap features
+* Infrastructure spending
+* Architectural changes
 
-docs/ARCHITECTURE.md — how the system is structured
-docs/DECISIONS.md — why things were built this way
-docs/ROADMAP.md — what is planned and what is not
-docs/VISION.md — what Syaahi is and is not
-Ask the founder
-Build carefully. Document thoroughly. Protect simplicity.
+---
+
+# Where To Look First
+
+If something is unclear:
+
+```text
+ARCHITECTURE.md
+↓
+DECISIONS.md
+↓
+ROADMAP.md
+↓
+VISION.md
+↓
+Founder
+```
+
+---
+
+# Final Principle
+
+Build carefully.
+
+Document thoroughly.
+
+Protect simplicity.
+
+Optimize for emotional value, not feature count.

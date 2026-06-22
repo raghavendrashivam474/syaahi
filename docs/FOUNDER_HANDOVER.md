@@ -1,8 +1,8 @@
-# Syaahi
+# 🪶 Syaahi
 
-## Founder Handover & Continuity Document
+# Founder Handover & Continuity Document
 
-### Version: v0.2.1
+### Version: v0.2.2
 
 ### Prepared By: Raghavendra Singh
 
@@ -14,7 +14,7 @@
 
 Syaahi is a platform for emotional expression, memory preservation, poetry, journals, letters, and personal reflection.
 
-The project exists because modern social platforms optimize for attention.
+The project exists because modern digital platforms optimize for attention.
 
 Syaahi optimizes for meaning.
 
@@ -35,9 +35,9 @@ If future development ever drifts away from these goals, it is likely moving awa
 
 The founder observed:
 
-* Social media rewards visibility.
-* Most platforms optimize for reactions.
-* Few platforms help users preserve emotional experiences.
+* Social media rewards visibility
+* Most platforms optimize for reactions
+* Few platforms help users preserve emotional experiences
 
 People write:
 
@@ -46,7 +46,7 @@ People write:
 * Journals
 * Reflections
 
-But those writings become scattered across notebooks, chats, notes apps, and social feeds.
+But those writings become scattered across notebooks, chats, notes applications, and social feeds.
 
 Syaahi exists to become:
 
@@ -56,13 +56,13 @@ Syaahi exists to become:
 
 # 3. Product Philosophy
 
-Every feature should satisfy at least one of:
+Every feature should satisfy at least one of the following:
 
-1. Helps users express emotions.
-2. Helps users preserve memories.
-3. Helps users revisit past experiences.
+1. Helps users express emotions
+2. Helps users preserve memories
+3. Helps users revisit past experiences
 
-If a feature does not satisfy any of these criteria, it should be questioned.
+If a feature satisfies none of these, it should be questioned.
 
 ---
 
@@ -71,7 +71,7 @@ If a feature does not satisfy any of these criteria, it should be questioned.
 Syaahi is NOT:
 
 * Instagram
-* Twitter/X
+* Twitter / X
 * LinkedIn
 * Medium
 * Reddit
@@ -92,35 +92,64 @@ These are exclusions by design.
 
 # 5. Current Product State
 
-Version:
+### Version
 
-v0.2.1
+v0.2.2
 
-Status:
+### Status
 
-Locally verified MVP.
+MVP Complete
 
-Users can:
+Documentation Complete
 
-* Register
+Locally Verified
+
+Deployment Pending
+
+### Current User Journey
+
+```text
+Register
+↓
+Login
+↓
+Session Recovery
+↓
+Browse Feed
+↓
+Create Poem
+↓
+Read Poem
+↓
+Logout
+```
+
+### Features Available Today
+
+* Registration
 * Login
-* Persist session
-* Publish poem
-* Browse poems
-* Read poems
-
-The first complete user journey has been validated.
+* JWT Authentication
+* Session Persistence
+* Poem Publishing
+* Poem Reading
+* User Profiles
+* Cursor Pagination
+* Infinite Scroll
+* Pull To Refresh
+* Seed Content System
+* Documentation Suite
 
 ---
 
 # 6. Technical Architecture
 
-Frontend
+## Frontend
 
 Flutter Web
 
 Architecture:
 
+```text
 UI
 ↓
 Riverpod
@@ -128,21 +157,27 @@ Riverpod
 Repository
 ↓
 Dio
+```
 
-Backend
+## Backend
 
+```text
 Node.js
 ↓
 Express
 ↓
 Prisma
+```
 
-Database
+## Database
 
+```text
 Supabase PostgreSQL
+```
 
-Data Flow:
+## Data Flow
 
+```text
 User Action
 ↓
 Repository
@@ -158,22 +193,23 @@ Response
 State
 ↓
 UI
+```
 
 ---
 
 # 7. Architectural Decisions
 
-## ADR-001
+### ADR-001
 
 Feature-Based Architecture
 
 Reason:
 
-Scalability and maintainability.
+Scalable and maintainable code organization.
 
 ---
 
-## ADR-002
+### ADR-002
 
 Repository Pattern
 
@@ -183,69 +219,81 @@ UI should never directly call APIs.
 
 ---
 
-## ADR-003
+### ADR-003
 
 JWT Authentication
 
 Reason:
 
-Mobile-friendly and stateless.
+Stateless and mobile friendly.
 
 ---
 
-## ADR-004
+### ADR-004
 
-Flutter
+Flutter Web
 
 Reason:
 
-Single codebase for Web and Mobile.
+Single codebase for Web and future Mobile support.
 
 ---
 
-## ADR-005
+### ADR-005
 
 Supabase + Prisma
 
 Reason:
 
-Rapid development while maintaining SQL ownership.
+Rapid development while retaining PostgreSQL ownership.
+
+---
+
+### ADR-011
+
+Cursor Pagination
+
+Reason:
+
+Feed scalability and infinite scroll support.
+
+---
+
+### ADR-012
+
+Seed Content System
+
+Reason:
+
+Repeatable development and demonstration environment.
 
 ---
 
 # 8. Current Folder Structure
 
-Backend
+## Backend
 
+```text
 src/
+├── config/
+├── middleware/
+├── modules/
+│   ├── auth/
+│   ├── poems/
+│   └── users/
+└── utils/
+```
 
-config/
+## Frontend
 
-middleware/
-
-modules/
-
-auth/
-
-poems/
-
-users/
-
-utils/
-
-Frontend
-
+```text
 lib/
-
-core/
-
-features/
-
-auth/
-
-poems/
-
-shared/
+├── core/
+├── features/
+│   ├── auth/
+│   └── poems/
+└── shared/
+```
 
 Future features should follow the same structure.
 
@@ -253,25 +301,26 @@ Future features should follow the same structure.
 
 # 9. Known Technical Debt
 
-Current accepted limitations:
+Accepted limitations:
 
 * No refresh tokens
 * No email verification
-* No pagination
 * No profile editing
+* No poem editing
+* No poem deletion
 * No automated tests
-* Staging CORS relaxation
 * No token blacklist
+* In-memory rate limiting
 
-These are known and acceptable at current stage.
+These are accepted trade-offs for the current stage.
 
 ---
 
-# 10. Future Roadmap
+# 10. Product Roadmap
 
-## Phase 1
+## v0.3.0
 
-Deployment
+Deployment Sprint
 
 Goal:
 
@@ -279,23 +328,23 @@ Public staging environment.
 
 ---
 
-## Phase 2
+## v0.4.0
 
-Testing
+Testing Sprint
 
 Goal:
 
-Reliability.
+Reliability and regression prevention.
 
 ---
 
-## Phase 3
+## v0.5.0
 
 Journals
 
 Goal:
 
-Daily user retention.
+Private emotional reflection.
 
 Features:
 
@@ -308,7 +357,7 @@ Private by default.
 
 ---
 
-## Phase 4
+## v0.6.0
 
 Personal Archive
 
@@ -319,12 +368,13 @@ Memory preservation.
 Features:
 
 * Timeline
-* Memory view
-* Writing history
+* Memory View
+* Writing History
+* On This Day
 
 ---
 
-## Phase 5
+## v0.7.0
 
 Letters After Midnight
 
@@ -334,29 +384,29 @@ Anonymous emotional communication.
 
 Important:
 
-Requires moderation strategy before implementation.
+Requires moderation architecture before implementation.
 
 ---
 
-## Phase 6
+## v0.8.0
 
 Time Capsules
 
 Goal:
 
-Long-term emotional retention.
+Long-term emotional preservation.
 
-Users can write messages to their future selves.
+Users write messages to their future selves.
 
 ---
 
-## Phase 7
+## v0.9.0
 
 Community Circles
 
 Goal:
 
-Belonging through shared themes.
+Belonging through shared writing.
 
 Examples:
 
@@ -369,13 +419,17 @@ No follower mechanics.
 
 ---
 
-## Phase 8
+## v1.0.0
 
-Audio Poetry
+First Public Release
 
-Goal:
+Requirements:
 
-Alternative content format.
+* Stable deployment
+* Testing coverage
+* Journals
+* Personal Archive
+* Core moderation tooling
 
 ---
 
@@ -391,6 +445,7 @@ Do not implement without explicit review:
 * Algorithmic ranking
 * Paid subscriptions
 * Advertising systems
+* Trending feeds
 
 These can fundamentally alter product direction.
 
@@ -398,22 +453,21 @@ These can fundamentally alter product direction.
 
 # 12. Deployment Information
 
-Backend:
+## Backend
 
 Railway
 
-Frontend:
+## Frontend
 
 Vercel
 
-Database:
+## Database
 
 Supabase
 
-Required Environment Variables:
+### Backend Environment Variables
 
-Backend:
-
+```text
 DATABASE_URL
 DIRECT_URL
 JWT_SECRET
@@ -422,10 +476,13 @@ CORS_ORIGIN
 SUPABASE_URL
 SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
+```
 
-Frontend:
+### Frontend Environment Variables
 
+```text
 API_BASE_URL
+```
 
 ---
 
@@ -433,65 +490,73 @@ API_BASE_URL
 
 A feature is complete only if:
 
+```text
 ✓ Implemented
-
 ✓ Validated
-
 ✓ Error handling added
-
 ✓ Documented
-
 ✓ Reviewed
-
+✓ Verified manually
 ✓ Works on staging
+```
 
-Local-only functionality is not considered complete.
+Local-only functionality is not complete.
 
 ---
 
 # 14. Development Rules
 
-1. Keep architecture simple.
-
-2. Prefer maintainability over cleverness.
-
-3. Avoid premature optimization.
-
-4. Document decisions.
-
-5. Commit frequently.
-
-6. Preserve product philosophy.
-
-7. Do not build features because competitors have them.
-
-8. Build features only if they strengthen the mission.
+1. Keep architecture simple
+2. Prefer maintainability over cleverness
+3. Avoid premature optimization
+4. Document decisions
+5. Commit frequently
+6. Preserve product philosophy
+7. Do not build features because competitors have them
+8. Build features only if they strengthen the mission
 
 ---
 
 # 15. Success Metrics
 
-Short Term
+## Short Term
 
 * Public staging deployment
 * 10 active users
 * 100 poems
 
-Medium Term
+## Medium Term
 
 * 100 users
 * 1,000 poems
 * Journal adoption
 
-Long Term
+## Long Term
 
 * Meaningful personal archives
 * Returning users revisiting old writing
 * Time Capsule engagement
+* Letters After Midnight participation
 
 ---
 
-# 16. Final Founder Note
+# 16. If The Founder Is Unavailable
+
+If future contributors must make decisions without founder input:
+
+1. Preserve emotional depth over engagement
+2. Preserve simplicity over feature count
+3. Prefer reflection over consumption
+4. Prefer meaning over metrics
+5. Prefer permanence over novelty
+
+When uncertain:
+
+> Choose the option that makes Syaahi feel more like a journal and less like a social network.
+
+---
+
+# 17. Final Founder Note
 
 The value of Syaahi is not the technology.
 
@@ -499,7 +564,12 @@ Any competent engineer can rebuild the codebase.
 
 The difficult part is preserving the intent.
 
-The project should always feel like a quiet library, a journal, or a box of old letters.
+The project should always feel like:
+
+* A quiet library
+* A journal
+* A collection of letters
+* A personal archive
 
 If a future version begins to feel like a social network, something important has been lost.
 
@@ -509,7 +579,9 @@ Protect the simplicity.
 
 Protect the reason it exists.
 
-— Raghavendra Singh
+---
+
+**— Raghavendra Singh**
 Founder, Syaahi
 
-"Where emotions become words."
+*"Where emotions become words."*

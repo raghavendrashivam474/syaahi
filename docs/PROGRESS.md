@@ -1,124 +1,481 @@
 # 🪶 Syaahi — Progress Log
 
-This is the engineering diary for Syaahi.
-Updated at the end of every meaningful development session.
+This document serves as the engineering diary for Syaahi.
 
-Format:
+It records major milestones, decisions, implementation progress, and upcoming work.
+
+The goal is to help future contributors understand:
+
+* What was built
+* Why it was built
+* What remains
+* Where the project is heading
+
+---
+
+# 2026-06 — Foundation (v0.1.0)
+
+## Backend
+
+* Initialised Node.js + Express.js + TypeScript project
+* Configured Prisma ORM with Supabase PostgreSQL
+* Designed initial database schema
+* Implemented Zod environment validation
+* Created modular project structure
+* Added health check endpoint
+* Added Helmet security middleware
+* Added CORS middleware
+* Added Morgan request logging
+* Created ApiError utility
+* Created asyncHandler utility
+
+## Decisions Made
+
+* Feature-based architecture selected
+* Prisma selected as ORM
+* Zod selected for validation
+* Supabase selected for PostgreSQL hosting
+
+## Outcome
+
+Foundation established for MVP development.
+
+---
+
+# 2026-06 — MVP Implementation (v0.2.0)
+
+## Backend
+
+### Authentication
+
+* User signup
+* User login
+* JWT generation
+* JWT verification
+* Session recovery endpoint
+* Logout endpoint
+* Password hashing using bcrypt
+
+### Poems
+
+* Create poem
+* Retrieve poem by ID
+* Feed endpoint
+* Author joins on feed responses
+
+### Users
+
+* Public profile endpoint
+
+### Security
+
+* Global rate limiting
+* Auth-specific rate limiting
+* Request validation via Zod
+
+---
+
+## Flutter Application
+
+### Architecture
+
+* Riverpod
+* Dio
+* go_router
+* flutter_secure_storage
+
+### Authentication
+
+* Login screen
+* Signup screen
+* Session recovery
+* Secure token storage
+
+### Poems
+
+* Feed screen
+* Reader screen
+* Writer screen
+
+### Architecture Patterns
+
+* Repository pattern
+* Feature-based structure
+* Separation of UI and data layers
+
+---
+
+## Decisions Made
+
+* JWT authentication selected
+* Flutter Web selected for MVP
+* express-rate-limit selected for abuse prevention
+
+---
+
+## Known Gaps
+
+* No refresh tokens
+* No email verification
+* No profile editing
+* No poem deletion
+* No pagination
+* No automated testing
+* No deployment
+
+Accepted for MVP stage.
+
+---
+
+# 2026-06 — Documentation Sprint (v0.2.1)
+
+## Documentation Created
+
+* README.md
+* Backend README
+* Frontend README
+* ARCHITECTURE.md
+* API_CONTRACT.md
+* ROADMAP.md
+* DECISIONS.md
+* PROGRESS.md
+* VISION.md
+* CONTRIBUTING.md
+* FOUNDER_HANDOVER.md
+
+---
+
+## Project Governance
+
+Established:
+
+* Development standards
+* Handover procedures
+* Roadmap ownership
+* Architecture documentation
+* Product vision documentation
+
+---
+
+## Outcome
+
+Project became self-documenting and maintainable by future developers.
+
+---
+
+# 2026-06 — Local Verification Sprint
+
+## Full User Journey Verified
+
+Successfully tested:
 
 ```text
-## [Date] — [Short Title]
-- What was done
-- What was decided
-- What is next
-2026-06 — Foundation (v0.1.0)
-Backend
-Initialised Node.js + Express.js + TypeScript project
-Configured Prisma ORM with Supabase PostgreSQL
-Designed initial database schema
-Set up environment validation using Zod
-Created modular folder structure (config, middleware, modules, utils)
-Added health check endpoint
-Added helmet, cors, morgan middleware
-Created ApiError utility class
-Created asyncHandler utility
-Decisions Made
-Feature-based architecture chosen
-Prisma selected as ORM
-Zod selected for validation
-Supabase selected for PostgreSQL hosting
-2026-06 — MVP (v0.2.0)
-Backend
-Implemented authentication module
-Signup with email, username, displayName, password
-Login with JWT response
-Logout (client-side token discard)
-/me endpoint for session recovery
-bcrypt password hashing (12 rounds)
-JWT signing and verification
-Implemented poems module
-Create poem (authenticated)
-Get poem by ID
-Get poem feed
-Author data joined on feed and detail
-Implemented users module
-Get user profile by username
-Added rate limiting
-Global limiter on all API routes
-Stricter limiter on signup and login
-Added request validation via Zod schemas on all endpoints
-Flutter
-Project initialised with Riverpod, Dio, go_router, flutter_secure_storage
-Feature-based folder structure implemented
-Auth feature implemented
-Login screen
-Signup screen
-Session recovery on app launch
-JWT stored in flutter_secure_storage
-Poems feature implemented
-Feed screen
-Poem reader screen
-Poem writer screen
-Repository pattern implemented across all features
-Decisions Made
-JWT authentication chosen over session-based auth
-Flutter Web chosen as MVP frontend target
-express-rate-limit chosen for abuse prevention
-Known Gaps at v0.2.0
-No refresh token implementation
-No email verification on signup
-No poem deletion
-No profile update endpoint
-No pagination on poem feed
-No loading states in Flutter feed screen
-No empty state UI in Flutter
-Token revocation not implemented
-These are documented and accepted trade-offs for MVP stage.
+Register
+↓
+Login
+↓
+Create Poem
+↓
+View Feed
+↓
+Read Poem
+```
 
-Current Focus — v0.3.0 Stability and Deployment
-Documentation Sprint
- Backend README updated
- ARCHITECTURE.md created
- ROADMAP.md created
- DECISIONS.md created
- PROGRESS.md created
- VISION.md created
- CONTRIBUTING.md created
- Root README.md updated
- .env.example completed
-Deployment Sprint (after documentation)
- Backend deployed to Railway
- Frontend deployed to Vercel
- Environment variables configured on Railway
- CORS updated with Vercel URL
- End-to-end flow verified on staging
- v0.3.0 tagged on GitHub
-Upcoming — v0.4.0 Journals
-Not started.
+Status:
 
-Planned scope:
+PASS
 
-Create journal entry
-Edit journal entry
-Archive journal entry
-Search journal entries
-Private by default
-Will begin after v0.3.0 deployment is verified.
+---
 
-Engineering Notes
-Things to address before production
-Issue	Priority	Notes
-Refresh token implementation	High	Users must re-login on token expiry
-Email verification on signup	High	Any email can be registered currently
-CORS wildcard	High	Replace with FRONTEND_URL
-Poem feed pagination	Medium	No pagination, returns all poems
-Poem deletion	Medium	No way to delete a poem currently
-Profile update endpoint	Medium	Users cannot edit their profile
-Redis-backed rate limiting	Low	In-memory resets on server restart
-Token blacklist for logout	Low	True logout requires Redis
-Things that are intentionally deferred
-Feature	Reason
-Followers and following	Outside current product vision
-Like counts	Optimises for validation not depth
-Trending feed	Engagement loop, not aligned with vision
-AI-generated poetry	Contradicts human expression core value
-Monetisation	Premature
+## CORS Issue Identified
+
+### Problem
+
+Flutter Web runs on dynamic localhost ports.
+
+Backend only allowed:
+
+```text
+localhost:3000
+localhost:5000
+```
+
+### Resolution
+
+Development mode now automatically allows localhost origins.
+
+Production remains controlled via:
+
+```env
+CORS_ORIGIN
+```
+
+### Outcome
+
+Local development workflow stabilized.
+
+---
+
+# 2026-06 — Seed Content Sprint (v0.2.2)
+
+## Initial Dataset Expanded
+
+Previous:
+
+```text
+5 Accounts
+15 Poems
+```
+
+Current:
+
+```text
+10 Accounts
+30 Poems
+```
+
+---
+
+## Writer Personas Added
+
+* raghav_writes
+* midnight_writer
+* sara_writes
+* arjun_kavya
+* zara_lafz
+* aarav_thinks
+* meera_writes
+* kabir_outdoors
+* ananya_heals
+* rizwan_recalls
+
+---
+
+## Coverage
+
+Languages:
+
+* Hindi
+* English
+
+Emotions:
+
+* Love
+* Longing
+* Hope
+* Solitude
+* Gratitude
+
+---
+
+## Seed Automation
+
+Created:
+
+```text
+scripts/cleanup-and-reseed.ts
+```
+
+Capabilities:
+
+* Reset seed accounts
+* Reset poems
+* Recreate dataset
+* Randomize feed order
+* Create realistic timestamps
+
+---
+
+## Outcome
+
+Development environment became repeatable and demonstration-ready.
+
+---
+
+# 2026-06 — Pagination Sprint (v0.2.2)
+
+## Problem
+
+Feed was limited and could not scale beyond initial content.
+
+Only a portion of poems were visible.
+
+---
+
+## Solution
+
+Implemented cursor-based pagination.
+
+API:
+
+```text
+GET /api/v1/poems?cursor=&limit=
+```
+
+---
+
+## Frontend Changes
+
+Introduced FeedNotifier.
+
+State managed:
+
+```text
+poems
+isLoading
+isLoadingMore
+hasMore
+nextCursor
+error
+```
+
+---
+
+## Infinite Scroll
+
+Implemented automatic loading at approximately 85% scroll position.
+
+Added:
+
+```text
+Pull To Refresh
+End Of Feed Indicator
+```
+
+---
+
+## Outcome
+
+Feed now scales naturally with content growth.
+
+---
+
+# Current Project State
+
+## Version
+
+```text
+v0.2.2
+```
+
+---
+
+## Completed
+
+```text
+Authentication
+Poem Publishing
+Poem Reading
+Session Persistence
+Pagination
+Infinite Scroll
+Seed Content
+Documentation
+Founder Handover
+Local Verification
+```
+
+---
+
+## Pending
+
+```text
+Railway Deployment
+Vercel Deployment
+Staging Verification
+Automated Testing
+```
+
+---
+
+# Next Milestone — v0.3.0
+
+## Deployment Sprint
+
+### Backend
+
+* Deploy to Railway
+* Configure environment variables
+* Verify database connectivity
+* Verify health endpoint
+
+### Frontend
+
+* Deploy Flutter Web to Vercel
+* Configure API_BASE_URL
+* Verify routing
+
+### Validation
+
+Complete full user journey on staging.
+
+---
+
+# Future Milestones
+
+## v0.4.0 — Testing Sprint
+
+* API tests
+* Repository tests
+* Widget tests
+* Integration tests
+
+---
+
+## v0.5.0 — Journals
+
+Planned:
+
+* Create journal entry
+* Edit journal entry
+* Archive journal entry
+* Search journal entries
+
+Private by default.
+
+---
+
+## Future Phases
+
+* Personal Archive
+* Letters After Midnight
+* Time Capsules
+* Community Circles
+* Audio Poetry
+
+---
+
+# Engineering Notes
+
+## High Priority
+
+* Refresh tokens
+* Email verification
+* Production deployment
+
+## Medium Priority
+
+* Profile editing
+* Poem editing
+* Poem deletion
+
+## Low Priority
+
+* Redis rate limiting
+* Token blacklist
+* Advanced moderation tooling
+
+---
+
+# Current Status
+
+```text
+MVP Complete
+Documentation Complete
+Locally Verified
+Seeded
+Paginated
+Deployment Pending
+```
+
+Syaahi is currently awaiting deployment to a public staging environment.

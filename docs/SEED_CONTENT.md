@@ -21,80 +21,97 @@ These seed accounts and poems exist to:
 
 ## Environments
 
-Seed content exists in:
+```text
 ✅ Local development
 ✅ Staging (once deployed)
 ❌ Production — real users only
+Resetting Seed Data
+To wipe and recreate all seed content at any time:
 
-text
+Bash
 
+cd syaahi-backend
+npx tsx scripts/cleanup-and-reseed.ts
+This will delete all seed accounts and poems and recreate them fresh
+with a randomised order.
 
----
-
-## Seed Accounts
-
-| Display Name | Username        | Language Preference |
-|--------------|-----------------|---------------------|
-| Raghav       | raghav_writes   | Hindi, English      |
-| Midnight     | midnight_writer | Hindi, English      |
-| Sara         | sara_writes     | English, Hindi      |
-| Arjun        | arjun_kavya     | English, Hindi      |
-| Zara         | zara_lafz       | Hindi, English      |
-
-Credentials for these accounts are stored separately in a local document.
+Seed Accounts
+#	Display Name	Username	Style
+1	Raghav	raghav_writes	General
+2	Midnight	midnight_writer	Introspective
+3	Sara	sara_writes	Emotional
+4	Arjun	arjun_kavya	Romantic
+5	Zara	zara_lafz	Lyrical
+6	Aarav	aarav_thinks	Philosophical
+7	Meera	meera_writes	Romantic
+8	Kabir	kabir_outdoors	Nature
+9	Ananya	ananya_heals	Healing
+10	Rizwan	rizwan_recalls	Nostalgic
+Credentials are stored in a separate local document.
 They are never committed to the repository.
 
----
+Seed Poems
+raghav_writes
+Title	Language	Emotion	Theme
+पहली बारिश	HINDI	LONGING	nature
+Still Here	ENGLISH	HOPE	writing
+खामोशी	HINDI	SOLITUDE	silence
+midnight_writer
+Title	Language	Emotion	Theme
+3 बजे	HINDI	SOLITUDE	night
+Gravity	ENGLISH	LONGING	loss
+कल	HINDI	HOPE	tomorrow
+sara_writes
+Title	Language	Emotion	Theme
+Unsent	ENGLISH	LONGING	letters
+Small Things	ENGLISH	GRATITUDE	everyday
+अधूरी बात	HINDI	LONGING	unspoken
+arjun_kavya
+Title	Language	Emotion	Theme
+The Reader	ENGLISH	LOVE	books
+वापसी	HINDI	HOPE	people
+Enough	ENGLISH	HOPE	self
+zara_lafz
+Title	Language	Emotion	Theme
+इश्क़	HINDI	LOVE	love
+Midnight Chai	ENGLISH	SOLITUDE	night
+यादें	HINDI	LONGING	memories
+aarav_thinks
+Title	Language	Emotion	Theme
+Who Were You	ENGLISH	HOPE	identity
+समय	HINDI	SOLITUDE	time
+The Question	ENGLISH	HOPE	existence
+meera_writes
+Title	Language	Emotion	Theme
+तुम्हारा इंतज़ार	HINDI	LOVE	waiting
+Your Handwriting	ENGLISH	LONGING	memories
+पहली मुलाक़ात	HINDI	LOVE	love
+kabir_outdoors
+Title	Language	Emotion	Theme
+River Logic	ENGLISH	HOPE	rivers
+बारिश के बाद	HINDI	GRATITUDE	rain
+November	ENGLISH	SOLITUDE	seasons
+ananya_heals
+Title	Language	Emotion	Theme
+Slowly	ENGLISH	HOPE	healing
+शुक्रगुज़ार	HINDI	GRATITUDE	gratitude
+New Soil	ENGLISH	HOPE	new beginnings
+rizwan_recalls
+Title	Language	Emotion	Theme
+पुरानी गलियाँ	HINDI	LONGING	nostalgia
+City at 6am	ENGLISH	SOLITUDE	city
+माँ की रसोई	HINDI	LONGING	home
+Coverage
+text
 
-## Seed Poems
-
-### raghav_writes
-
-| Title | Language | Emotion | Theme |
-|-------|----------|---------|-------|
-| पहली बारिश | HINDI | LONGING | nature |
-| Still Here | ENGLISH | HOPE | writing |
-| खामोशी | HINDI | SOLITUDE | silence |
-
-### midnight_writer
-
-| Title | Language | Emotion | Theme |
-|-------|----------|---------|-------|
-| 3 बजे | HINDI | SOLITUDE | night |
-| Gravity | ENGLISH | LONGING | loss |
-| कल | HINDI | HOPE | tomorrow |
-
-### sara_writes
-
-| Title | Language | Emotion | Theme |
-|-------|----------|---------|-------|
-| Unsent | ENGLISH | LONGING | letters |
-| Small Things | ENGLISH | GRATITUDE | everyday |
-| अधूरी बात | HINDI | LONGING | unspoken |
-
-### arjun_kavya
-
-| Title | Language | Emotion | Theme |
-|-------|----------|---------|-------|
-| The Reader | ENGLISH | LOVE | books |
-| वापसी | HINDI | HOPE | people |
-| Enough | ENGLISH | HOPE | self |
-
-### zara_lafz
-
-| Title | Language | Emotion | Theme |
-|-------|----------|---------|-------|
-| इश्क़ | HINDI | LOVE | love |
-| Midnight Chai | ENGLISH | SOLITUDE | night |
-| यादें | HINDI | LONGING | memories |
-
----
-
-## Coverage
-Total Accounts : 5
-Total Poems : 15
-Languages : HINDI, ENGLISH
-Emotions : LOVE, LONGING, HOPE, SOLITUDE, GRATITUDE
-Themes : nature, writing, silence, night, loss,
-tomorrow, letters, everyday, unspoken,
-books, people, self, love, memories
+Total Accounts : 10
+Total Poems    : 30
+Languages      : HINDI, ENGLISH
+Emotions       : LOVE, LONGING, HOPE, SOLITUDE, GRATITUDE
+Themes         : nature, writing, silence, night, loss,
+                 tomorrow, letters, everyday, unspoken,
+                 books, people, self, love, memories,
+                 identity, time, existence, waiting,
+                 rivers, rain, seasons, healing,
+                 gratitude, new beginnings, nostalgia,
+                 city, home

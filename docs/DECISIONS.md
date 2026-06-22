@@ -251,3 +251,234 @@ In production, only origins listed in the CORS_ORIGIN environment variable are a
 CORS_ORIGIN must be set correctly on Railway before any production deployment.
 The Vercel frontend URL must be the only allowed origin in production.
 
+## ADR-011: Cursor-Based Feed Pagination
+
+Date: 2026-06
+
+Status: Active
+
+### Context
+
+The poem feed initially returned all poems in a single request.
+
+As the dataset grew from a handful of poems to dozens of poems, loading the entire feed became inefficient and prevented infinite scrolling.
+
+A scalable feed strategy was required before deployment.
+
+### Decision
+
+Implement cursor-based pagination for the poem feed.
+
+API contract:
+
+```text
+GET /api/v1/poems?cursor=<cursor>&limit=<limit>
+```
+
+Response returns:
+
+```text
+poems
+nextCursor
+```
+
+Frontend uses nextCursor to request additional pages.
+
+### Reasoning
+
+* Better scalability than offset pagination
+* Consistent performance as data grows
+* Supports infinite scroll naturally
+* Avoids duplicate or skipped records during feed updates
+
+### Consequences
+
+All feed consumers must understand cursor pagination.
+
+Feed responses now include:
+
+```text
+poems
+nextCursor
+```
+
+Future feed-related endpoints should prefer cursor pagination over offset pagination.
+
+---
+
+## ADR-012: Infinite Scroll Feed Experience
+
+Date: 2026-06
+
+Status: Active
+
+### Context
+
+The original feed required manual pagination and exposed only the first portion of available poems.
+
+A more natural reading experience was needed.
+
+### Decision
+
+Implement automatic infinite scrolling.
+
+Frontend loads the next page when the user reaches approximately 85% of the current scroll position.
+
+End of feed displays:
+
+```text
+— you have read everything —
+```
+
+### Reasoning
+
+* More natural reading experience
+* Reduced user friction
+* Aligns with modern content consumption patterns
+* Works well with cursor pagination
+
+### Consequences
+
+Feed state became more complex.
+
+A simple FutureProvider was no longer sufficient.
+
+Dedicated feed state management was introduced.
+
+---
+
+## ADR-013: Feed StateNotifier Architecture
+
+Date: 2026-06
+
+Status: Active
+
+### Context
+
+Cursor pagination introduced multiple state variables:
+
+* loading
+* loading more
+* next cursor
+* accumulated poems
+* has more
+* error state
+
+FutureProvider could no longer manage feed state cleanly.
+
+### Decision
+
+Replace the feed FutureProvider with a dedicated StateNotifier.
+
+FeedNotifier owns:
+
+```text
+poems
+isLoading
+isLoadingMore
+hasMore
+nextCursor
+error
+```
+
+### Reasoning
+
+* Better separation of concerns
+* Predictable pagination state
+* Easier future enhancements
+* Cleaner UI layer
+
+### Consequences
+
+All feed interactions must go through FeedNotifier.
+
+Future feed features should extend FeedNotifier rather than introducing parallel state systems.
+
+---
+
+## ADR-014: Development Seed Content System
+
+Date: 2026-06
+
+Status: Active
+
+### Context
+
+An empty platform creates a poor testing and demonstration experience.
+
+Manual creation of accounts and poems before every test session was repetitive and error-prone.
+
+### Decision
+
+Introduce a reusable seed content system.
+
+Seed dataset currently contains:
+
+```text
+10 Users
+30 Poems
+```
+
+Reset command:
+
+```bash
+npx tsx scripts/cleanup-and-reseed.ts
+```
+
+### Reasoning
+
+* Consistent testing environment
+* Better demo experience
+* Faster onboarding for new developers
+* Enables pagination verification
+
+### Consequences
+
+Seed data is now considered part of the development environment.
+
+Changes to seed accounts, poems, or credentials should be documented in:
+
+```text
+docs/SEED_CONTENT.md
+```
+
+---
+
+## ADR-015: Writer Persona-Based Seed Data
+
+Date: 2026-06
+
+Status: Active
+
+### Context
+
+Randomly generated seed content made the platform feel artificial.
+
+The goal was to create a believable reading experience.
+
+### Decision
+
+Each seed account represents a specific writing style.
+
+Examples:
+
+```text
+aarav_thinks     → Philosophical
+meera_writes     → Romantic
+kabir_outdoors   → Nature
+ananya_heals     → Healing
+rizwan_recalls   → Nostalgic
+```
+
+### Reasoning
+
+* More realistic feed
+* Better emotional variety
+* Improved product demonstrations
+* Easier visual validation during development
+
+### Consequences
+
+Future seed content should preserve author identity and writing style.
+
+Seed accounts are development assets and should remain consistent across resets.

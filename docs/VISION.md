@@ -105,6 +105,19 @@ Rediscover what you wrote when you were hopeful, lonely, in love.
 
 ---
 
+## Design Principles
+
+Every interface in Syaahi should aim to be:
+
+- Calm rather than addictive
+- Reflective rather than performative
+- Personal rather than competitive
+- Timeless rather than trend-driven
+
+When there is a conflict between engagement and meaning,
+meaning wins.
+
+
 ## Who is Syaahi For?
 
 Syaahi is for people who:

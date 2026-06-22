@@ -1,177 +1,397 @@
 # 🪶 Syaahi — App
 
-Flutter frontend for **Syaahi**, a platform for poetry, letters, journals, and human expression.
+Flutter frontend for **Syaahi**, a platform for poetry, journals, letters, memory preservation, and human expression.
 
 > Where emotions become words.
 
 ---
 
-## Current Status
+# Current Status
 
-**v0.2.0 — MVP Complete**
+**Version:** v0.2.2
 
-| Feature          | Status       |
-|------------------|--------------|
-| Splash Screen    | ✅ Complete  |
-| Welcome Screen   | ✅ Complete  |
-| Authentication   | ✅ Complete  |
-| Poem Feed        | ✅ Complete  |
-| Poem Reader      | ✅ Complete  |
-| Poem Writer      | ✅ Complete  |
-| User Profiles    | 🔜 Planned   |
-| Journals         | 🔜 Sprint 3  |
+**Status:** MVP Complete • Documentation Complete • Locally Verified
 
 ---
 
-## Tech Stack
+## Available Features
 
-| Layer            | Technology              |
-|------------------|-------------------------|
-| Framework        | Flutter                 |
-| Language         | Dart                    |
-| State Management | Riverpod                |
-| Navigation       | go_router               |
-| HTTP Client      | Dio                     |
-| Secure Storage   | flutter_secure_storage  |
-| Fonts            | google_fonts            |
+| Feature             | Status     |
+| ------------------- | ---------- |
+| Splash Screen       | ✅          |
+| Welcome Screen      | ✅          |
+| Authentication      | ✅          |
+| Session Persistence | ✅          |
+| Poem Feed           | ✅          |
+| Poem Reader         | ✅          |
+| Poem Writer         | ✅          |
+| Cursor Pagination   | ✅          |
+| Infinite Scroll     | ✅          |
+| Pull To Refresh     | ✅          |
+| User Profiles       | ✅ Basic    |
+| Journals            | 🔜 Planned |
 
 ---
 
-## Project Structure
+# Tech Stack
+
+| Layer            | Technology             |
+| ---------------- | ---------------------- |
+| Framework        | Flutter Web            |
+| Language         | Dart                   |
+| State Management | Riverpod               |
+| Navigation       | go_router              |
+| HTTP Client      | Dio                    |
+| Secure Storage   | flutter_secure_storage |
+| Typography       | google_fonts           |
+
+---
+
+# Project Structure
 
 ```text
 syaahi-app/
 └── lib/
     ├── core/
-    │   ├── constants/       # App-wide constants
-    │   ├── network/         # Dio API client setup
-    │   ├── router/          # go_router configuration
-    │   ├── storage/         # Secure storage helpers
-    │   └── theme/           # Colors, typography, theme
+    │   ├── constants/
+    │   ├── network/
+    │   ├── router/
+    │   ├── storage/
+    │   └── theme/
     │
     ├── features/
-    │   ├── splash/          # Splash screen
-    │   ├── welcome/         # Welcome / onboarding screen
+    │   ├── splash/
+    │   ├── welcome/
     │   ├── auth/
-    │   │   ├── data/        # AuthRepository
-    │   │   ├── state/       # Auth providers (Riverpod)
-    │   │   └── presentation/ # Login, Signup screens
+    │   │   ├── data/
+    │   │   ├── state/
+    │   │   └── presentation/
+    │   │
     │   ├── poems/
-    │   │   ├── data/        # PoemRepository
-    │   │   ├── state/       # Poem providers (Riverpod)
-    │   │   └── presentation/ # Feed, Reader, Writer screens
-    │   └── home/            # Home screen
+    │   │   ├── data/
+    │   │   ├── state/
+    │   │   └── presentation/
+    │   │
+    │   └── home/
     │
     ├── shared/
-    │   ├── models/          # User, Poem data models
-    │   └── widgets/         # Shared UI components
+    │   ├── models/
+    │   └── widgets/
     │
-    └── main.dart            # App entry point
-Getting Started
-Prerequisites
-Flutter SDK (stable channel)
-Dart SDK ^3.5.0
-Chrome (for web development)
-Syaahi backend running locally or on staging
-1. Install Dependencies
-Bash
+    └── main.dart
+```
 
+---
+
+# Getting Started
+
+## Prerequisites
+
+Required:
+
+* Flutter SDK (Stable Channel)
+* Dart SDK ^3.5.0
+* Chrome
+* Running Syaahi Backend
+
+---
+
+## Install Dependencies
+
+```bash
 flutter pub get
-2. Run the App
-Against local backend:
+```
 
-Bash
+---
 
+## Run Locally
+
+```bash
 flutter run -d chrome
-Against staging backend:
+```
 
-Bash
+Default backend:
 
-flutter run -d chrome --dart-define=API_BASE_URL=https://your-railway-url.up.railway.app
-Environment Configuration
-The API base URL is injected at runtime via --dart-define.
+```text
+http://localhost:4000
+```
 
-Variable	Default	Description
-API_BASE_URL	http://localhost:4000	Backend API base URL
-For local development the default works out of the box.
+---
 
-For staging or production, always pass the correct URL via --dart-define.
+## Run Against Staging
 
-Architecture
-Key Principle
-UI never calls the API directly.
+```bash
+flutter run -d chrome \
+--dart-define=API_BASE_URL=https://your-railway-url.up.railway.app
+```
 
-text
+---
 
+# Environment Configuration
+
+API URL is injected through:
+
+```text
+--dart-define
+```
+
+| Variable     | Default               |
+| ------------ | --------------------- |
+| API_BASE_URL | http://localhost:4000 |
+
+Local development works without additional configuration.
+
+Staging and production deployments should always provide an explicit API URL.
+
+---
+
+# Architecture
+
+## Core Principle
+
+UI never talks directly to the backend.
+
+Architecture:
+
+```text
 Screen
-  ↓
-Riverpod Provider
-  ↓
+ ↓
+Provider
+ ↓
 Repository
-  ↓
-Dio (API Client)
-  ↓
-Express Backend
-Feature Structure
-Every feature follows the same pattern:
+ ↓
+Dio
+ ↓
+Express API
+```
 
-text
+---
 
+# Feature Architecture
+
+Every feature follows:
+
+```text
 feature/
 ├── data/
-│   └── feature_repository.dart   # All API calls
 ├── state/
-│   └── feature_provider.dart     # Riverpod state
 └── presentation/
-    └── feature_screen.dart       # UI only
-Screens only read from providers.
-Providers call repositories.
-Repositories talk to the API.
+```
 
-Available Commands
-Bash
+Responsibilities:
 
-# Run on Chrome
-flutter run -d chrome
+```text
+presentation → UI
+state        → Riverpod
+data         → API communication
+```
 
-# Build for web
-flutter build web
+---
 
-# Build for web with staging URL
-flutter build web --dart-define=API_BASE_URL=https://your-url.up.railway.app
+# Feed Architecture
 
-# Run tests
-flutter test
+The feed is powered by:
 
-# Check for outdated packages
-flutter pub outdated
+```text
+FeedNotifier
+```
 
-# Analyze code
-flutter analyze
-User Journey
-text
+Responsibilities:
 
+* Initial load
+* Cursor pagination
+* Infinite scroll
+* Pull to refresh
+* Error handling
+
+State tracked:
+
+```text
+poems
+isLoading
+isLoadingMore
+hasMore
+nextCursor
+error
+```
+
+---
+
+# Pagination
+
+Feed uses cursor pagination.
+
+API:
+
+```text
+GET /api/v1/poems?cursor=&limit=
+```
+
+Default page size:
+
+```text
+10 poems
+```
+
+Behavior:
+
+```text
+Load first page
+      ↓
+Receive nextCursor
+      ↓
+User scrolls
+      ↓
+Load next page
+      ↓
+Repeat until nextCursor = null
+```
+
+---
+
+# User Journey
+
+```text
 App Launch
     ↓
-Splash Screen (check stored token)
+Splash Screen
     ↓
-Token exists → Home Screen (Feed)
+Check Stored JWT
     ↓
-No token → Welcome Screen
+Token Exists
+    ↓
+Feed Screen
+
+OR
+
+No Token
+    ↓
+Welcome Screen
     ↓
 Login / Signup
     ↓
-Home Screen (Feed)
+Feed Screen
     ↓
-Read Poem → Poem Reader
+Read Poem
     ↓
-Write Poem → Poem Writer
-Backend
-This app connects to the Syaahi backend API.
+Write Poem
+```
 
-See syaahi-backend/README.md for backend setup.
-See syaahi-backend/API_CONTRACT.md for endpoint reference.
+---
 
-Author
-Raghavendra Singh
+# Development Dataset
+
+For realistic testing, the backend includes:
+
+```text
+10 Seed Accounts
+30 Seed Poems
+```
+
+Used for:
+
+* Feed validation
+* Pagination testing
+* UI demonstrations
+* Multi-author testing
+
+Reset via:
+
+```bash
+npx tsx scripts/cleanup-and-reseed.ts
+```
+
+from the backend project.
+
+---
+
+# Useful Commands
+
+## Run Application
+
+```bash
+flutter run -d chrome
+```
+
+---
+
+## Build Web
+
+```bash
+flutter build web
+```
+
+---
+
+## Build For Staging
+
+```bash
+flutter build web \
+--dart-define=API_BASE_URL=https://your-url.up.railway.app
+```
+
+---
+
+## Run Tests
+
+```bash
+flutter test
+```
+
+---
+
+## Analyze Code
+
+```bash
+flutter analyze
+```
+
+---
+
+## Check Dependency Updates
+
+```bash
+flutter pub outdated
+```
+
+---
+
+# Related Documentation
+
+See:
+
+```text
+docs/ARCHITECTURE.md
+docs/API_CONTRACT.md
+docs/ROADMAP.md
+docs/DECISIONS.md
+docs/PROGRESS.md
+```
+
+Backend:
+
+```text
+syaahi-backend/README.md
+syaahi-backend/API_CONTRACT.md
+```
+
+---
+
+# Development Principles
+
+* UI never calls APIs directly
+* Business logic does not live in widgets
+* Repository pattern is mandatory
+* State flows through Riverpod
+* Documentation is updated alongside code
+* Code that only works locally is not complete
+
+---
+
+# Author
+
+**Raghavendra Singh**
+
 Built with coffee, midnight thoughts, and a love for words.
+
+> Syaahi — Where emotions become words.
