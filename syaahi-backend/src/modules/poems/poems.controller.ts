@@ -38,8 +38,10 @@ export const listPoems = async (req: Request, res: Response) => {
 };
 
 export const getPoem = async (req: Request, res: Response) => {
+  const id = req.params.id as string;
+
   const poem = await prisma.poem.findUnique({
-    where: { id: req.params.id },
+    where: { id },
     include: {
       author: { select: { id: true, username: true, displayName: true, avatarUrl: true, bio: true } },
       _count: { select: { reactions: true } },
@@ -56,7 +58,7 @@ export const getPoem = async (req: Request, res: Response) => {
  */
 export const updatePoem = async (req: Request, res: Response) => {
   const data = updatePoemSchema.parse(req.body);
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   const existing = await prisma.poem.findUnique({
     where: { id },
@@ -87,7 +89,7 @@ export const updatePoem = async (req: Request, res: Response) => {
  * Delete own poem
  */
 export const deletePoem = async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   const existing = await prisma.poem.findUnique({
     where: { id },

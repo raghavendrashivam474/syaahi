@@ -13,6 +13,7 @@
     "declaration": false,
     "sourceMap": true,
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"]

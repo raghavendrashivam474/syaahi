@@ -8,7 +8,7 @@ import { updateMeSchema, userPoemsQuerySchema } from './users.schemas';
  * Public profile of any user
  */
 export const getUserProfile = async (req: Request, res: Response) => {
-  const { username } = req.params;
+  const username = req.params.username as string;
 
   const user = await prisma.user.findUnique({
     where: { username },
@@ -35,7 +35,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
  * Paginated poems by a specific user
  */
 export const getUserPoems = async (req: Request, res: Response) => {
-  const { username } = req.params;
+  const username = req.params.username as string;
   const { cursor, limit } = userPoemsQuerySchema.parse(req.query);
 
   const user = await prisma.user.findUnique({
