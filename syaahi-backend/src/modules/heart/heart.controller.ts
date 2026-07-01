@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { prisma } from '../../config/prisma';
 import { ApiError } from '../../utils/ApiError';
 
@@ -91,7 +91,7 @@ export const getMyHeart = async (req: Request, res: Response) => {
   const nextCursor = hasMore && items.length > 0 ? items[items.length - 1].id : null;
 
   // Return Poem[] not Heart[]
-  const poems = items.map((h) => h.poem);
+  const poems = items.map((h: { poem: object }) => h.poem);
 
   res.json({ success: true, data: { poems, nextCursor } });
 };

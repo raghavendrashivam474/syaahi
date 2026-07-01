@@ -1,8 +1,8 @@
+﻿import { ReactionType } from '@prisma/client';
 import { Request, Response } from 'express';
 import { prisma } from '../../config/prisma';
 import { ApiError } from '../../utils/ApiError';
 import { reactionTypeSchema, REACTION_LABELS } from './reactions.schemas';
-import { ReactionType } from '@prisma/client';
 
 /**
  * POST /api/v1/poems/:id/reactions
@@ -115,11 +115,11 @@ export const getReactions = async (req: Request, res: Response) => {
       })
     : [];
 
-  const userReactionTypes = new Set(userReactions.map((r) => r.type));
+  const userReactionTypes = new Set(userReactions.map((r: { type: string }) => r.type));
 
   // Build response with all six types, even if count is zero
   const reactions = Object.entries(REACTION_LABELS).map(([type, label]) => {
-    const found = grouped.find((g) => g.type === type);
+    const found = grouped.find((g: { type: string; _count: { type: number } }) => g.type === type);
     return {
       type,
       label,
