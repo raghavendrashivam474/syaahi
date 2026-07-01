@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -54,7 +54,7 @@ class _WriterScreenState extends ConsumerState<WriterScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Published. Your words are out there. 🪶',
+            'Published. Your words are out there. ðŸª¶',
             style: GoogleFonts.cormorantGaramond(fontSize: 16),
           ),
           backgroundColor: SyaahiColors.success,
@@ -154,7 +154,7 @@ class _WriterScreenState extends ConsumerState<WriterScreen> {
                   height: 1.7,
                 ),
                 decoration: InputDecoration(
-                  hintText: 'Let your words flow…',
+                  hintText: 'Let your words flowâ€¦',
                   hintStyle: GoogleFonts.cormorantGaramond(
                     color: SyaahiColors.textFaded,
                     fontSize: 20,
@@ -219,12 +219,12 @@ class _WriterScreenState extends ConsumerState<WriterScreen> {
                       onSelected: (_) => setState(() => _language = l),
                       backgroundColor: SyaahiColors.surfaceCard,
                       selectedColor: SyaahiColors.goldBase,
-                      labelStyle: GoogleFonts.inter(
-                        color: selected
-                            ? SyaahiColors.midnightDark
-                            : SyaahiColors.textSecondary,
-                        fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      ),
+                      labelStyle: TextStyle(
+                      color: selected
+                          ? SyaahiColors.midnightDark
+                          : SyaahiColors.textSecondary,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                    ),
                       side: BorderSide(
                         color: selected
                             ? SyaahiColors.goldBase

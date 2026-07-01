@@ -1,11 +1,13 @@
-import 'package:go_router/go_router.dart';
-import '../../features/splash/splash_screen.dart';
-import '../../features/welcome/welcome_screen.dart';
-import '../../features/auth/presentation/signup_screen.dart';
-import '../../features/auth/presentation/login_screen.dart';
-import '../../features/poems/presentation/feed_screen.dart';
-import '../../features/poems/presentation/reader_screen.dart';
-import '../../features/poems/presentation/writer_screen.dart';
+﻿import 'package:go_router/go_router.dart';
+import 'package:syaahi_app/features/splash/splash_screen.dart';
+import 'package:syaahi_app/features/welcome/welcome_screen.dart';
+import 'package:syaahi_app/features/auth/presentation/signup_screen.dart';
+import 'package:syaahi_app/features/auth/presentation/login_screen.dart';
+import 'package:syaahi_app/features/poems/presentation/feed_screen.dart';
+import 'package:syaahi_app/features/poems/presentation/reader_screen.dart';
+import 'package:syaahi_app/features/poems/presentation/writer_screen.dart';
+import 'package:syaahi_app/features/poems/presentation/heart_screen.dart';
+import 'package:syaahi_app/features/profile/profile_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -41,6 +43,14 @@ class AppRouter {
         path: '/poem/:id',
         builder: (context, state) =>
             ReaderScreen(poemId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/heart',
+        builder: (context, state) => const HeartScreen(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

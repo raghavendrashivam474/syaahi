@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/sizes.dart';
 import '../../../shared/models/poem.dart';
-import '../../auth/state/auth_providers.dart';
+import '../../../features/auth/state/auth_providers.dart';
+import '../data/poems_repository.dart';
 import '../state/poems_providers.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
@@ -17,6 +18,7 @@ class FeedScreen extends ConsumerStatefulWidget {
 
 class _FeedScreenState extends ConsumerState<FeedScreen> {
   final _scrollController = ScrollController();
+  bool _showFilters = false;
 
   @override
   void initState() {
@@ -31,31 +33,40 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   }
 
   void _onScroll() {
-    final position = _scrollController.position;
-    final threshold = position.maxScrollExtent * 0.85;
-
-    if (position.pixels >= threshold) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
       ref.read(feedProvider.notifier).loadMore();
     }
   }
 
-  String _greeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return 'Good Morning';
-    if (hour < 17) return 'Good Afternoon';
-    if (hour < 21) return 'Good Evening';
-    return 'Good Night';
-  }
-
   @override
   Widget build(BuildContext context) {
-    final feedState = ref.watch(feedProvider);
-    final user = ref.watch(authProvider).user;
+    final state = ref.watch(feedProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Syaahi'),
         actions: [
+          IconButton(
+            icon: Icon(
+              _showFilters ? Icons.filter_list_off : Icons.filter_list,
+              color: state.filters.isEmpty
+                  ? SyaahiColors.textMuted
+                  : SyaahiColors.goldBase,
+            ),
+            tooltip: 'Filters',
+            onPressed: () => setState(() => _showFilters = !_showFilters),
+          ),
+          IconButton(
+            icon: const Icon(Icons.favorite_outline),
+            tooltip: 'My Heart',
+            onPressed: () => context.push('/heart'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Profile',
+            onPressed: () => context.push('/profile'),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sign out',
@@ -66,149 +77,215 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/write'),
         backgroundColor: SyaahiColors.goldBase,
         foregroundColor: SyaahiColors.midnightDark,
-        icon: const Icon(Icons.edit_outlined),
-        label: Text(
-          'Write',
-          style: GoogleFonts.inter(fontWeight: FontWeight.w600),
-        ),
+        child: const Icon(Icons.edit_outlined),
       ),
-      body: RefreshIndicator(
-        onRefresh: () => ref.read(feedProvider.notifier).refresh(),
-        color: SyaahiColors.goldBase,
-        child: _buildBody(feedState, user?.displayName),
+      body: Column(
+        children: [
+          if (_showFilters) _FilterBar(
+            filters: state.filters,
+            onChanged: (filters) {
+              ref.read(feedProvider.notifier).setFilters(filters);
+            },
+            onClear: () {
+              ref.read(feedProvider.notifier).clearFilters();
+            },
+          ),
+          Expanded(child: _buildBody(state)),
+        ],
       ),
     );
   }
 
-  Widget _buildBody(FeedState feedState, String? displayName) {
-    // Initial loading
-    if (feedState.isLoading) {
+  Widget _buildBody(FeedState state) {
+    if (state.isLoading && state.poems.isEmpty) {
       return const Center(
         child: CircularProgressIndicator(color: SyaahiColors.goldBase),
       );
     }
 
-    // Initial error
-    if (feedState.error != null && feedState.poems.isEmpty) {
+    if (state.error != null && state.poems.isEmpty) {
       return _ErrorView(
-        message: feedState.error!,
-        onRetry: () => ref.read(feedProvider.notifier).load(),
+        message: state.error!,
+        onRetry: () => ref.read(feedProvider.notifier).refresh(),
       );
     }
 
-    // Empty
-    if (feedState.poems.isEmpty) {
+    if (state.poems.isEmpty) {
       return _EmptyFeed(onWrite: () => context.push('/write'));
     }
 
-    return CustomScrollView(
-      controller: _scrollController,
-      slivers: [
-        // Header
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(
-            SyaahiSizes.xl,
-            SyaahiSizes.lg,
-            SyaahiSizes.xl,
-            SyaahiSizes.md,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${_greeting()},',
-                  style: GoogleFonts.inter(
-                    color: SyaahiColors.textMuted,
-                    fontSize: 14,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  displayName ?? 'Poet',
-                  style: GoogleFonts.cormorantGaramond(
-                    color: SyaahiColors.goldBase,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: SyaahiSizes.lg),
-                Text(
-                  'Recent Poems',
-                  style: GoogleFonts.inter(
-                    color: SyaahiColors.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 1.5,
-                  ),
-                ),
-              ],
-            ),
-          ),
+    return RefreshIndicator(
+      color: SyaahiColors.goldBase,
+      backgroundColor: SyaahiColors.midnightBase,
+      onRefresh: () => ref.read(feedProvider.notifier).refresh(),
+      child: ListView.separated(
+        controller: _scrollController,
+        padding: const EdgeInsets.fromLTRB(
+          SyaahiSizes.md, SyaahiSizes.md, SyaahiSizes.md, SyaahiSizes.xxxl,
         ),
-
-        // Poem list
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(
-            SyaahiSizes.xl,
-            0,
-            SyaahiSizes.xl,
-            SyaahiSizes.md,
-          ),
-          sliver: SliverList.separated(
-            itemCount: feedState.poems.length,
-            separatorBuilder: (_, __) =>
-                const SizedBox(height: SyaahiSizes.md),
-            itemBuilder: (_, i) => _PoemCard(poem: feedState.poems[i]),
-          ),
-        ),
-
-        // Load more indicator
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.only(bottom: SyaahiSizes.xxxl),
-            child: _buildFooter(feedState),
-          ),
-        ),
-      ],
+        itemCount: state.poems.length + (state.isLoadingMore ? 1 : 0),
+        separatorBuilder: (_, __) => const SizedBox(height: SyaahiSizes.md),
+        itemBuilder: (context, index) {
+          if (index == state.poems.length) {
+            return const Padding(
+              padding: EdgeInsets.all(SyaahiSizes.lg),
+              child: Center(
+                child: CircularProgressIndicator(
+                  color: SyaahiColors.goldBase,
+                  strokeWidth: 2,
+                ),
+              ),
+            );
+          }
+          return _PoemCard(poem: state.poems[index]);
+        },
+      ),
     );
   }
+}
 
-  Widget _buildFooter(FeedState feedState) {
-    if (feedState.isLoadingMore) {
-      return const Padding(
-        padding: EdgeInsets.all(SyaahiSizes.lg),
-        child: Center(
-          child: CircularProgressIndicator(
-            color: SyaahiColors.goldBase,
-            strokeWidth: 2,
-          ),
+class _FilterBar extends StatelessWidget {
+  final FeedFilters filters;
+  final ValueChanged<FeedFilters> onChanged;
+  final VoidCallback onClear;
+
+  const _FilterBar({
+    required this.filters,
+    required this.onChanged,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        SyaahiSizes.md, SyaahiSizes.sm, SyaahiSizes.md, SyaahiSizes.md,
+      ),
+      decoration: const BoxDecoration(
+        color: SyaahiColors.midnightBase,
+        border: Border(
+          bottom: BorderSide(color: SyaahiColors.divider, width: 0.5),
         ),
-      );
-    }
-
-    if (!feedState.hasMore && feedState.poems.isNotEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(SyaahiSizes.lg),
-        child: Center(
-          child: Text(
-            '— you have read everything —',
-            style: GoogleFonts.cormorantGaramond(
-              color: SyaahiColors.textMuted,
-              fontSize: 14,
-              fontStyle: FontStyle.italic,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'EMOTION',
+                style: GoogleFonts.inter(
+                  color: SyaahiColors.textMuted,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 1.5,
+                ),
+              ),
+              const Spacer(),
+              if (!filters.isEmpty)
+                GestureDetector(
+                  onTap: onClear,
+                  child: Text(
+                    'Clear all',
+                    style: GoogleFonts.inter(
+                      color: SyaahiColors.goldLight,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: SyaahiSizes.xs),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: PoemEmotion.values.map((e) {
+                final selected = filters.emotion == e;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: FilterChip(
+                    label: Text('${e.emoji} ${e.label}'),
+                    selected: selected,
+                    onSelected: (sel) {
+                      onChanged(sel
+                          ? filters.copyWith(emotion: e)
+                          : filters.copyWith(clearEmotion: true));
+                    },
+                    backgroundColor: SyaahiColors.surfaceCard,
+                    selectedColor: SyaahiColors.goldBase,
+                    labelStyle: TextStyle(
+                    color: selected
+                        ? SyaahiColors.midnightDark
+                        : SyaahiColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight:
+                        selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                    side: BorderSide(
+                      color: selected
+                          ? SyaahiColors.goldBase
+                          : SyaahiColors.divider,
+                    ),
+                    showCheckmark: false,
+                    visualDensity: VisualDensity.compact,
+                  ),
+                );
+              }).toList(),
             ),
           ),
-        ),
-      );
-    }
-
-    return const SizedBox.shrink();
+          const SizedBox(height: SyaahiSizes.sm),
+          Text(
+            'LANGUAGE',
+            style: GoogleFonts.inter(
+              color: SyaahiColors.textMuted,
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: SyaahiSizes.xs),
+          Row(
+            children: PoemLanguage.values.map((l) {
+              final selected = filters.language == l;
+              return Padding(
+                padding: const EdgeInsets.only(right: 6),
+                child: FilterChip(
+                  label: Text(l.label),
+                  selected: selected,
+                  onSelected: (sel) {
+                    onChanged(sel
+                        ? filters.copyWith(language: l)
+                        : filters.copyWith(clearLanguage: true));
+                  },
+                  backgroundColor: SyaahiColors.surfaceCard,
+                  selectedColor: SyaahiColors.goldBase,
+                  labelStyle: TextStyle(
+                    color: selected
+                        ? SyaahiColors.midnightDark
+                        : SyaahiColors.textSecondary,
+                    fontSize: 12,
+                    fontWeight:
+                        selected ? FontWeight.w600 : FontWeight.w400,
+                  ),
+                  side: BorderSide(
+                    color: selected
+                        ? SyaahiColors.goldBase
+                        : SyaahiColors.divider,
+                  ),
+                  showCheckmark: false,
+                  visualDensity: VisualDensity.compact,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -219,7 +296,7 @@ class _PoemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final preview = poem.content.length > 140
-        ? '${poem.content.substring(0, 140)}…'
+        ? '${poem.content.substring(0, 140)}...'
         : poem.content;
 
     return InkWell(
@@ -309,8 +386,8 @@ class _EmotionBadge extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: SyaahiColors.goldDark.withValues(alpha: 0.15),
-        border:
-            Border.all(color: SyaahiColors.goldDark.withValues(alpha: 0.4)),
+        border: Border.all(
+            color: SyaahiColors.goldDark.withValues(alpha: 0.4)),
         borderRadius: BorderRadius.circular(SyaahiSizes.radiusFull),
       ),
       child: Text(
