@@ -8,9 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// ──────────────────────────────────────────────
-// USER
-// ──────────────────────────────────────────────
 model User {
   id           String   @id @default(uuid())
   email        String   @unique
@@ -22,6 +19,7 @@ model User {
 
   poems     Poem[]
   reactions Reaction[]
+  hearts    Heart[]
   followers Follow[]   @relation("following")
   following Follow[]   @relation("follower")
   rooms     RoomMember[]
@@ -32,9 +30,6 @@ model User {
   @@index([username])
 }
 
-// ──────────────────────────────────────────────
-// POEM
-// ──────────────────────────────────────────────
 model Poem {
   id          String   @id @default(uuid())
   authorId    String
@@ -48,6 +43,7 @@ model Poem {
 
   author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
   reactions Reaction[]
+  hearts    Heart[]
   rooms     PoemRoom[]
 
   createdAt DateTime @default(now())
@@ -58,9 +54,6 @@ model Poem {
   @@index([createdAt])
 }
 
-// ──────────────────────────────────────────────
-// REACTION (Meaningful Reactions)
-// ──────────────────────────────────────────────
 model Reaction {
   id     String       @id @default(uuid())
   userId String
@@ -76,9 +69,20 @@ model Reaction {
   @@index([poemId])
 }
 
-// ──────────────────────────────────────────────
-// FOLLOW
-// ──────────────────────────────────────────────
+model Heart {
+  id     String @id @default(uuid())
+  userId String
+  poemId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  poem Poem @relation(fields: [poemId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, poemId])
+  @@index([userId])
+}
+
 model Follow {
   followerId  String
   followingId String
@@ -92,9 +96,6 @@ model Follow {
   @@index([followingId])
 }
 
-// ──────────────────────────────────────────────
-// ROOM (Poetry Rooms)
-// ──────────────────────────────────────────────
 model Room {
   id          String  @id @default(uuid())
   slug        String  @unique
@@ -135,9 +136,6 @@ model PoemRoom {
   @@id([poemId, roomId])
 }
 
-// ──────────────────────────────────────────────
-// ENUMS
-// ──────────────────────────────────────────────
 enum Language {
   ENGLISH
   HINDI
@@ -156,8 +154,10 @@ enum Emotion {
 enum ReactionType {
   FELT_THIS
   STAYED_WITH_ME
-  BEAUTIFUL_IMAGERY
+  BEAUTIFULLY_WRITTEN
   MADE_ME_THINK
+  COMFORTED_ME
+  INSPIRED_ME
 }
 
 enum RoomRole {
