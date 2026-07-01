@@ -8,6 +8,7 @@ import authRoutes from './modules/auth/auth.routes';
 import poemRoutes from './modules/poems/poems.routes';
 import userRoutes from './modules/users/users.routes';
 import heartRoutes from './modules/heart/heart.routes';
+import reactionRoutes from './modules/reactions/reactions.routes';
 import { globalLimiter } from './middleware/rateLimiter';
 
 const app = express();
@@ -52,6 +53,7 @@ app.use('/api/v1/poems', poemRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/poems', heartRoutes);
 app.use('/api/v1/users', heartRoutes);
+app.use('/api/v1/poems', reactionRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
