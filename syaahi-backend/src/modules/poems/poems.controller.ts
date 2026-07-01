@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../config/prisma';
 import { ApiError } from '../../utils/ApiError';
+import { syaahiFlow, DEFAULT_FEED_OPTIONS } from '../../utils/feed';
 import { createPoemSchema, listPoemsSchema, updatePoemSchema } from './poems.schemas';
 
 export const createPoem = async (req: Request, res: Response) => {
@@ -19,20 +20,35 @@ export const createPoem = async (req: Request, res: Response) => {
 export const listPoems = async (req: Request, res: Response) => {
   const { emotion, language, theme, cursor, limit } = listPoemsSchema.parse(req.query);
 
-  const poems = await prisma.poem.findMany({
-    where: { isPublished: true, ...(emotion && { emotion }), ...(language && { language }), ...(theme && { theme }) },
-    take: limit + 1,
+  const windowSize = DEFAULT_FEED_OPTIONS.windowSize;
+
+  // Fetch a larger window than requested so Syaahi Flow has room to sequence
+  // Cursor applies to the window fetch, not the final page
+  const raw = await prisma.poem.findMany({
+    where: {
+      isPublished: true,
+      ...(emotion && { emotion }),
+      ...(language && { language }),
+      ...(theme && { theme }),
+    },
+    take: windowSize,
     ...(cursor && { cursor: { id: cursor }, skip: 1 }),
     orderBy: { createdAt: 'desc' },
     include: {
       author: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
-      _count: { select: { reactions: true } },
+      _count: { select: { reactions: true, hearts: true } },
     },
   });
 
-  const hasMore = poems.length > limit;
-  const items = hasMore ? poems.slice(0, -1) : poems;
-  const nextCursor = hasMore ? items[items.length - 1].id : null;
+  // Apply Syaahi Flow sequencing
+  const sequenced = syaahiFlow(raw, {
+    ...DEFAULT_FEED_OPTIONS,
+    pageSize: limit + 1, // fetch one extra to determine hasMore
+  });
+
+  const hasMore = sequenced.length > limit;
+  const items = hasMore ? sequenced.slice(0, -1) : sequenced;
+  const nextCursor = hasMore && items.length > 0 ? items[items.length - 1].id : null;
 
   res.json({ success: true, data: { poems: items, nextCursor } });
 };
@@ -44,7 +60,7 @@ export const getPoem = async (req: Request, res: Response) => {
     where: { id },
     include: {
       author: { select: { id: true, username: true, displayName: true, avatarUrl: true, bio: true } },
-      _count: { select: { reactions: true } },
+      _count: { select: { reactions: true, hearts: true } },
     },
   });
 
