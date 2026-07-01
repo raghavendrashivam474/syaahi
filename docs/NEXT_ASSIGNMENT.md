@@ -4,76 +4,145 @@
 
 Junior Developer
 
+---
+
 ## Project Version
 
-v0.2.2
-
-## Current Status
-
-Syaahi MVP is complete.
-
-Documentation sprint is complete.
-
-Local verification is complete.
-
-Seed content system is complete.
-
-Cursor pagination and infinite scrolling are complete.
-
-The project is now entering the Deployment Sprint.
+**v0.3.0-beta**
 
 ---
 
-# Objective
+## Current Project State
 
-Deploy Syaahi to a publicly accessible staging environment.
+Syaahi has completed its internal development milestone.
 
-Target outcome:
+Completed:
 
-A new user should be able to visit a public URL and complete the entire journey without local setup.
+- ✅ Authentication
+- ✅ Session Persistence
+- ✅ Poetry Feed
+- ✅ User Profiles
+- ✅ Cursor Pagination
+- ✅ Infinite Scroll
+- ✅ Pull-to-Refresh
+- ✅ Feed Filters
+- ✅ Syaahi Flow feed sequencing
+- ✅ Meaningful Reactions
+- ✅ Commit to Heart
+- ✅ Seed Content System
+- ✅ Documentation Suite
+
+The application has been fully verified in the local development environment.
+
+The next objective is preparing Syaahi for its **first internal beta release**.
+
+---
+
+# Sprint Objective
+
+Prepare Syaahi for real users.
+
+The goal is **stability**, not additional features.
+
+Every completed task should move the project toward a successful internal beta.
+
+---
+
+# Primary Deliverable
+
+A new user should be able to install the application and complete the entire experience.
 
 ```text
 Register
-↓
+      ↓
 Login
-↓
+      ↓
+Session Recovery
+      ↓
 Browse Feed
-↓
-Create Poem
-↓
+      ↓
+Apply Filters
+      ↓
 Read Poem
-↓
+      ↓
+Leave Meaningful Reaction
+      ↓
+Commit To Heart
+      ↓
+Write Poem
+      ↓
+Visit Author Profile
+      ↓
 Logout
+```
+
+The complete journey should work without developer intervention.
+
+---
+
+# Deliverable 1 — Production Readiness Audit
+
+Perform a complete audit before deployment.
+
+## Backend
+
+Verify:
+
+```text
+✓ Production build succeeds
+
+✓ Environment variables documented
+
+✓ No localhost URLs remain
+
+✓ Prisma schema synchronized
+
+✓ Health endpoint operational
+
+✓ Seed script functional
+
+✓ Feed filters working
+
+✓ Cursor pagination verified
+
+✓ Syaahi Flow verified
+
+✓ Commit to Heart endpoints verified
+
+✓ Meaningful Reactions verified
 ```
 
 ---
 
-# Deliverable 1 — Deployment Readiness Audit
+## Flutter Application
 
-Before deployment, verify:
-
-## Backend
+Verify:
 
 ```text
-✓ Production build succeeds
-✓ No hardcoded localhost URLs
-✓ Environment variables documented
-✓ Prisma schema synchronized
-✓ Health endpoint operational
-✓ Seed script still functional
+✓ Release APK builds successfully
+
+✓ API URL configurable
+
+✓ Session persistence works
+
+✓ Browser-independent routing
+
+✓ Infinite scroll works
+
+✓ Feed filters work
+
+✓ Heart system works
+
+✓ Meaningful reactions work
+
+✓ User profiles load correctly
 ```
 
-## Frontend
+---
 
-```text
-✓ Flutter web build succeeds
-✓ API URL configurable via --dart-define
-✓ Session persistence verified
-✓ Browser refresh does not break routing
-✓ Infinite scroll still functions
-```
+## Output
 
-Output:
+Create:
 
 ```text
 docs/DEPLOYMENT_CHECKLIST.md
@@ -81,23 +150,47 @@ docs/DEPLOYMENT_CHECKLIST.md
 
 ---
 
-# Deliverable 2 — Railway Deployment
+# Deliverable 2 — Backend Deployment
 
-Deploy backend.
+Deploy the backend.
+
+Preferred:
+
+```text
+Railway
+```
+
+Alternatives (if required):
+
+- Render
+- Fly.io
+- Coolify
 
 Requirements:
 
 ```text
-✓ Create Railway project
-✓ Configure environment variables
-✓ Connect Supabase database
-✓ Verify startup logs
-✓ Verify health endpoint
-✓ Verify authentication endpoints
-✓ Verify poems endpoints
+✓ Environment variables configured
+
+✓ Database connected
+
+✓ Startup successful
+
+✓ Health endpoint verified
+
+✓ Authentication verified
+
+✓ Feed verified
+
+✓ Filters verified
+
+✓ Pagination verified
+
+✓ Heart endpoints verified
+
+✓ Reaction endpoints verified
 ```
 
-Expected Result:
+Expected Output:
 
 ```text
 https://<backend>.up.railway.app
@@ -105,69 +198,95 @@ https://<backend>.up.railway.app
 
 ---
 
-# Deliverable 3 — Vercel Deployment
+# Deliverable 3 — Android Beta Build
 
-Deploy Flutter Web application.
+Generate an Android APK for internal testing.
 
 Requirements:
 
 ```text
-✓ Production Flutter build
-✓ Configure API_BASE_URL
-✓ Deploy to Vercel
-✓ Verify routing
-✓ Verify login flow
-✓ Verify poem creation
+✓ Release APK generated
+
+✓ API_BASE_URL configured
+
+✓ Connects to deployed backend
+
+✓ Installs successfully
+
+✓ Launches correctly
+
+✓ Session recovery verified
 ```
 
-Expected Result:
+Output:
 
 ```text
-https://<frontend>.vercel.app
+build/app/outputs/flutter-apk/app-release.apk
 ```
 
 ---
 
-# Deliverable 4 — Production CORS Configuration
+# Deliverable 4 — Production Configuration
 
-Current development mode allows localhost origins.
+Verify production configuration.
 
-Before staging verification:
+Backend:
 
 ```text
-✓ Remove wildcard-style staging configuration
-✓ Set CORS_ORIGIN to Vercel URL
-✓ Redeploy backend
-✓ Verify frontend connectivity
+✓ CORS configured correctly
+
+✓ Environment variables verified
+
+✓ JWT configuration verified
+
+✓ Database connection stable
 ```
 
-Result:
+Flutter:
 
-Only the staging frontend may access the backend.
+```text
+✓ Production API URL
+
+✓ Release configuration
+
+✓ Debug flags removed
+```
 
 ---
 
-# Deliverable 5 — End-to-End Staging Verification
+# Deliverable 5 — Complete Beta Verification
 
-Execute and document:
+Execute the complete user journey.
 
 ```text
+Install APK
+      ↓
 Open App
-↓
-Register New User
-↓
+      ↓
+Register
+      ↓
 Login
-↓
-Create Poem
-↓
-Refresh Browser
-↓
-Verify Session Recovery
-↓
+      ↓
+Browse Feed
+      ↓
+Apply Filters
+      ↓
 Read Poem
-↓
+      ↓
+React
+      ↓
+Commit To Heart
+      ↓
+Write Poem
+      ↓
+Visit Profile
+      ↓
+Restart App
+      ↓
+Verify Session Recovery
+      ↓
 Logout
-↓
+      ↓
 Login Again
 ```
 
@@ -175,98 +294,158 @@ Verify:
 
 ```text
 ✓ Authentication
+
+✓ Session Recovery
+
 ✓ Feed
-✓ Pagination
+
+✓ Feed Filters
+
+✓ Cursor Pagination
+
 ✓ Infinite Scroll
-✓ Pull To Refresh
-✓ Poem Creation
-✓ Session Persistence
+
+✓ Pull-to-Refresh
+
+✓ Syaahi Flow
+
+✓ Meaningful Reactions
+
+✓ Commit to Heart
+
+✓ User Profiles
+
+✓ Poem Publishing
 ```
 
 ---
 
-# Deliverable 6 — Staging Report
+# Deliverable 6 — Internal Beta Report
 
 Create:
 
 ```text
-docs/STAGING_VERIFICATION.md
+docs/BETA_VERIFICATION.md
 ```
 
 Include:
 
-* Frontend URL
-* Backend URL
-* Screenshots
-* Test results
-* Known issues
-* Recommendations
+- Backend URL
+- APK Version
+- Device tested
+- Android version
+- Verification checklist
+- Screenshots
+- Performance observations
+- Known issues
+- Recommendations
 
 ---
 
-# Out Of Scope
+# Out of Scope
 
-Do NOT begin:
+Do **not** begin work on:
 
 ```text
 Journals
+
 Personal Archive
+
 Letters After Midnight
+
 Time Capsules
+
 Community Circles
+
 Audio Poetry
 ```
 
-Do not introduce new product features.
+Do not redesign the architecture.
 
 Do not modify the roadmap.
 
-Focus exclusively on deployment and verification.
+Do not introduce new engagement features.
+
+Focus entirely on deployment readiness and internal beta quality.
 
 ---
 
 # Success Criteria
 
-Assignment is complete when:
+This assignment is complete when:
 
 ```text
 ✓ Backend deployed
-✓ Frontend deployed
-✓ Public URLs available
-✓ Full user journey verified
+
+✓ Production environment configured
+
+✓ Release APK generated
+
+✓ Complete user journey verified
+
 ✓ Documentation updated
-✓ No critical blockers remain
+
+✓ No critical issues remain
+
+✓ Ready for internal writers to begin testing
 ```
 
 ---
 
-# Completion Report Required
+# Completion Report
 
 Submit:
 
-1. Frontend URL
-2. Backend URL
+1. Backend URL
+2. APK file
 3. Deployment checklist
-4. Staging verification report
+4. Internal beta verification report
 5. Screenshots
 6. Known issues
+7. Recommendations for the next sprint
 
-Only after successful staging verification will v0.4.0 (Testing Sprint) begin.
+---
+
+# Next Sprint
+
+After successful internal beta verification, development will move to:
+
+```text
+v0.4.0 — Reliability & Testing
+```
+
+Focus areas:
+
+- Automated testing
+- Monitoring
+- Logging
+- Production hardening
+- Performance optimization
+
+No major product features will begin until the internal beta is considered stable.
 
 ---
 
 # Founder Note
 
-The objective is not merely to deploy software.
+The objective is not simply to release software.
 
-The objective is to make Syaahi accessible to real users for the first time.
+The objective is to place Syaahi into the hands of its first real writers.
 
-Prioritize stability over speed.
+Every bug fixed now preserves trust later.
 
-A working deployment is more valuable than three unfinished features.
+Every thoughtful improvement strengthens the experience.
+
+Prioritize reliability over speed.
+
+Protect simplicity.
+
+Protect meaning.
 
 ---
 
 **— Raghavendra Singh**
 
-*Syaahi — Where emotions become words.*
+*Founder, Syaahi*
+
+> **Syaahi — Where emotions become words.**

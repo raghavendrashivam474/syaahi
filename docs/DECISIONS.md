@@ -482,3 +482,39 @@ rizwan_recalls   → Nostalgic
 Future seed content should preserve author identity and writing style.
 
 Seed accounts are development assets and should remain consistent across resets.
+
+---
+
+## ADR-020: Feature-Based Modular Expansion
+
+**Date:** 2026-07
+
+**Status:** Active
+
+### Context
+
+As Syaahi expanded beyond the MVP, new capabilities such as Hearts, Reactions, Profiles, and future Journals increased architectural complexity.
+
+A consistent strategy for future expansion was required.
+
+### Decision
+
+Every new capability will continue to be implemented as an independent feature module.
+
+Each module owns its:
+
+- Routes
+- Validation
+- Business logic
+- State management
+- Documentation
+
+Shared concerns remain isolated within common middleware, utilities, and configuration.
+
+### Reasoning
+
+Independent modules improve maintainability, onboarding, testing, and long-term scalability.
+
+### Consequences
+
+Future features such as Journals, Time Capsules, Community Circles, Letters After Midnight, and Audio Poetry will follow the same architectural pattern.

@@ -2,14 +2,15 @@
 
 This document serves as the engineering diary for Syaahi.
 
-It records major milestones, decisions, implementation progress, and upcoming work.
+It records significant milestones, engineering decisions, implementation progress, architectural evolution, and future direction.
 
-The goal is to help future contributors understand:
+Its purpose is to help every future contributor understand:
 
-* What was built
-* Why it was built
-* What remains
-* Where the project is heading
+- What was built
+- Why it was built
+- What changed
+- What remains
+- Where the product is heading
 
 ---
 
@@ -17,194 +18,212 @@ The goal is to help future contributors understand:
 
 ## Backend
 
-* Initialised Node.js + Express.js + TypeScript project
-* Configured Prisma ORM with Supabase PostgreSQL
-* Designed initial database schema
-* Implemented Zod environment validation
-* Created modular project structure
-* Added health check endpoint
-* Added Helmet security middleware
-* Added CORS middleware
-* Added Morgan request logging
-* Created ApiError utility
-* Created asyncHandler utility
+### Infrastructure
 
-## Decisions Made
+- Initialised Node.js + Express.js + TypeScript project
+- Configured Prisma ORM
+- Connected PostgreSQL via Supabase
+- Implemented Zod environment validation
+- Established feature-based architecture
+- Added global error handling
+- Added async request handling utilities
 
-* Feature-based architecture selected
-* Prisma selected as ORM
-* Zod selected for validation
-* Supabase selected for PostgreSQL hosting
+### Middleware
 
-## Outcome
+Implemented:
 
-Foundation established for MVP development.
+- Helmet
+- CORS
+- Morgan
+- Environment validation
+- Health endpoint
+
+### Decisions
+
+- Feature-based architecture
+- Prisma as ORM
+- PostgreSQL via Supabase
+- Zod for validation
+
+### Outcome
+
+A scalable backend foundation ready for feature development.
 
 ---
 
-# 2026-06 — MVP Implementation (v0.2.0)
+# 2026-06 — MVP Sprint (v0.2.0)
 
 ## Backend
 
 ### Authentication
 
-* User signup
-* User login
-* JWT generation
-* JWT verification
-* Session recovery endpoint
-* Logout endpoint
-* Password hashing using bcrypt
+Implemented:
+
+- User registration
+- Login
+- JWT authentication
+- Session recovery
+- Logout
+- Password hashing with bcrypt
 
 ### Poems
 
-* Create poem
-* Retrieve poem by ID
-* Feed endpoint
-* Author joins on feed responses
+Implemented:
+
+- Publish poem
+- Read poem
+- Public feed
+- Author information
 
 ### Users
 
-* Public profile endpoint
+Implemented:
+
+- Public profile endpoint
 
 ### Security
 
-* Global rate limiting
-* Auth-specific rate limiting
-* Request validation via Zod
+Added:
+
+- Global rate limiting
+- Authentication rate limiting
+- Request validation
 
 ---
 
 ## Flutter Application
 
-### Architecture
+### Foundation
 
-* Riverpod
-* Dio
-* go_router
-* flutter_secure_storage
+- Flutter project
+- Riverpod
+- Dio
+- go_router
+- flutter_secure_storage
 
 ### Authentication
 
-* Login screen
-* Signup screen
-* Session recovery
-* Secure token storage
+Implemented:
+
+- Welcome screen
+- Login
+- Signup
+- Session persistence
 
 ### Poems
 
-* Feed screen
-* Reader screen
-* Writer screen
+Implemented:
 
-### Architecture Patterns
+- Feed
+- Reader
+- Writer
 
-* Repository pattern
-* Feature-based structure
-* Separation of UI and data layers
+### Architecture
 
----
+Adopted:
 
-## Decisions Made
+- Repository Pattern
+- Feature-based architecture
+- Separation of UI and business logic
 
-* JWT authentication selected
-* Flutter Web selected for MVP
-* express-rate-limit selected for abuse prevention
+### Outcome
 
----
+The first complete user journey became operational.
 
-## Known Gaps
-
-* No refresh tokens
-* No email verification
-* No profile editing
-* No poem deletion
-* No pagination
-* No automated testing
-* No deployment
-
-Accepted for MVP stage.
+```text
+Register
+      ↓
+Login
+      ↓
+Create Poem
+      ↓
+Browse Feed
+      ↓
+Read Poem
+```
 
 ---
 
 # 2026-06 — Documentation Sprint (v0.2.1)
 
-## Documentation Created
+## Documentation
 
-* README.md
-* Backend README
-* Frontend README
-* ARCHITECTURE.md
-* API_CONTRACT.md
-* ROADMAP.md
-* DECISIONS.md
-* PROGRESS.md
-* VISION.md
-* CONTRIBUTING.md
-* FOUNDER_HANDOVER.md
+Created:
+
+- README.md
+- Backend README
+- App README
+- ARCHITECTURE.md
+- API_CONTRACT.md
+- ROADMAP.md
+- DECISIONS.md
+- PROGRESS.md
+- VISION.md
+- CONTRIBUTING.md
+- FOUNDER_HANDOVER.md
+- SEED_CONTENT.md
 
 ---
 
-## Project Governance
+## Governance
 
 Established:
 
-* Development standards
-* Handover procedures
-* Roadmap ownership
-* Architecture documentation
-* Product vision documentation
+- Engineering standards
+- Contributor guidelines
+- Documentation standards
+- Architecture documentation
+- Founder continuity documentation
 
----
+### Outcome
 
-## Outcome
-
-Project became self-documenting and maintainable by future developers.
+The project became maintainable, transferable, and contributor-friendly.
 
 ---
 
 # 2026-06 — Local Verification Sprint
 
-## Full User Journey Verified
+## End-to-End Verification
 
-Successfully tested:
+Successfully validated:
 
 ```text
 Register
-↓
+      ↓
 Login
-↓
+      ↓
+Session Recovery
+      ↓
 Create Poem
-↓
-View Feed
-↓
+      ↓
+Browse Feed
+      ↓
 Read Poem
+      ↓
+Logout
 ```
 
-Status:
+Result:
 
+```text
 PASS
+```
 
 ---
 
-## CORS Issue Identified
+## Development Improvements
 
-### Problem
+### CORS
 
-Flutter Web runs on dynamic localhost ports.
+Problem:
 
-Backend only allowed:
+Flutter Web uses dynamic localhost ports.
 
-```text
-localhost:3000
-localhost:5000
-```
+Solution:
 
-### Resolution
+Development mode now automatically permits localhost origins.
 
-Development mode now automatically allows localhost origins.
-
-Production remains controlled via:
+Production continues to use:
 
 ```env
 CORS_ORIGIN
@@ -212,65 +231,54 @@ CORS_ORIGIN
 
 ### Outcome
 
-Local development workflow stabilized.
+Local development became significantly smoother.
 
 ---
 
-# 2026-06 — Seed Content Sprint (v0.2.2)
+# 2026-06 — Feed & Seed Sprint (v0.2.2)
 
-## Initial Dataset Expanded
+## Seed Content
+
+Expanded dataset.
 
 Previous:
 
 ```text
-5 Accounts
+5 Writers
 15 Poems
 ```
 
 Current:
 
 ```text
-10 Accounts
+10 Writers
 30 Poems
 ```
 
----
+Writer personas:
 
-## Writer Personas Added
+- raghav_writes
+- midnight_writer
+- sara_writes
+- arjun_kavya
+- zara_lafz
+- aarav_thinks
+- meera_writes
+- kabir_outdoors
+- ananya_heals
+- rizwan_recalls
 
-* raghav_writes
-* midnight_writer
-* sara_writes
-* arjun_kavya
-* zara_lafz
-* aarav_thinks
-* meera_writes
-* kabir_outdoors
-* ananya_heals
-* rizwan_recalls
+Coverage:
 
----
-
-## Coverage
-
-Languages:
-
-* Hindi
-* English
-
-Emotions:
-
-* Love
-* Longing
-* Hope
-* Solitude
-* Gratitude
+- Multiple languages
+- Multiple themes
+- Multiple emotions
 
 ---
 
 ## Seed Automation
 
-Created:
+Implemented:
 
 ```text
 scripts/cleanup-and-reseed.ts
@@ -278,47 +286,24 @@ scripts/cleanup-and-reseed.ts
 
 Capabilities:
 
-* Reset seed accounts
-* Reset poems
-* Recreate dataset
-* Randomize feed order
-* Create realistic timestamps
+- Delete existing seed data
+- Recreate writers
+- Recreate poems
+- Distribute authors naturally
+- Generate realistic timestamps
 
 ---
 
-## Outcome
+## Feed Improvements
 
-Development environment became repeatable and demonstration-ready.
+Implemented:
 
----
+- Cursor pagination
+- Infinite scrolling
+- Pull-to-refresh
+- End-of-feed indicator
 
-# 2026-06 — Pagination Sprint (v0.2.2)
-
-## Problem
-
-Feed was limited and could not scale beyond initial content.
-
-Only a portion of poems were visible.
-
----
-
-## Solution
-
-Implemented cursor-based pagination.
-
-API:
-
-```text
-GET /api/v1/poems?cursor=&limit=
-```
-
----
-
-## Frontend Changes
-
-Introduced FeedNotifier.
-
-State managed:
+Feed State:
 
 ```text
 poems
@@ -329,24 +314,143 @@ nextCursor
 error
 ```
 
+### Outcome
+
+The platform became scalable, demo-ready, and easier to develop.
+
 ---
 
-## Infinite Scroll
+# 2026-07 — Internal Beta Sprint (v0.3.0-beta)
 
-Implemented automatic loading at approximately 85% scroll position.
+The focus shifted from feature completion to improving the overall reading experience.
 
-Added:
+Rather than introducing engagement mechanics, new capabilities were designed around emotional preservation.
+
+---
+
+## Syaahi Flow
+
+Designed and implemented the **Syaahi Flow** literary sequencing engine.
+
+Objectives:
+
+- Preserve chronological freshness
+- Distribute different writers naturally
+- Avoid consecutive poems by the same author whenever possible
+- Never use engagement metrics
+- Produce deterministic ordering
+
+Result:
+
+The feed now feels closer to reading a curated anthology than scrolling a social platform.
+
+---
+
+## Feed Filters
+
+Implemented support for filtering by:
+
+- Language
+- Emotion
+- Theme
+
+Filters integrate seamlessly with:
+
+- Cursor pagination
+- Infinite scrolling
+- Syaahi Flow
+
+---
+
+## Heart System
+
+Implemented **Commit to Heart**.
+
+Characteristics:
+
+- Private
+- No notifications
+- No public counts
+- No influence on feed ranking
+
+Purpose:
+
+Allow readers to preserve poems that resonated personally.
+
+---
+
+## Meaningful Reactions
+
+Traditional Like buttons were intentionally excluded.
+
+Implemented expressive reactions:
 
 ```text
-Pull To Refresh
-End Of Feed Indicator
+FELT_THIS
+STAYED_WITH_ME
+BEAUTIFULLY_WRITTEN
+MADE_ME_THINK
+COMFORTED_ME
+INSPIRED_ME
 ```
+
+Purpose:
+
+Encourage emotional acknowledgement rather than popularity.
+
+---
+
+## User Profiles
+
+Expanded profile capabilities.
+
+Profiles now surface:
+
+- Published writing
+- Languages used
+- Themes explored
+- Writing summary
+
+Without introducing followers or audience metrics.
+
+---
+
+## Documentation Synchronization
+
+Updated:
+
+- README
+- Backend README
+- App README
+- ARCHITECTURE.md
+- API_CONTRACT.md
+- ROADMAP.md
+- DECISIONS.md
+- PROGRESS.md
+- VISION.md
+- CONTRIBUTING.md
+- SEED_CONTENT.md
+- FOUNDER_HANDOVER.md
+
+Documentation now accurately reflects the implementation.
+
+---
+
+## Engineering Decisions
+
+New architectural decisions introduced:
+
+- Syaahi Flow
+- Commit to Heart
+- Meaningful Reactions
+- Private emotional interactions
+- Continued feature-first architecture
 
 ---
 
 ## Outcome
 
-Feed now scales naturally with content growth.
+Syaahi evolved beyond a functional MVP into an internally validated beta focused on meaningful reading experiences.
 
 ---
 
@@ -355,7 +459,7 @@ Feed now scales naturally with content growth.
 ## Version
 
 ```text
-v0.2.2
+v0.3.0-beta
 ```
 
 ---
@@ -364,61 +468,118 @@ v0.2.2
 
 ```text
 Authentication
+
+Session Recovery
+
 Poem Publishing
+
 Poem Reading
-Session Persistence
-Pagination
+
+User Profiles
+
+Cursor Pagination
+
 Infinite Scroll
-Seed Content
-Documentation
+
+Feed Filters
+
+Syaahi Flow
+
+Commit to Heart
+
+Meaningful Reactions
+
+Seed Content System
+
+Documentation Suite
+
 Founder Handover
-Local Verification
+
+Internal Beta Preparation
 ```
 
 ---
 
-## Pending
+## Current Technical Debt
+
+Accepted and intentionally deferred:
 
 ```text
-Railway Deployment
-Vercel Deployment
-Staging Verification
-Automated Testing
+Refresh Tokens
+
+Email Verification
+
+Token Blacklist
+
+Automated Test Suite
+
+Redis-backed Rate Limiting
+
+Production Monitoring
+
+Public Deployment
 ```
 
 ---
 
-# Next Milestone — v0.3.0
+# Next Milestone
 
-## Deployment Sprint
+## Internal Beta Deployment
 
-### Backend
+### Infrastructure
 
-* Deploy to Railway
-* Configure environment variables
-* Verify database connectivity
-* Verify health endpoint
+- Deploy backend
+- Configure production environment
+- Configure production database
+- Production CORS
+- Health monitoring
 
-### Frontend
+### Distribution
 
-* Deploy Flutter Web to Vercel
-* Configure API_BASE_URL
-* Verify routing
+- Generate Android APK
+- Internal beta distribution
+- Invite first writers
+- Gather qualitative feedback
 
 ### Validation
 
-Complete full user journey on staging.
+- Verify complete user journey
+- Validate Syaahi Flow
+- Validate Heart system
+- Validate Meaningful Reactions
+- Performance testing
+
+### Success Criteria
+
+- Stable deployment
+- Successful internal beta
+- Actionable user feedback
+- Production-ready foundation
 
 ---
 
 # Future Milestones
 
-## v0.4.0 — Testing Sprint
+## v0.4.0 — Reliability & Testing
 
-* API tests
-* Repository tests
-* Widget tests
-* Integration tests
+Backend:
+
+- API tests
+- Repository tests
+- Authentication tests
+- Integration tests
+
+Frontend:
+
+- Widget tests
+- Riverpod tests
+- End-to-end tests
+
+Infrastructure:
+
+- Monitoring
+- Logging
+- Error reporting
 
 ---
 
@@ -426,56 +587,68 @@ Complete full user journey on staging.
 
 Planned:
 
-* Create journal entry
-* Edit journal entry
-* Archive journal entry
-* Search journal entries
+- Create journal
+- Edit journal
+- Archive journal
+- Search journals
 
 Private by default.
 
 ---
 
-## Future Phases
+## Future Releases
 
-* Personal Archive
-* Letters After Midnight
-* Time Capsules
-* Community Circles
-* Audio Poetry
+Planned evolution:
+
+- Personal Archive
+- Letters After Midnight
+- Time Capsules
+- Community Circles
+- Audio Poetry
 
 ---
 
-# Engineering Notes
+# Engineering Priorities
 
-## High Priority
+## High
 
-* Refresh tokens
-* Email verification
-* Production deployment
+- Production deployment
+- Refresh tokens
+- Email verification
+- Automated testing
 
-## Medium Priority
+## Medium
 
-* Profile editing
-* Poem editing
-* Poem deletion
+- Production monitoring
+- Performance optimisation
+- Moderation tooling
 
-## Low Priority
+## Low
 
-* Redis rate limiting
-* Token blacklist
-* Advanced moderation tooling
+- Redis-backed rate limiting
+- Token blacklist
+- Infrastructure scaling
 
 ---
 
 # Current Status
 
 ```text
-MVP Complete
+Internal Beta
+
+Feature Complete
+
 Documentation Complete
+
 Locally Verified
-Seeded
-Paginated
-Deployment Pending
+
+Deployment Ready
+
+Awaiting Internal User Testing
 ```
 
-Syaahi is currently awaiting deployment to a public staging environment.
+Syaahi has progressed from a functional MVP into a polished internal beta focused on meaningful writing, reading, and emotional preservation.
+
+Every major architectural and product decision continues to support one guiding principle:
+
+> **Help people express, preserve, and revisit their emotions.**

@@ -1,20 +1,26 @@
 # 🪶 Syaahi — API Contract
 
-## Version: v0.2.2
+## Version
 
-**Local Base URL**
+**v0.3.0-beta**
+
+---
+
+## Base URLs
+
+### Local
 
 ```text
 http://localhost:4000
 ```
 
-**Staging Base URL**
+### Staging
 
 ```text
-TBD (Railway Deployment)
+TBD (Deployment)
 ```
 
-**API Prefix**
+### API Prefix
 
 ```text
 /api/v1
@@ -49,32 +55,32 @@ All API responses follow a consistent structure.
 
 # Status Codes
 
-| Code | Meaning               |
-| ---- | --------------------- |
-| 200  | Success               |
-| 201  | Created               |
-| 400  | Validation Error      |
-| 401  | Unauthenticated       |
-| 403  | Forbidden             |
-| 404  | Not Found             |
-| 409  | Conflict              |
-| 429  | Rate Limited          |
-| 500  | Internal Server Error |
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Validation Error |
+| 401 | Authentication Required |
+| 403 | Forbidden |
+| 404 | Not Found |
+| 409 | Conflict |
+| 429 | Rate Limited |
+| 500 | Internal Server Error |
 
 ---
 
 # Authentication
 
-Protected endpoints require:
+Protected endpoints require
 
 ```http
 Authorization: Bearer <jwt_token>
 ```
 
-JWT tokens are returned by:
+JWTs are issued by:
 
-* Signup
-* Login
+- Signup
+- Login
 
 Stored client-side using:
 
@@ -84,366 +90,216 @@ flutter_secure_storage
 
 ---
 
-# System Endpoints
+# System
 
 ## GET /
 
 Returns API metadata.
 
-### Response
-
-```json
-{
-  "name": "Syaahi API",
-  "version": "0.2.2",
-  "status": "ok"
-}
-```
-
 ---
 
 ## GET /health
 
-Health endpoint used for deployment verification.
+Returns service health.
 
-### Response
-
-```json
-{
-  "status": "healthy",
-  "timestamp": "2026-06-20T10:00:00.000Z"
-}
-```
+Used for deployment verification and uptime monitoring.
 
 ---
 
-# Authentication Module
+# Authentication
 
-## POST /api/v1/auth/signup
+| Method | Endpoint | Protected |
+|---------|----------|-----------|
+| POST | /auth/signup | ❌ |
+| POST | /auth/login | ❌ |
+| GET | /auth/me | ✅ |
+| POST | /auth/logout | ✅ |
 
-Create account.
-
-### Body
-
-```json
-{
-  "email": "user@example.com",
-  "username": "raghav_writes",
-  "displayName": "Raghav",
-  "password": "Password123!"
-}
-```
-
-### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {},
-    "token": "jwt_token"
-  }
-}
-```
-
----
-
-## POST /api/v1/auth/login
-
-Authenticate user.
-
-### Body
-
-```json
-{
-  "email": "user@example.com",
-  "password": "Password123!"
-}
-```
-
-### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {},
-    "token": "jwt_token"
-  }
-}
-```
-
----
-
-## GET /api/v1/auth/me
-
-**Protected**
-
-Returns authenticated user.
-
-### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {}
-  }
-}
-```
-
----
-
-## POST /api/v1/auth/logout
-
-**Protected**
-
-Current implementation:
+Current logout implementation:
 
 ```text
-Client-side logout only.
+Client-side token removal.
 ```
 
-Token revocation is not yet implemented.
+Refresh tokens and token revocation are not yet implemented.
 
 ---
 
-# Users Module
+# Users
 
-## GET /api/v1/users/:username
+| Method | Endpoint |
+|---------|----------|
+| GET | /users/:username |
+| PATCH | /users/me |
+| GET | /users/:username/poems |
 
-Returns public profile.
+Returned profile includes:
 
-### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "user": {}
-  }
-}
-```
+- Basic information
+- Published poems
+- Languages used
+- Themes used
 
 ---
 
-## Planned Endpoints
+# Poems
 
-### PATCH /api/v1/users/me
-
-Status:
-
-```text
-Planned
-```
-
-### GET /api/v1/users/:username/poems
-
-Status:
-
-```text
-Planned
-```
+| Method | Endpoint |
+|---------|----------|
+| GET | /poems |
+| GET | /poems/:id |
+| POST | /poems |
+| PATCH | /poems/:id |
+| DELETE | /poems/:id |
 
 ---
 
-# Poems Module
+## Feed Query Parameters
 
-## GET /api/v1/poems
+Supported:
 
-Returns paginated poem feed.
+| Parameter | Description |
+|-----------|-------------|
+| cursor | Cursor pagination |
+| limit | Page size |
+| language | Filter by language |
+| emotion | Filter by emotion |
+| theme | Filter by theme |
 
-### Query Parameters
-
-| Parameter | Type   | Required |
-| --------- | ------ | -------- |
-| cursor    | string | No       |
-| limit     | number | No       |
-
-Default:
-
-```text
-limit=10
-```
-
----
-
-## Example Request
+Example:
 
 ```http
-GET /api/v1/poems?limit=10
-```
-
-Next page:
-
-```http
-GET /api/v1/poems?cursor=abc123&limit=10
+GET /api/v1/poems?language=HINDI&emotion=LONGING&limit=10
 ```
 
 ---
 
-## Response
+## Pagination
 
-```json
-{
-  "success": true,
-  "data": {
-    "poems": [
-      {
-        "id": "uuid",
-        "title": "Midnight Rain",
-        "content": "Poem content...",
-        "language": "ENGLISH",
-        "emotion": "LONGING",
-        "isPublished": true,
-        "createdAt": "2026-06-20T10:00:00.000Z",
-        "author": {
-          "id": "uuid",
-          "username": "raghav_writes",
-          "displayName": "Raghav",
-          "avatarUrl": null
-        }
-      }
-    ],
-    "nextCursor": "next_poem_id_or_null"
-  }
-}
+Feed uses cursor pagination.
+
 ```
-
----
-
-## Pagination Behaviour
-
-```text
 Initial Request
-      ↓
-Returns 10 Poems
-      ↓
-Returns nextCursor
-      ↓
-Client requests next page
-      ↓
-More poems returned
-      ↓
-Repeat until nextCursor = null
-```
-
-When:
-
-```text
+        ↓
+10 Poems
+        ↓
+nextCursor
+        ↓
+Load More
+        ↓
+Repeat
+        ↓
 nextCursor = null
 ```
 
-The feed has reached the end.
+---
+
+## Feed Ordering
+
+The backend returns poems ordered by **Syaahi Flow**.
+
+Syaahi Flow:
+
+- Preserves recency
+- Avoids consecutive poems from the same writer whenever possible
+- Does not rank using popularity
+- Does not use likes or reactions
+- Is deterministic
+
+It is a literary sequencing engine, not a recommendation engine.
 
 ---
 
-## GET /api/v1/poems/:id
+# Heart
 
-Returns a single poem.
+Private saving system.
 
-### Response
+Unlike bookmarks on traditional platforms, Hearts are intentionally personal.
 
-```json
-{
-  "success": true,
-  "data": {
-    "poem": {}
-  }
-}
-```
+| Method | Endpoint |
+|---------|----------|
+| POST | /poems/:id/heart |
+| DELETE | /poems/:id/heart |
+| GET | /users/me/heart |
 
----
+Characteristics:
 
-## POST /api/v1/poems
-
-**Protected**
-
-Create a poem.
-
-### Body
-
-```json
-{
-  "title": "Midnight Rain",
-  "content": "Poem content...",
-  "language": "ENGLISH",
-  "emotion": "LONGING",
-  "theme": "nature"
-}
-```
-
-### Response
-
-```json
-{
-  "success": true,
-  "data": {
-    "poem": {}
-  }
-}
-```
+- Private
+- No notifications
+- No public count
+- No popularity ranking
 
 ---
 
-# Planned Poem Endpoints
+# Reactions
 
-## PATCH /api/v1/poems/:id
+Meaningful acknowledgements replacing likes.
 
-Owner only.
+| Method | Endpoint |
+|---------|----------|
+| POST | /poems/:id/reactions |
+| DELETE | /poems/:id/reactions/:type |
+| GET | /poems/:id/reactions |
 
-Status:
+Supported reaction types:
 
 ```text
-Planned
+FELT_THIS
+
+STAYED_WITH_ME
+
+BEAUTIFULLY_WRITTEN
+
+MADE_ME_THINK
+
+COMFORTED_ME
+
+INSPIRED_ME
 ```
 
----
-
-## DELETE /api/v1/poems/:id
-
-Owner only.
-
-Status:
-
-```text
-Planned
-```
+Each user may react once per reaction type.
 
 ---
 
 # Rate Limiting
 
-| Endpoint          | Limit                     |
-| ----------------- | ------------------------- |
-| POST /auth/signup | 5 requests/hour           |
-| POST /auth/login  | 10 requests/hour          |
-| All API routes    | 100 requests / 15 minutes |
+| Endpoint | Limit |
+|----------|-------|
+| POST /auth/signup | 5/hour |
+| POST /auth/login | 10/hour |
+| All API Routes | 100 requests / 15 minutes |
 
-Development Mode:
+Development:
 
 ```text
-Rate limits are bypassed for seed scripts and local development workflows.
+Rate limits are relaxed for local development and seed workflows.
 ```
 
 Production:
 
 ```text
-Rate limiting fully enforced.
+Strict rate limiting is enforced.
 ```
 
 ---
 
 # Seed Content
 
-Current development dataset:
+Development dataset:
 
 ```text
-10 Accounts
+10 Writers
+
 30 Poems
+
+Multiple Languages
+
+Multiple Themes
+
+Multiple Emotions
 ```
 
-Reset command:
+Reset:
 
 ```bash
 npx tsx scripts/cleanup-and-reseed.ts
@@ -451,36 +307,34 @@ npx tsx scripts/cleanup-and-reseed.ts
 
 Purpose:
 
-* Demo content
-* UI validation
-* Pagination testing
-* Local development
+- UI development
+- Pagination testing
+- Feed testing
+- Demonstrations
 
 ---
 
-# Known Limitations
+# Current Limitations
 
-Current technical debt:
+Current Internal Beta limitations:
 
-```text
-No refresh tokens
-No email verification
-No token revocation
-No poem editing
-No poem deletion
-No automated API tests
-```
+- No refresh tokens
+- No email verification
+- No token blacklist
+- No automated API test suite
+- In-memory rate limiting
+- Single-instance deployment assumptions
+
+These are documented and accepted trade-offs.
 
 ---
 
 # Changelog
 
-| Version | Changes                                               |
-| ------- | ----------------------------------------------------- |
-| v0.1.0  | Initial draft                                         |
-| v0.2.0  | MVP endpoints documented                              |
-| v0.2.1  | Auth and verification updates                         |
-| v0.2.2  | Cursor pagination, seed system, feed contract updates |
-
-```
-```
+| Version | Highlights |
+|---------|------------|
+| v0.1.0 | Foundation |
+| v0.2.0 | MVP |
+| v0.2.1 | Documentation Sprint |
+| v0.2.2 | Seed Content, Infinite Scroll, Cursor Pagination |
+| v0.3.0-beta | Heart System, Reactions, Feed Filters, Profiles, Syaahi Flow, Internal Beta |

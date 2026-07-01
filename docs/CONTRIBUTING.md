@@ -1,31 +1,31 @@
 # 🪶 Syaahi — Contributing Guide
 
-Welcome to Syaahi.
+Welcome to **Syaahi**.
 
-Before contributing, read:
+Thank you for taking the time to contribute.
+
+Before writing your first line of code, understand **why Syaahi exists**. Every technical decision in this project is driven by its product philosophy.
+
+Read the following documents first:
 
 ```text
 docs/VISION.md
+docs/ROADMAP.md
+docs/ARCHITECTURE.md
+docs/DECISIONS.md
 ```
 
-to understand what this project is and what it is not.
-
-Every contribution should support the core question:
-
-> Does this help people express, preserve, or revisit emotions?
+Only after understanding the vision should implementation begin.
 
 ---
 
-# Before You Start
+# Our Guiding Principle
 
-Read these documents first:
+Every contribution should answer one question:
 
-1. VISION.md
-2. ROADMAP.md
-3. ARCHITECTURE.md
-4. DECISIONS.md
+> **Does this help people express, preserve, or revisit emotions?**
 
-Only after understanding the product vision should implementation begin.
+If the answer is no, reconsider whether it belongs in Syaahi.
 
 ---
 
@@ -33,12 +33,23 @@ Only after understanding the product vision should implementation begin.
 
 ## Prerequisites
 
-| Tool    | Version        |
-| ------- | -------------- |
-| Node.js | v20+           |
-| npm     | v10+           |
-| Flutter | Latest Stable  |
-| Git     | Recent Version |
+| Tool | Version |
+|------|---------|
+| Node.js | v20+ |
+| npm | v10+ |
+| Flutter | Latest Stable |
+| Git | Latest Stable |
+
+---
+
+# Repository Structure
+
+```text
+syaahi/
+├── docs/
+├── syaahi-backend/
+└── syaahi-app/
+```
 
 ---
 
@@ -53,14 +64,16 @@ npm install
 
 cp .env.example .env
 
-# configure environment variables
+# Configure environment variables
 
 npm run prisma:generate
+
+npm run prisma:push
 
 npm run dev
 ```
 
-Runs at:
+Backend runs at:
 
 ```text
 http://localhost:4000
@@ -82,7 +95,7 @@ flutter run -d chrome
 
 # Development Dataset
 
-Generate development content:
+Generate the complete development dataset:
 
 ```bash
 npx tsx scripts/cleanup-and-reseed.ts
@@ -91,26 +104,26 @@ npx tsx scripts/cleanup-and-reseed.ts
 Current dataset:
 
 ```text
-10 Accounts
+10 Writers
 30 Poems
-Multiple Authors
+Multiple Languages
+Multiple Themes
 Multiple Emotions
 ```
 
 Purpose:
 
-* UI validation
-* Feed testing
-* Pagination testing
-* Demonstrations
+- UI validation
+- Feed testing
+- Pagination testing
+- Multi-author testing
+- Demonstrations
 
-See:
+For dataset details see:
 
 ```text
 docs/SEED_CONTENT.md
 ```
-
-for details.
 
 ---
 
@@ -122,82 +135,104 @@ Never commit directly to:
 main
 ```
 
-Create a branch first.
+Create a feature branch first.
 
 Examples:
 
 ```bash
 git checkout -b feature/journals
-git checkout -b feature/archive
-git checkout -b fix/auth-session
-git checkout -b docs/roadmap
+
+git checkout -b feature/time-capsules
+
+git checkout -b feature/hearts
+
+git checkout -b fix/session-recovery
+
+git checkout -b docs/architecture
+
 git checkout -b chore/deployment
 ```
 
 ---
 
-# Branch Prefixes
+# Branch Naming
 
-| Prefix    | Purpose                 |
-| --------- | ----------------------- |
-| feature/  | New functionality       |
-| fix/      | Bug fixes               |
-| docs/     | Documentation           |
-| chore/    | Tooling & configuration |
-| refactor/ | Internal improvements   |
-| test/     | Test implementation     |
+| Prefix | Purpose |
+|---------|---------|
+| feature/ | New functionality |
+| fix/ | Bug fixes |
+| docs/ | Documentation |
+| refactor/ | Internal improvements |
+| test/ | Test implementation |
+| chore/ | Tooling & configuration |
 
 ---
 
 # Commit Messages
 
-Syaahi uses Conventional Commits.
+Syaahi follows **Conventional Commits**.
 
 Examples:
 
 ```bash
 feat: add journal creation endpoint
 
-fix: resolve session recovery bug
+feat: implement syaahi flow feed strategy
 
-docs: update roadmap
+fix: resolve session recovery issue
 
-chore: configure railway deployment
+docs: update architecture documentation
 
-test: add auth endpoint tests
+refactor: simplify poem repository
+
+test: add authentication integration tests
+
+chore: configure production deployment
 ```
 
-Rules:
+Guidelines:
 
-* Present tense
-* No full stop
-* Under 72 characters when possible
-* Specific and descriptive
+- Use present tense
+- Keep the subject concise
+- Avoid generic messages
+- Avoid full stops
+- Keep under 72 characters when practical
 
 ---
 
 # Backend Standards
 
-## Module Structure
+## Feature-Based Architecture
 
-Each feature owns its own folder.
+Each feature owns its implementation.
 
 Example:
 
 ```text
-auth/
-├── auth.routes.ts
-├── auth.controller.ts
-└── auth.schemas.ts
+modules/
+└── auth/
+    ├── auth.routes.ts
+    ├── auth.controller.ts
+    └── auth.schemas.ts
+```
+
+Business logic must remain inside its feature.
+
+Shared concerns belong only in:
+
+```text
+config/
+middleware/
+utils/
 ```
 
 ---
 
-## Validation
+## Request Validation
 
-Never trust user input.
+Never trust client input.
 
-Always validate through Zod.
+Always validate using Zod.
 
 Correct:
 
@@ -215,51 +250,63 @@ const { email } = req.body;
 
 ## Error Handling
 
-Expected failures should use:
+Expected errors should use:
 
 ```ts
 throw new ApiError(...)
 ```
 
-Never return inconsistent error shapes.
+Do not return inconsistent error responses.
 
 ---
 
-## Async Routes
+## Async Controllers
 
-Use:
+Always wrap asynchronous controllers.
 
 ```ts
-asyncHandler(...)
+asyncHandler(controller)
 ```
 
-for all async controllers.
+Never expose unhandled Promise rejections.
+
+---
+
+## Database Changes
+
+Whenever modifying the schema:
+
+- Update `schema.prisma`
+- Generate Prisma client
+- Create migration (or push during development)
+- Update documentation
+- Update API contract if required
 
 ---
 
 # Flutter Standards
 
-## Layering
+## Architecture
 
-UI never calls APIs directly.
-
-Architecture:
+UI must never communicate directly with the backend.
 
 ```text
 Screen
- ↓
+      ↓
 Provider
- ↓
+      ↓
 Repository
- ↓
+      ↓
 Dio
- ↓
-API
+      ↓
+Express API
 ```
 
 ---
 
 ## Feature Structure
+
+Every feature follows:
 
 ```text
 feature/
@@ -268,11 +315,21 @@ feature/
 └── presentation/
 ```
 
+Responsibilities:
+
+```text
+presentation → UI
+
+state → Riverpod
+
+data → API communication
+```
+
 ---
 
-## Feed Architecture
+## Feed
 
-Poem feed uses:
+The feed is managed exclusively through:
 
 ```text
 FeedNotifier
@@ -280,36 +337,59 @@ FeedNotifier
 
 Responsibilities:
 
-* Initial loading
-* Pagination
-* Refresh
-* Error handling
-* Infinite scroll state
+- Initial loading
+- Cursor pagination
+- Infinite scrolling
+- Pull-to-refresh
+- Filter management
+- Error handling
 
-Do not bypass FeedNotifier for feed-related functionality.
+Feed-related logic must not bypass the notifier.
 
 ---
 
-# Pagination Standards
+## Syaahi Flow
 
-Feed endpoints use:
+The feed uses the **Syaahi Flow** sequencing engine.
+
+Principles:
+
+- Preserve freshness
+- Distribute authors naturally
+- Avoid consecutive poems by the same author
+- Never rank using engagement
+- Keep ordering deterministic
+
+Do not introduce popularity-based ranking.
+
+---
+
+# Product Principles
+
+Syaahi intentionally avoids conventional engagement mechanics.
+
+When adding new functionality:
+
+Prefer:
+
+- Meaningful reactions
+- Commit to Heart
+- Emotional discovery
+- Personal archives
+
+Avoid introducing:
+
+- Like counts
+- Trending feeds
+- Followers
+- Engagement loops
+- Attention-maximizing mechanics
+
+When uncertain, revisit:
 
 ```text
-Cursor Pagination
+docs/VISION.md
 ```
-
-Preferred format:
-
-```text
-GET /resource?cursor=&limit=
-```
-
-Avoid offset pagination for feed-style content.
-
-Reason:
-
-* Better scalability
-* Better infinite scroll support
 
 ---
 
@@ -317,35 +397,37 @@ Reason:
 
 ## Backend
 
-1. Create module folder
+1. Create module
 2. Add schemas
 3. Add controller
 4. Add routes
 5. Register routes
 6. Update API contract
 7. Update progress log
+8. Update documentation if architecture changes
 
 ---
 
 ## Frontend
 
-1. Create feature folder
-2. Add repository
-3. Add state layer
-4. Add UI layer
+1. Create feature
+2. Repository
+3. State layer
+4. Presentation layer
 5. Register routes
-6. Update progress log
+6. Verify end-to-end
+7. Update documentation
 
 ---
 
 # Environment Variables
 
-Whenever a new variable is introduced:
+Whenever introducing a new variable:
 
-1. Add to Zod schema
-2. Add to `.env.example`
-3. Document in README
-4. Configure in Railway before deployment
+1. Add it to the Zod schema
+2. Add it to `.env.example`
+3. Document it in the README
+4. Configure it in production
 
 Never commit:
 
@@ -353,69 +435,112 @@ Never commit:
 .env
 ```
 
-Never hardcode secrets.
+Never hardcode credentials or secrets.
 
 ---
 
-# Deployment Rules
+# Deployment Checklist
 
-Before deployment:
+Before deployment ensure:
 
 ```text
-✓ Production build passes
+✓ Production build succeeds
+
 ✓ Environment variables configured
+
 ✓ No localhost URLs remain
+
+✓ Database connectivity verified
+
 ✓ Documentation updated
-✓ End-to-end flow verified
+
+✓ End-to-end verification completed
+
+✓ Health endpoint verified
 ```
 
-Code that only works locally is not complete.
+Code that only works locally is **not complete**.
 
 ---
 
-# Definition Of Done
+# Definition of Done
 
 A task is complete only when:
 
 ```text
 ✓ Implemented
-✓ Validated
-✓ Error handled
+
+✓ Input validated
+
+✓ Error cases handled
+
 ✓ Manually verified
-✓ Documented
-✓ Committed properly
-✓ Works on staging
+
+✓ Documentation updated
+
+✓ Proper commit created
+
+✓ Works on staging (or verified deployment target)
 ```
 
 ---
 
 # Changes Requiring Approval
 
-Approval required before:
+Discuss before implementing:
 
-* Adding dependencies
-* Database schema changes
-* New roadmap features
-* Infrastructure spending
-* Architectural changes
+- New dependencies
+- Database schema redesign
+- Architectural changes
+- Infrastructure spending
+- Features outside the roadmap
+- Changes affecting product philosophy
 
 ---
 
-# Where To Look First
+# Documentation Checklist
 
-If something is unclear:
+Whenever appropriate, update:
 
 ```text
+README.md
+
 ARCHITECTURE.md
-↓
-DECISIONS.md
-↓
+
+API_CONTRACT.md
+
 ROADMAP.md
-↓
+
+PROGRESS.md
+
+DECISIONS.md
+
 VISION.md
-↓
+```
+
+Documentation is considered part of the implementation.
+
+---
+
+# Need Help?
+
+When unsure, consult documentation in this order:
+
+```text
+VISION.md
+      ↓
+ROADMAP.md
+      ↓
+ARCHITECTURE.md
+      ↓
+DECISIONS.md
+      ↓
+PROGRESS.md
+      ↓
 Founder
 ```
+
+Most questions are already answered there.
 
 ---
 
@@ -425,6 +550,12 @@ Build carefully.
 
 Document thoroughly.
 
-Protect simplicity.
+Prefer simplicity over cleverness.
 
-Optimize for emotional value, not feature count.
+Optimize for emotional value rather than feature count.
+
+Every line of code should help make Syaahi a quieter, more thoughtful place to write, preserve, and rediscover human emotions.
+
+---
+
+> **Syaahi — Where emotions become words.**

@@ -1,25 +1,27 @@
 # 🪶 Syaahi — Architecture
 
-## Version: v0.2.2
+## Version: v0.3.0-beta
 
-## Status: MVP Complete, Seeded & Locally Verified
+## Status: Internal Beta • Locally Verified • Deployment Ready
 
 ---
 
 # System Overview
 
-Syaahi is a client-server application designed for emotional expression, poetry, memory preservation, and reflective writing.
+Syaahi is a client-server application built for emotional expression, poetry, memory preservation, and reflective writing.
+
+Unlike traditional social platforms, Syaahi does not optimize for engagement. Every architectural decision prioritizes simplicity, longevity, and meaningful user experiences.
 
 ```text
 ┌─────────────────────┐
-│   Flutter Web App   │
-│      (Vercel)       │
+│   Flutter App       │
+│ (Web / Android)     │
 └────────┬────────────┘
          │ HTTPS (REST API)
          ▼
 ┌─────────────────────┐
 │    Express API      │
-│      (Railway)      │
+│  (Node.js + TS)     │
 └────────┬────────────┘
          │ Prisma ORM
          ▼
@@ -29,17 +31,44 @@ Syaahi is a client-server application designed for emotional expression, poetry,
 └─────────────────────┘
 ```
 
-Current status:
+Current platform capabilities:
 
 ```text
 ✓ Authentication
-✓ Session Persistence
+✓ Session Recovery
+✓ User Profiles
 ✓ Poetry Feed
-✓ Infinite Scroll Pagination
-✓ Poem Reader
-✓ Poem Publishing
+✓ Cursor Pagination
+✓ Infinite Scroll
+✓ Feed Filters
+✓ Heart System
+✓ Meaningful Reactions
+✓ Syaahi Flow Feed Engine
 ✓ Seed Content System
 ✓ Local Verification
+```
+
+---
+
+# Application Flow
+
+The current user journey follows:
+
+```text
+App Launch
+      ↓
+Splash Screen
+      ↓
+Session Recovery
+      ↓
+Welcome / Feed
+      ↓
+Feed
+ ├── Read Poem
+ ├── Write Poem
+ ├── Profile
+ ├── Commit to Heart
+ └── Meaningful Reactions
 ```
 
 ---
@@ -49,14 +78,14 @@ Current status:
 Technology Stack:
 
 ```text
-Flutter Web
+Flutter
 │
 ├── go_router
 ├── Riverpod
 ├── Dio
 ├── flutter_secure_storage
 │
-└── features/
+└── Feature Modules
 ```
 
 Directory Structure:
@@ -65,72 +94,78 @@ Directory Structure:
 lib/
 │
 ├── core/
-│   ├── routing/
+│   ├── router/
+│   ├── network/
+│   ├── storage/
 │   ├── theme/
-│   ├── constants/
-│   └── network/
+│   └── constants/
 │
 ├── features/
-│   │
+│   ├── splash/
+│   ├── welcome/
 │   ├── auth/
-│   │   ├── data/
-│   │   ├── state/
-│   │   └── presentation/
-│   │
-│   └── poems/
-│       ├── data/
-│       ├── state/
-│       └── presentation/
+│   ├── poems/
+│   ├── profile/
+│   ├── heart/
+│   ├── reactions/
+│   └── home/
 │
-└── shared/
+├── shared/
+│   ├── models/
+│   └── widgets/
+│
+└── main.dart
 ```
 
 ---
 
-# Frontend Design Principle
+# Frontend Design Principles
 
-UI never communicates directly with the backend.
+UI never communicates directly with backend services.
 
 ```text
 Screen
-  ↓
+      ↓
 Riverpod Provider / StateNotifier
-  ↓
+      ↓
 Repository
-  ↓
+      ↓
 Dio
-  ↓
+      ↓
 REST API
 ```
 
 Benefits:
 
-* Testability
-* Separation of concerns
-* Easier maintenance
-* Consistent error handling
+- Clear separation of concerns
+- Highly testable architecture
+- Easier maintenance
+- Consistent error handling
+- Scalable feature development
 
 ---
 
 # Feed Architecture
 
-The poem feed uses cursor-based pagination.
-
-State is managed by a dedicated FeedNotifier.
+The feed is powered by cursor pagination and the Syaahi Flow engine.
 
 ```text
 Feed Screen
-     ↓
+      ↓
 FeedNotifier
-     ↓
+      ↓
 PoemsRepository
-     ↓
-Dio
-     ↓
+      ↓
 GET /api/v1/poems
+      ↓
+Syaahi Flow
+      ↓
+Cursor Pagination
+      ↓
+Append Results
 ```
 
-Feed State:
+Feed state maintains:
 
 ```text
 poems
@@ -143,14 +178,45 @@ error
 
 ---
 
+# Syaahi Flow
+
+Before poems are returned to the client, they pass through the **Syaahi Flow** sequencing engine.
+
+```text
+Database
+      ↓
+Recent Poems
+      ↓
+Syaahi Flow
+      ↓
+Cursor Pagination
+      ↓
+API Response
+```
+
+Responsibilities:
+
+- Preserve overall recency
+- Distribute authors naturally
+- Prevent consecutive poems by the same author whenever possible
+- Never rank content using popularity
+- Never use reactions or Hearts for ranking
+- Produce deterministic ordering
+
+Syaahi Flow is a literary sequencing engine, not a recommendation algorithm.
+
+---
+
 # Infinite Scroll Lifecycle
 
 ```text
 Initial Load
       ↓
-Fetch First 10 Poems
+Fetch First Page
       ↓
-User Scrolls Past 85%
+Receive nextCursor
+      ↓
+User Scrolls
       ↓
 loadMore()
       ↓
@@ -158,33 +224,38 @@ Fetch Next Page
       ↓
 Append Results
       ↓
-Update Cursor
+Repeat
       ↓
-Repeat Until hasMore = false
+nextCursor = null
       ↓
 "You have read everything"
 ```
 
-Pull-to-refresh resets state and reloads from the first page.
+Pull-to-refresh clears the current feed state and reloads from the beginning.
 
 ---
 
 # Backend Architecture
 
 ```text
-Express App
+Express Application
 │
 ├── Middleware
 │   ├── helmet
 │   ├── cors
 │   ├── morgan
 │   ├── rateLimiter
+│   ├── authenticate
 │   └── errorHandler
 │
-└── Modules
-    ├── auth/
-    ├── poems/
-    └── users/
+├── Auth Module
+├── Users Module
+├── Poems Module
+├── Hearts Module
+├── Reactions Module
+│
+└── Feed Engine
+    └── Syaahi Flow
 ```
 
 Directory Structure:
@@ -196,96 +267,143 @@ src/
 ├── middleware/
 ├── modules/
 │   ├── auth/
+│   ├── users/
 │   ├── poems/
-│   └── users/
+│   ├── hearts/
+│   └── reactions/
 │
 ├── utils/
+│   ├── feed/
+│   │   └── syaahiFlow.ts
+│   ├── ApiError.ts
+│   └── asyncHandler.ts
+│
+├── app.ts
 └── server.ts
 ```
 
 ---
 
-# Backend Design Principle
+# Backend Design Principles
 
-Each module owns:
+Every feature owns its:
 
 ```text
 Routes
 Validation
 Business Logic
+Repositories
 ```
 
 Example:
 
 ```text
-auth/
-├── auth.routes.ts
-├── auth.schemas.ts
-└── auth.controller.ts
+poems/
+├── poems.routes.ts
+├── poems.schemas.ts
+├── poems.controller.ts
+└── poems.repository.ts
 ```
 
-Shared concerns belong only in:
+Shared behaviour belongs only in:
 
 ```text
+config/
 middleware/
 utils/
-config/
 ```
 
 ---
 
-# Database Schema
+# Database Model Overview
 
-## User
+## Active Models
 
 ```text
 User
-├── id
-├── email
-├── username
-├── displayName
-├── passwordHash
-├── bio
-├── avatarUrl
-└── poems[]
-```
+│
+├── Poems
+├── Hearts
+└── Reactions
 
----
-
-## Poem
-
-```text
 Poem
-├── id
-├── authorId
-├── title
-├── content
-├── language
-├── emotion
-├── isPublished
-├── createdAt
-└── author
+│
+├── Author
+├── Hearts
+└── Reactions
+
+Heart
+
+Reaction
 ```
 
 ---
 
-# Future Schema Models
+## Future Models
 
-Defined but not active:
+Reserved for future releases:
 
 ```text
-Reaction
+Journal
+
+TimeCapsule
+
+Letter
+
+Circle
+
 Follow
-Room
-RoomMember
-PoemRoom
 ```
 
-Purpose:
+These remain outside the current API until their respective roadmap phases begin.
 
-Future-proof schema evolution and reduce migration risk.
+---
 
-These models are not currently exposed through APIs.
+# Heart System
+
+Readers may privately preserve poems.
+
+Characteristics:
+
+- Private
+- No notifications
+- No public counts
+- Personal archive only
+- Does not influence feed ranking
+
+```text
+Reader
+      ↓
+Commit to Heart
+      ↓
+Private Collection
+```
+
+---
+
+# Meaningful Reactions
+
+Syaahi intentionally avoids Like buttons.
+
+Readers acknowledge how a poem affected them.
+
+Supported reactions:
+
+```text
+FELT_THIS
+
+STAYED_WITH_ME
+
+BEAUTIFULLY_WRITTEN
+
+MADE_ME_THINK
+
+COMFORTED_ME
+
+INSPIRED_ME
+```
+
+These reactions communicate emotional impact rather than popularity.
 
 ---
 
@@ -296,22 +414,20 @@ User Login
       ↓
 Zod Validation
       ↓
-Find User
+User Lookup
       ↓
-bcrypt Compare
+bcrypt Verification
       ↓
 JWT Generation
       ↓
-Return Token
-      ↓
-flutter_secure_storage
+Secure Storage
       ↓
 Authorization Header
       ↓
-Protected Route Access
+Protected API Access
 ```
 
-Current Authentication Features:
+Current capabilities:
 
 ```text
 ✓ Signup
@@ -322,12 +438,14 @@ Current Authentication Features:
 ✓ Password Hashing
 ```
 
-Known Limitation:
+Current limitations:
 
 ```text
-✗ Refresh Tokens
-✗ Token Revocation
-✗ Email Verification
+No Refresh Tokens
+
+No Token Blacklist
+
+No Email Verification
 ```
 
 Logout currently removes the token from the client only.
@@ -339,17 +457,17 @@ Logout currently removes the token from the client only.
 ```text
 Incoming Request
       ↓
-helmet
+Helmet
       ↓
-cors
+CORS
       ↓
-morgan
+Morgan
       ↓
-rateLimiter
+Rate Limiter
       ↓
-Router
+Authentication
       ↓
-authenticate (protected routes)
+Zod Validation
       ↓
 Controller
       ↓
@@ -357,9 +475,13 @@ Prisma
       ↓
 Database
       ↓
+Syaahi Flow (Feed Only)
+      ↓
+Cursor Pagination
+      ↓
 JSON Response
       ↓
-errorHandler (if needed)
+Error Handler (if required)
 ```
 
 ---
@@ -374,25 +496,15 @@ Allow all localhost origins
 
 Reason:
 
-Flutter Web uses dynamic localhost ports.
-
-Example:
-
-```text
-localhost:3000
-localhost:5000
-localhost:59837
-```
+Flutter development uses dynamic localhost ports.
 
 Production:
 
 ```text
-Allow only CORS_ORIGIN
+Allow only configured CORS_ORIGIN values
 ```
 
-Configured through environment variables.
-
-This behaviour is documented in ADR-010.
+Configured entirely through environment variables.
 
 ---
 
@@ -400,37 +512,27 @@ This behaviour is documented in ADR-010.
 
 Purpose:
 
-Provide realistic data for development, demos, testing, and UI validation.
+- Local development
+- UI validation
+- Feed testing
+- Pagination testing
+- Demonstrations
 
-Current Dataset:
+Current dataset:
 
 ```text
-10 Users
+10 Writers
+
 30 Poems
-2 Languages
-5 Core Emotions
+
+Multiple Languages
+
+Multiple Themes
+
+Multiple Emotions
 ```
 
-Writer Personas:
-
-```text
-raghav_writes
-midnight_writer
-sara_writes
-arjun_kavya
-zara_lafz
-aarav_thinks
-meera_writes
-kabir_outdoors
-ananya_heals
-rizwan_recalls
-```
-
----
-
-# Seed Script
-
-Location:
+Seed script:
 
 ```text
 scripts/cleanup-and-reseed.ts
@@ -442,35 +544,33 @@ Usage:
 npx tsx scripts/cleanup-and-reseed.ts
 ```
 
-Actions:
+Operations performed:
 
 ```text
-Delete old seed data
-Create accounts
+Delete previous seed data
+Create seed accounts
 Create poems
-Shuffle authors
+Distribute authors naturally
 Stagger timestamps
 ```
-
-Used for development only.
 
 ---
 
 # Environment Validation
 
-All environment variables are validated using Zod at startup.
+All backend environment variables are validated at startup using Zod.
 
 If validation fails:
 
 ```text
-Server startup is aborted.
+Server startup is aborted immediately.
 ```
 
 Benefits:
 
-* Prevents misconfiguration
-* Detects missing secrets early
-* Safer deployments
+- Prevents invalid deployments
+- Detects missing configuration early
+- Eliminates silent runtime failures
 
 ---
 
@@ -481,9 +581,12 @@ Backend:
 ```env
 DATABASE_URL=
 DIRECT_URL=
+
 JWT_SECRET=
 JWT_EXPIRES_IN=
+
 CORS_ORIGIN=
+
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=
@@ -502,73 +605,92 @@ API_BASE_URL=
 Accepted technical debt:
 
 ```text
-No refresh tokens
-No email verification
-No profile editing
-No poem deletion
-No automated tests
-No production deployment yet
+No Refresh Tokens
+
+No Email Verification
+
+No Token Blacklist
+
+No Automated Test Suite
+
+Redis-backed Rate Limiting Pending
+
+Production Deployment Pending
 ```
 
-These are documented and intentionally deferred.
+These limitations are documented and intentionally deferred.
 
 ---
 
 # Deployment Targets
 
 ```text
-Frontend → Vercel
-Backend  → Railway
-Database → Supabase
+Android APK  → Internal Beta Distribution
+
+Backend      → Railway (or alternative)
+
+Database     → Supabase
 ```
 
-Current Status:
+Current status:
 
 ```text
 Deployment Ready
-Not Yet Deployed
+
+Awaiting Production Deployment
 ```
 
 ---
 
-# Guiding Principles
+# Architectural Principles
 
 1. Feature-based architecture.
-2. Repository pattern everywhere.
-3. UI never calls APIs directly.
-4. Validate all inputs.
-5. Validate all environment variables.
-6. Prefer simplicity over complexity.
-7. Preserve emotional-first product philosophy.
+2. Repository pattern throughout the application.
+3. UI never communicates directly with APIs.
+4. Every request is validated.
+5. Every environment variable is validated.
+6. Shared logic belongs only in common utilities.
+7. Feed ordering is handled exclusively by Syaahi Flow.
+8. Emotional interactions never influence ranking.
+9. Prefer simplicity over cleverness.
+10. Preserve the product's emotional-first philosophy.
 
 ---
 
 # Architecture Summary
 
 ```text
-Flutter Web
-     ↓
+Flutter App
+      ↓
 Riverpod
-     ↓
+      ↓
 Repository
-     ↓
+      ↓
 Dio
-     ↓
+      ↓
 Express API
-     ↓
+      ↓
 Prisma
-     ↓
+      ↓
 PostgreSQL
+      ↓
+Syaahi Flow
+      ↓
+Cursor Pagination
+      ↓
+Client
 ```
 
-Current Version:
+Current Release:
 
 ```text
-v0.2.2
-MVP Complete
-Seeded
-Paginated
-Documented
+v0.3.0-beta
+
+Internal Beta
+
 Locally Verified
-Deployment Pending
+
+Documentation Complete
+
+Deployment Ready
 ```

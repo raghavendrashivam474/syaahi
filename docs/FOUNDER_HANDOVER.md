@@ -2,55 +2,69 @@
 
 # Founder Handover & Continuity Document
 
-### Version: v0.2.2
+**Version:** v0.3.0-beta
 
-### Prepared By: Raghavendra Singh
+**Prepared By:** Raghavendra Singh
 
-### Purpose: Long-Term Project Continuity
+**Purpose:** Long-Term Project Continuity & Product Stewardship
 
 ---
 
 # 1. Executive Summary
 
-Syaahi is a platform for emotional expression, memory preservation, poetry, journals, letters, and personal reflection.
+Syaahi is a platform for poetry, journals, letters, memory preservation, and emotional reflection.
 
-The project exists because modern digital platforms optimize for attention.
+It exists because modern digital platforms optimize for attention.
 
 Syaahi optimizes for meaning.
 
-The objective is not to maximize engagement.
+The objective has never been to maximize engagement.
 
-The objective is to help users:
+The objective is to help people:
 
-* Express emotions
-* Preserve memories
-* Revisit personal history
-* Create lasting written artifacts
+- Express emotions
+- Preserve memories
+- Revisit personal history
+- Build a lifelong archive of their own words
 
-If future development ever drifts away from these goals, it is likely moving away from the intended vision.
+Every significant product decision should strengthen one or more of these goals.
+
+If future development moves away from them, the project has likely drifted from its intended purpose.
 
 ---
 
 # 2. Why Syaahi Exists
 
-The founder observed:
+Most digital platforms encourage people to perform.
 
-* Social media rewards visibility
-* Most platforms optimize for reactions
-* Few platforms help users preserve emotional experiences
+Visibility becomes success.
+
+Engagement becomes validation.
+
+Algorithms determine what deserves attention.
+
+Writing slowly shifts from expression to performance.
 
 People write:
 
-* Poems
-* Letters
-* Journals
-* Reflections
+- Poems
+- Journals
+- Letters
+- Reflections
 
-But those writings become scattered across notebooks, chats, notes applications, and social feeds.
+Yet these writings become scattered across:
+
+- Notebooks
+- Notes applications
+- Chat histories
+- Social media
+- Forgotten folders
+
+Very few platforms exist to preserve these moments.
 
 Syaahi exists to become:
 
-> A personal archive of human expression.
+> **A personal archive of human expression.**
 
 ---
 
@@ -58,86 +72,132 @@ Syaahi exists to become:
 
 Every feature should satisfy at least one of the following:
 
-1. Helps users express emotions
-2. Helps users preserve memories
-3. Helps users revisit past experiences
+1. Help people express emotions.
+2. Help people preserve memories.
+3. Help people revisit their past.
 
-If a feature satisfies none of these, it should be questioned.
+If a feature satisfies none of these goals, it should probably not exist.
+
+Technology serves the philosophy.
+
+The philosophy never serves the technology.
 
 ---
 
 # 4. What Syaahi Is Not
 
-Syaahi is NOT:
+Syaahi is intentionally **not**:
 
-* Instagram
-* Twitter / X
-* LinkedIn
-* Medium
-* Reddit
-* A creator economy platform
+- Instagram
+- X (Twitter)
+- LinkedIn
+- Reddit
+- Medium
+- A creator economy platform
 
-The following are intentionally excluded:
+The following are deliberately excluded:
 
-* Follower counts
-* Influencer mechanics
-* Algorithmic feeds
-* Trending pages
-* Engagement farming
-* Virality systems
+- Followers
+- Public Like counts
+- Trending feeds
+- Viral mechanics
+- Endless engagement loops
+- Audience building
+- Influencer mechanics
+- Engagement farming
 
-These are exclusions by design.
+These exclusions are product decisions, not missing features.
 
 ---
 
 # 5. Current Product State
 
-### Version
+## Version
 
-v0.2.2
+```text
+v0.3.0-beta
+```
 
-### Status
+## Status
 
-MVP Complete
+```text
+Internal Beta
+
+Feature Complete
 
 Documentation Complete
 
 Locally Verified
 
-Deployment Pending
+Deployment Ready
 
-### Current User Journey
+Awaiting Internal User Testing
+```
+
+---
+
+## Current User Journey
 
 ```text
 Register
-↓
+      ↓
 Login
-↓
+      ↓
 Session Recovery
-↓
+      ↓
 Browse Feed
-↓
-Create Poem
-↓
+      ↓
+Filter Feed
+      ↓
 Read Poem
-↓
+      ↓
+Meaningful Reactions
+      ↓
+Commit to Heart
+      ↓
+Write Poem
+      ↓
+Visit Profiles
+      ↓
 Logout
 ```
 
-### Features Available Today
+---
 
-* Registration
-* Login
-* JWT Authentication
-* Session Persistence
-* Poem Publishing
-* Poem Reading
-* User Profiles
-* Cursor Pagination
-* Infinite Scroll
-* Pull To Refresh
-* Seed Content System
-* Documentation Suite
+## Features Available
+
+### Authentication
+
+- Registration
+- Login
+- JWT Authentication
+- Session Recovery
+- Logout
+
+### Feed
+
+- Cursor Pagination
+- Infinite Scroll
+- Pull-to-Refresh
+- Feed Filters
+- Syaahi Flow sequencing
+
+### Poems
+
+- Publish
+- Read
+- Author Profiles
+
+### Emotional Features
+
+- Meaningful Reactions
+- Commit to Heart
+
+### Platform
+
+- User Profiles
+- Seed Content System
+- Documentation Suite
 
 ---
 
@@ -145,29 +205,35 @@ Logout
 
 ## Frontend
 
-Flutter Web
+Flutter
 
 Architecture:
 
 ```text
-UI
-↓
+Screen
+      ↓
 Riverpod
-↓
+      ↓
 Repository
-↓
+      ↓
 Dio
 ```
+
+---
 
 ## Backend
 
 ```text
-Node.js
-↓
 Express
-↓
+      ↓
+Controllers
+      ↓
 Prisma
+      ↓
+PostgreSQL
 ```
+
+---
 
 ## Database
 
@@ -175,101 +241,148 @@ Prisma
 Supabase PostgreSQL
 ```
 
-## Data Flow
+---
+
+## Complete Data Flow
 
 ```text
-User Action
-↓
+User
+      ↓
+Flutter UI
+      ↓
+Riverpod
+      ↓
 Repository
-↓
-API
-↓
+      ↓
+Dio
+      ↓
+REST API
+      ↓
+Controller
+      ↓
 Prisma
-↓
+      ↓
 Database
-↓
+      ↓
 Response
-↓
+      ↓
 State
-↓
+      ↓
 UI
 ```
 
 ---
 
-# 7. Architectural Decisions
+# 7. Major Architectural Decisions
 
-### ADR-001
+## ADR-001
 
 Feature-Based Architecture
 
 Reason:
 
-Scalable and maintainable code organization.
+Independent, maintainable modules.
 
 ---
 
-### ADR-002
+## ADR-002
 
 Repository Pattern
 
 Reason:
 
-UI should never directly call APIs.
+UI never communicates directly with APIs.
 
 ---
 
-### ADR-003
+## ADR-003
 
 JWT Authentication
 
 Reason:
 
-Stateless and mobile friendly.
+Stateless authentication compatible with mobile and web.
 
 ---
 
-### ADR-004
+## ADR-004
 
-Flutter Web
+Flutter
 
 Reason:
 
-Single codebase for Web and future Mobile support.
+Single codebase for Android, iOS, and Web.
 
 ---
 
-### ADR-005
+## ADR-005
 
-Supabase + Prisma
+Prisma + PostgreSQL
 
 Reason:
 
-Rapid development while retaining PostgreSQL ownership.
+Type-safe development while retaining SQL ownership.
 
 ---
 
-### ADR-011
+## ADR-006
 
 Cursor Pagination
 
 Reason:
 
-Feed scalability and infinite scroll support.
+Infinite scrolling without offset performance problems.
 
 ---
 
-### ADR-012
+## ADR-007
 
 Seed Content System
 
 Reason:
 
-Repeatable development and demonstration environment.
+Repeatable demonstrations and development environments.
 
 ---
 
-# 8. Current Folder Structure
+## ADR-008
+
+Syaahi Flow
+
+Reason:
+
+Feeds should encourage reading, not scrolling.
+
+Ordering priorities:
+
+- Preserve freshness
+- Balance authors
+- Never use popularity
+- Avoid consecutive poems by the same writer whenever possible
+
+---
+
+## ADR-009
+
+Meaningful Reactions
+
+Reason:
+
+Replace Likes with emotional acknowledgement.
+
+---
+
+## ADR-010
+
+Commit to Heart
+
+Reason:
+
+Bookmarks are private emotional keepsakes rather than engagement metrics.
+
+---
+
+# 8. Repository Structure
 
 ## Backend
 
@@ -280,9 +393,13 @@ src/
 ├── modules/
 │   ├── auth/
 │   ├── poems/
-│   └── users/
+│   ├── users/
+│   ├── hearts/
+│   └── reactions/
 └── utils/
 ```
+
+---
 
 ## Frontend
 
@@ -291,50 +408,58 @@ lib/
 ├── core/
 ├── features/
 │   ├── auth/
-│   └── poems/
+│   ├── poems/
+│   ├── hearts/
+│   ├── reactions/
+│   └── profiles/
 └── shared/
 ```
 
-Future features should follow the same structure.
+Future features should continue following the same modular structure.
 
 ---
 
-# 9. Known Technical Debt
+# 9. Current Technical Debt
 
 Accepted limitations:
 
-* No refresh tokens
-* No email verification
-* No profile editing
-* No poem editing
-* No poem deletion
-* No automated tests
-* No token blacklist
-* In-memory rate limiting
+- Refresh tokens
+- Email verification
+- Automated testing
+- Production deployment
+- Production monitoring
+- Redis-backed rate limiting
+- Token blacklist
 
-These are accepted trade-offs for the current stage.
+These are intentional trade-offs while validating the product.
 
 ---
 
 # 10. Product Roadmap
 
-## v0.3.0
+## v0.3.x
 
-Deployment Sprint
+Internal Beta
 
-Goal:
+Objectives:
 
-Public staging environment.
+- Deploy backend
+- Generate Android APK
+- Invite first writers
+- Collect qualitative feedback
 
 ---
 
 ## v0.4.0
 
-Testing Sprint
+Reliability
 
-Goal:
+Objectives:
 
-Reliability and regression prevention.
+- Automated testing
+- Monitoring
+- Logging
+- Production hardening
 
 ---
 
@@ -342,16 +467,12 @@ Reliability and regression prevention.
 
 Journals
 
-Goal:
-
-Private emotional reflection.
-
 Features:
 
-* Create
-* Edit
-* Archive
-* Search
+- Create
+- Edit
+- Archive
+- Search
 
 Private by default.
 
@@ -361,16 +482,12 @@ Private by default.
 
 Personal Archive
 
-Goal:
-
-Memory preservation.
-
 Features:
 
-* Timeline
-* Memory View
-* Writing History
-* On This Day
+- Timeline
+- Memory View
+- Emotional History
+- On This Day
 
 ---
 
@@ -378,13 +495,9 @@ Features:
 
 Letters After Midnight
 
-Goal:
+Anonymous emotional conversations.
 
-Anonymous emotional communication.
-
-Important:
-
-Requires moderation architecture before implementation.
+Requires moderation before release.
 
 ---
 
@@ -392,11 +505,9 @@ Requires moderation architecture before implementation.
 
 Time Capsules
 
-Goal:
+Messages delivered to one's future self.
 
-Long-term emotional preservation.
-
-Users write messages to their future selves.
+Locked after sealing.
 
 ---
 
@@ -404,16 +515,7 @@ Users write messages to their future selves.
 
 Community Circles
 
-Goal:
-
-Belonging through shared writing.
-
-Examples:
-
-* Midnight Thoughts
-* Healing
-* Monsoon Poetry
-* First Love
+Small writing communities.
 
 No follower mechanics.
 
@@ -421,33 +523,36 @@ No follower mechanics.
 
 ## v1.0.0
 
-First Public Release
+First Stable Public Release
 
 Requirements:
 
-* Stable deployment
-* Testing coverage
-* Journals
-* Personal Archive
-* Core moderation tooling
+- Stable deployment
+- Automated testing
+- Journals
+- Personal Archive
+- Moderation
+- Monitoring
 
 ---
 
 # 11. Features Requiring Founder Review
 
-Do not implement without explicit review:
+The following require explicit approval before implementation:
 
-* AI-generated poetry
-* AI co-writing
-* Creator monetization
-* NFT integration
-* Blockchain concepts
-* Algorithmic ranking
-* Paid subscriptions
-* Advertising systems
-* Trending feeds
+- AI-generated poetry
+- AI co-writing
+- Creator monetization
+- Paid subscriptions
+- Advertisements
+- Blockchain
+- NFTs
+- Trending feeds
+- Algorithmic ranking
+- Followers
+- Public Like counts
 
-These can fundamentally alter product direction.
+These fundamentally change the product philosophy.
 
 ---
 
@@ -455,30 +560,64 @@ These can fundamentally alter product direction.
 
 ## Backend
 
+Preferred:
+
+```text
 Railway
+```
+
+Alternatives:
+
+- Render
+- Fly.io
+- Coolify
+- DigitalOcean
+
+---
 
 ## Frontend
 
-Vercel
+Internal beta:
+
+```text
+Android APK
+```
+
+Future:
+
+```text
+Flutter Web
+```
+
+---
 
 ## Database
 
-Supabase
+```text
+Supabase PostgreSQL
+```
 
-### Backend Environment Variables
+---
+
+## Backend Environment Variables
 
 ```text
 DATABASE_URL
 DIRECT_URL
+
 JWT_SECRET
 JWT_EXPIRES_IN
+
 CORS_ORIGIN
+
 SUPABASE_URL
 SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 ```
 
-### Frontend Environment Variables
+---
+
+## Frontend
 
 ```text
 API_BASE_URL
@@ -488,32 +627,39 @@ API_BASE_URL
 
 # 13. Definition of Done
 
-A feature is complete only if:
+A feature is complete only when:
 
 ```text
 ✓ Implemented
-✓ Validated
-✓ Error handling added
-✓ Documented
-✓ Reviewed
-✓ Verified manually
-✓ Works on staging
+
+✓ Input Validated
+
+✓ Error Handling Added
+
+✓ Manually Verified
+
+✓ Documentation Updated
+
+✓ Proper Commit Created
+
+✓ Works On Deployment Target
 ```
 
-Local-only functionality is not complete.
+Code that works only on a local machine is not complete.
 
 ---
 
 # 14. Development Rules
 
-1. Keep architecture simple
-2. Prefer maintainability over cleverness
-3. Avoid premature optimization
-4. Document decisions
-5. Commit frequently
-6. Preserve product philosophy
-7. Do not build features because competitors have them
-8. Build features only if they strengthen the mission
+1. Preserve simplicity.
+2. Prefer readability over cleverness.
+3. Avoid premature optimization.
+4. Document significant decisions.
+5. Commit frequently.
+6. Keep modules independent.
+7. Preserve product philosophy.
+8. Never add features simply because competitors have them.
+9. Build only what strengthens emotional expression.
 
 ---
 
@@ -521,67 +667,83 @@ Local-only functionality is not complete.
 
 ## Short Term
 
-* Public staging deployment
-* 10 active users
-* 100 poems
+- Successful internal beta
+- First 20–50 genuine writers
+- Meaningful qualitative feedback
+
+---
 
 ## Medium Term
 
-* 100 users
-* 1,000 poems
-* Journal adoption
+- Active journals
+- Returning readers
+- Growing personal archives
+
+---
 
 ## Long Term
 
-* Meaningful personal archives
-* Returning users revisiting old writing
-* Time Capsule engagement
-* Letters After Midnight participation
+The most important metric is not usage.
+
+It is return.
+
+People returning months or years later to rediscover their own words.
+
+That is success.
 
 ---
 
 # 16. If The Founder Is Unavailable
 
-If future contributors must make decisions without founder input:
+When difficult decisions arise:
 
-1. Preserve emotional depth over engagement
-2. Preserve simplicity over feature count
-3. Prefer reflection over consumption
-4. Prefer meaning over metrics
-5. Prefer permanence over novelty
+Choose the option that makes Syaahi feel more like:
+
+- A journal
+- A quiet library
+- A collection of letters
+- A memory archive
+
+And less like:
+
+- A social network
+- An attention platform
+- A creator economy
 
 When uncertain:
 
-> Choose the option that makes Syaahi feel more like a journal and less like a social network.
+> **Choose meaning over engagement.**
 
 ---
 
 # 17. Final Founder Note
 
-The value of Syaahi is not the technology.
+Technology will evolve.
 
-Any competent engineer can rebuild the codebase.
+Frameworks will change.
 
-The difficult part is preserving the intent.
+Databases will be replaced.
 
-The project should always feel like:
+The codebase can always be rewritten.
 
-* A quiet library
-* A journal
-* A collection of letters
-* A personal archive
+The difficult part is preserving intent.
 
-If a future version begins to feel like a social network, something important has been lost.
+Protect the quietness.
 
-Protect the experience.
+Protect the honesty.
 
 Protect the simplicity.
 
-Protect the reason it exists.
+Protect the experience of someone opening Syaahi years later and finding a forgotten piece of themselves waiting there.
+
+If that experience survives,
+
+Syaahi has succeeded.
 
 ---
 
 **— Raghavendra Singh**
+
 Founder, Syaahi
 
-*"Where emotions become words."*
+> **"Where emotions become words."**

@@ -2,9 +2,9 @@
 
 > Where emotions become words.
 
-This roadmap reflects the long-term vision for Syaahi.
+This roadmap represents the long-term evolution of Syaahi.
 
-Features are prioritized by emotional value and user impact rather than technical complexity.
+Features are prioritized by emotional value, user impact, and product philosophy rather than technical complexity.
 
 ---
 
@@ -12,7 +12,7 @@ Features are prioritized by emotional value and user impact rather than technica
 
 Before any feature is built, ask:
 
-> Does this help people express, preserve, or revisit emotions?
+> **Does this help people express, preserve, or revisit emotions?**
 
 If the answer is no, it probably does not belong in Syaahi.
 
@@ -24,17 +24,19 @@ If the answer is no, it probably does not belong in Syaahi.
 
 ### Backend
 
-* Express.js setup
-* TypeScript configuration
-* Prisma ORM integration
-* Supabase PostgreSQL integration
-* Environment validation with Zod
-* Modular architecture
-* Health check endpoint
+- Express.js project setup
+- TypeScript configuration
+- Prisma ORM integration
+- PostgreSQL (Supabase)
+- Environment validation with Zod
+- Feature-based architecture
+- Health endpoint
+- Security middleware
+- Global error handling
 
 ### Outcome
 
-Development foundation established.
+A scalable backend foundation for future development.
 
 ---
 
@@ -42,135 +44,181 @@ Development foundation established.
 
 ### Authentication
 
-* Registration
-* Login
-* JWT authentication
-* Session recovery
-* Logout
+- User registration
+- Login
+- JWT authentication
+- Session recovery
+- Logout
 
 ### Poems
 
-* Create poem
-* Read poem
-* Feed
-* Author profiles
+- Publish poem
+- Read poem
+- Public feed
+- User profiles
 
 ### Frontend
 
-* Flutter Web application
-* Riverpod state management
-* Repository pattern
-* Secure token storage
+- Flutter application
+- Riverpod state management
+- Repository pattern
+- Secure JWT storage
 
 ### Outcome
 
-First complete user journey operational.
+The first complete end-to-end user journey became operational.
 
 ---
 
-## v0.2.1 — Documentation & Verification
+## v0.2.1 — Documentation & Engineering
 
 ### Documentation
 
-* Architecture documentation
-* API contract
-* Roadmap
-* Progress log
-* Vision document
-* Contributing guide
-* Founder handover
+- Architecture
+- API Contract
+- Roadmap
+- Progress Log
+- Vision
+- Contributing Guide
+- Founder Handover
 
-### Verification
+### Engineering
 
-* Full local verification completed
-* Authentication verified
-* Feed verified
-* Poem creation verified
+- Local verification
+- Documentation refinement
+- Development standards
+- Project continuity
 
 ### Outcome
 
-Project became maintainable and transferable.
+Syaahi became maintainable, transferable, and contributor-friendly.
 
 ---
 
-## v0.2.2 — Feed & Seed Content Improvements
+## v0.2.2 — Feed & Developer Experience
 
 ### Feed
 
-* Cursor-based pagination
-* Infinite scrolling
-* Pull-to-refresh
-* End-of-feed indicator
+- Cursor pagination
+- Infinite scrolling
+- Pull-to-refresh
+- End-of-feed indicator
 
-### Development Environment
+### Development
 
-* Seed content system
-* Writer personas
-* Reusable reseed script
+- Seed content system
+- Writer personas
+- Cleanup & reseed script
+- Documentation improvements
 
 ### Dataset
 
-```text id="axkvhe"
-10 Accounts
+```text
+10 Writers
 30 Poems
-Multiple Writing Styles
+Multiple Languages
+Multiple Themes
 Multiple Emotions
 ```
 
 ### Outcome
 
-Application became demo-ready and scalable.
+The application became demo-ready and significantly easier to develop and test.
+
+---
+
+## v0.3.0-beta — Internal Beta
+
+### Feed Experience
+
+- Syaahi Flow literary sequencing engine
+- Feed filters
+- Improved reading experience
+- Better author distribution
+
+### Emotional Interactions
+
+- Commit to Heart
+- Meaningful Reactions
+- Private emotional interactions
+- Reader-first philosophy
+
+### Profiles
+
+- Expanded public profiles
+- Writing summaries
+- Language and theme insights
+
+### Product
+
+- Documentation synchronized
+- Internal beta prepared
+- Ready for controlled user testing
+
+### Outcome
+
+Syaahi evolved from a functional MVP into a product-ready internal beta focused on meaningful reading experiences.
 
 ---
 
 # Current Milestone
 
-## v0.3.0 — Deployment Sprint
+## v0.3.x — Deployment & Internal Testing
 
-### Backend
+### Infrastructure
 
-* [ ] Deploy to Railway
-* [ ] Configure production environment variables
-* [ ] Verify database connectivity
-* [ ] Verify health endpoint
+- [ ] Deploy backend
+- [ ] Configure production environment
+- [ ] Configure production database
+- [ ] Production CORS
+- [ ] Health monitoring
 
-### Frontend
+### Distribution
 
-* [ ] Deploy Flutter Web to Vercel
-* [ ] Configure API_BASE_URL
-* [ ] Verify production routing
+- [ ] Generate Android APK
+- [ ] Internal beta distribution
+- [ ] Invite first writers
+- [ ] Collect qualitative feedback
 
 ### Validation
 
-* [ ] Complete staging verification
-* [ ] Verify full user journey
-* [ ] Share public URLs
+- [ ] Verify complete user journey
+- [ ] Validate Syaahi Flow
+- [ ] Validate Hearts
+- [ ] Validate Reactions
+- [ ] Performance testing
 
-### Outcome
+### Success Criteria
 
-Public staging environment available.
+- Stable deployment
+- Successful internal beta
+- Actionable user feedback
+- Production-ready foundation
 
 ---
 
 # Planned
 
-## v0.4.0 — Testing Sprint
-
-Goal:
-
-Increase reliability before introducing major features.
+## v0.4.0 — Testing & Reliability
 
 ### Backend
 
-* [ ] API regression tests
-* [ ] Repository tests
-* [ ] Authentication tests
+- Automated API tests
+- Repository tests
+- Authentication tests
+- Integration tests
 
 ### Frontend
 
-* [ ] Widget tests
-* [ ] State management tests
-* [ ] Integration tests
+- Widget tests
+- Riverpod state tests
+- End-to-end testing
+
+### Infrastructure
+
+- Monitoring
+- Logging
+- Error reporting
 
 ---
 
@@ -180,55 +228,53 @@ Private by default.
 
 ### Features
 
-* [ ] Create journal entry
-* [ ] Edit journal entry
-* [ ] Archive journal entry
-* [ ] Search journal entries
+- Create journal
+- Edit journal
+- Archive journal
+- Search journals
+- Rich writing experience
 
-### Why Journals?
+### Purpose
 
-Poetry is occasional.
+Poetry captures moments.
 
-Journaling creates a habit of returning.
-
-The journal becomes a personal emotional archive over time.
+Journals preserve seasons of life.
 
 ---
 
 ## v0.6.0 — Personal Archive
 
-A timeline of your own words.
+Your own timeline of memories.
 
 ### Features
 
-* [ ] Personal writing timeline
-* [ ] Memory view
-* [ ] Emotional history
-* [ ] On This Day
+- Personal timeline
+- Memory view
+- Emotional history
+- On This Day
+- Writing insights
 
-### Why Archives?
+### Purpose
 
-The most meaningful feature is not writing.
-
-It is rediscovering.
+Rediscover your own growth through your words.
 
 ---
 
 ## v0.7.0 — Letters After Midnight
 
-Anonymous letters and anonymous replies.
+Anonymous emotional conversations.
 
 ### Features
 
-* [ ] Anonymous letter creation
-* [ ] Anonymous replies
-* [ ] Reporting system
-* [ ] Abuse prevention
-* [ ] Moderation tools
+- Anonymous letters
+- Anonymous replies
+- Moderation system
+- Abuse prevention
+- Reporting
 
-### Important
+### Note
 
-Moderation architecture must be completed before implementation begins.
+Safety infrastructure must exist before launch.
 
 ---
 
@@ -238,86 +284,100 @@ Write to your future self.
 
 ### Features
 
-* [ ] Scheduled delivery
-* [ ] Locked after sealing
-* [ ] Future notification
-* [ ] Time capsule archive
+- Future delivery
+- Locked after sealing
+- Delivery notifications
+- Capsule archive
 
-### Why Time Capsules?
+### Purpose
 
-Few digital experiences are as meaningful as hearing from your past self.
+Help people reconnect with earlier versions of themselves.
 
 ---
 
 ## v0.9.0 — Community Circles
 
-Small communities, not public audiences.
+Small writing communities.
 
 ### Features
 
-* [ ] Writing circles
-* [ ] Monthly prompts
-* [ ] Poetry challenges
-* [ ] Circle sharing
-* [ ] Private and public circles
+- Writing circles
+- Monthly prompts
+- Poetry challenges
+- Circle sharing
+- Invite-only communities
 
-### Why Circles?
+### Purpose
 
-Meaningful connection matters more than audience growth.
+Meaningful communities rather than public audiences.
 
 ---
 
 ## v1.0.0 — First Public Release
 
-Requirements:
+Requirements
 
-* Stable deployment
-* Automated testing
-* Journals
-* Archive system
-* Core moderation tools
-* Production monitoring
+- Stable deployment
+- Comprehensive testing
+- Journals
+- Personal Archive
+- Core moderation
+- Production monitoring
+- Documentation complete
 
 ---
 
 # Explicitly Out of Scope
 
-The following features are intentionally excluded.
+The following features are intentionally excluded unless the product vision changes.
 
-| Feature                   | Reason                                         |
-| ------------------------- | ---------------------------------------------- |
-| Followers & Following     | Encourages audience building over expression   |
-| Like Counts               | Optimizes for validation instead of reflection |
-| Trending Feed             | Creates engagement loops                       |
-| Algorithmic Ranking       | Prioritizes attention over meaning             |
-| AI-Generated Poetry       | Contradicts human expression                   |
-| Creator Monetization      | Premature for current mission                  |
-| NFT / Blockchain Features | No alignment with product goals                |
+| Feature | Reason |
+|---------|--------|
+| Followers & Following | Encourages audience building |
+| Like Counts | Rewards validation rather than expression |
+| Trending Feed | Creates engagement loops |
+| Algorithmic Ranking | Optimizes for attention |
+| AI-generated Poetry | Contradicts authentic expression |
+| AI Co-writing | Outside current product philosophy |
+| Creator Monetization | Premature for the mission |
+| Advertising | Distracts from the writing experience |
+| NFT / Blockchain | No alignment with product goals |
 
 ---
 
 # Version Strategy
 
-```text id="8p6jgd"
-v0.x.x → Early development
-v1.0.0 → First stable public release
-v1.x.x → Feature additions
-v2.0.0 → Major platform evolution
+```text
+v0.x.x      → Early development
+v0.3.x      → Internal beta
+v0.5.x      → Feature expansion
+v1.0.0      → First stable public release
+v1.x.x      → Public feature releases
+v2.0.0      → Major platform evolution
 ```
 
 ---
 
 # Long-Term Vision
 
-Syaahi should eventually become:
+Syaahi aims to become a home for human expression.
 
-```text id="z4ep2x"
+```text
 Poetry
+     ↓
 Journals
+     ↓
 Letters
-Archives
+     ↓
 Time Capsules
+     ↓
+Personal Archives
+     ↓
 Memories
 ```
 
-A place where people can preserve who they were, and rediscover those moments years later.
+A place where people can express what they feel today, preserve it safely, and years later rediscover who they once were.
+
+---
+
+**Syaahi — Where emotions become words.**
