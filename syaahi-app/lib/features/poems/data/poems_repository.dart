@@ -18,16 +18,54 @@ class PoemFeedResult {
   const PoemFeedResult({required this.poems, this.nextCursor});
 }
 
+class FeedFilters {
+  final PoemEmotion? emotion;
+  final PoemLanguage? language;
+  final String? theme;
+
+  const FeedFilters({this.emotion, this.language, this.theme});
+
+  bool get isEmpty => emotion == null && language == null && theme == null;
+
+  FeedFilters copyWith({
+    PoemEmotion? emotion,
+    PoemLanguage? language,
+    String? theme,
+    bool clearEmotion = false,
+    bool clearLanguage = false,
+    bool clearTheme = false,
+  }) {
+    return FeedFilters(
+      emotion: clearEmotion ? null : (emotion ?? this.emotion),
+      language: clearLanguage ? null : (language ?? this.language),
+      theme: clearTheme ? null : (theme ?? this.theme),
+    );
+  }
+
+  Map<String, dynamic> toQueryParams() {
+    return {
+      if (emotion != null) 'emotion': emotion!.apiValue,
+      if (language != null) 'language': language!.apiValue,
+      if (theme != null && theme!.isNotEmpty) 'theme': theme,
+    };
+  }
+}
+
 class PoemsRepository {
   final Dio _dio;
 
   PoemsRepository({Dio? dio}) : _dio = dio ?? ApiClient().dio;
 
-  Future<PoemFeedResult> listPoems({String? cursor, int limit = 10}) async {
+  Future<PoemFeedResult> listPoems({
+    String? cursor,
+    int limit = 10,
+    FeedFilters? filters,
+  }) async {
     try {
       final response = await _dio.get('/poems', queryParameters: {
         if (cursor != null) 'cursor': cursor,
         'limit': limit,
+        ...?filters?.toQueryParams(),
       });
       final data = response.data['data'] as Map<String, dynamic>;
       final list = data['poems'] as List<dynamic>;
@@ -68,6 +106,79 @@ class PoemsRepository {
       });
       final data = response.data['data'] as Map<String, dynamic>;
       return Poem.fromJson(data['poem'] as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
+  Future<void> commitToHeart(String poemId) async {
+    try {
+      await _dio.post('/poems/$poemId/heart');
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
+  Future<void> removeFromHeart(String poemId) async {
+    try {
+      await _dio.delete('/poems/$poemId/heart');
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
+  Future<bool> getHeartStatus(String poemId) async {
+    try {
+      final response = await _dio.get('/poems/$poemId/heart/status');
+      final data = response.data['data'] as Map<String, dynamic>;
+      return data['hearted'] as bool;
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
+  Future<PoemFeedResult> getMyHeart({String? cursor, int limit = 20}) async {
+    try {
+      final response = await _dio.get('/users/me/heart', queryParameters: {
+        if (cursor != null) 'cursor': cursor,
+        'limit': limit,
+      });
+      final data = response.data['data'] as Map<String, dynamic>;
+      final list = data['poems'] as List<dynamic>;
+      final poems = list
+          .map((j) => Poem.fromJson(j as Map<String, dynamic>))
+          .toList();
+      final nextCursor = data['nextCursor'] as String?;
+      return PoemFeedResult(poems: poems, nextCursor: nextCursor);
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
+  Future<List<ReactionSummary>> getReactions(String poemId) async {
+    try {
+      final response = await _dio.get('/poems/$poemId/reactions');
+      final data = response.data['data'] as Map<String, dynamic>;
+      final list = data['reactions'] as List<dynamic>;
+      return list
+          .map((j) => ReactionSummary.fromJson(j as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
+  Future<void> addReaction(String poemId, ReactionType type) async {
+    try {
+      await _dio.post('/poems/$poemId/reactions', data: {'type': type.apiValue});
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
+  Future<void> removeReaction(String poemId, ReactionType type) async {
+    try {
+      await _dio.delete('/poems/$poemId/reactions/${type.apiValue}');
     } on DioException catch (e) {
       throw _handle(e);
     }

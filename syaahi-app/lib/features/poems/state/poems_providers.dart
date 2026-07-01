@@ -6,9 +6,9 @@ final poemsRepositoryProvider = Provider<PoemsRepository>((ref) {
   return PoemsRepository();
 });
 
-// ─────────────────────────────────────────
+// ---------------------------------------------
 // Feed State
-// ─────────────────────────────────────────
+// ---------------------------------------------
 
 class FeedState {
   final List<Poem> poems;
@@ -17,6 +17,7 @@ class FeedState {
   final bool hasMore;
   final String? nextCursor;
   final String? error;
+  final FeedFilters filters;
 
   const FeedState({
     this.poems = const [],
@@ -25,6 +26,7 @@ class FeedState {
     this.hasMore = true,
     this.nextCursor,
     this.error,
+    this.filters = const FeedFilters(),
   });
 
   FeedState copyWith({
@@ -35,6 +37,7 @@ class FeedState {
     String? nextCursor,
     String? error,
     bool clearError = false,
+    FeedFilters? filters,
   }) {
     return FeedState(
       poems: poems ?? this.poems,
@@ -43,6 +46,7 @@ class FeedState {
       hasMore: hasMore ?? this.hasMore,
       nextCursor: nextCursor ?? this.nextCursor,
       error: clearError ? null : (error ?? this.error),
+      filters: filters ?? this.filters,
     );
   }
 }
@@ -60,7 +64,10 @@ class FeedNotifier extends StateNotifier<FeedState> {
     state = state.copyWith(isLoading: true, clearError: true);
 
     try {
-      final result = await _repository.listPoems(limit: 10);
+      final result = await _repository.listPoems(
+        limit: 10,
+        filters: state.filters,
+      );
       state = state.copyWith(
         poems: result.poems,
         nextCursor: result.nextCursor,
@@ -83,6 +90,7 @@ class FeedNotifier extends StateNotifier<FeedState> {
       final result = await _repository.listPoems(
         cursor: state.nextCursor,
         limit: 10,
+        filters: state.filters,
       );
       state = state.copyWith(
         poems: [...state.poems, ...result.poems],
@@ -96,6 +104,16 @@ class FeedNotifier extends StateNotifier<FeedState> {
   }
 
   Future<void> refresh() async {
+    state = FeedState(filters: state.filters);
+    await load();
+  }
+
+  Future<void> setFilters(FeedFilters filters) async {
+    state = FeedState(filters: filters);
+    await load();
+  }
+
+  Future<void> clearFilters() async {
     state = const FeedState();
     await load();
   }
@@ -105,9 +123,9 @@ final feedProvider = StateNotifierProvider.autoDispose<FeedNotifier, FeedState>(
   return FeedNotifier(ref.watch(poemsRepositoryProvider));
 });
 
-// ─────────────────────────────────────────
+// ---------------------------------------------
 // Single poem
-// ─────────────────────────────────────────
+// ---------------------------------------------
 
 final poemByIdProvider =
     FutureProvider.autoDispose.family<Poem, String>((ref, id) async {
@@ -115,9 +133,9 @@ final poemByIdProvider =
   return repo.getPoem(id);
 });
 
-// ─────────────────────────────────────────
+// ---------------------------------------------
 // Writer
-// ─────────────────────────────────────────
+// ---------------------------------------------
 
 class WriterState {
   final bool isPublishing;
@@ -172,4 +190,98 @@ class WriterNotifier extends StateNotifier<WriterState> {
 final writerProvider =
     StateNotifierProvider<WriterNotifier, WriterState>((ref) {
   return WriterNotifier(ref.watch(poemsRepositoryProvider), ref);
+});
+
+// ---------------------------------------------
+// Heart
+// ---------------------------------------------
+
+class HeartState {
+  final List<Poem> poems;
+  final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final String? nextCursor;
+  final String? error;
+
+  const HeartState({
+    this.poems = const [],
+    this.isLoading = false,
+    this.isLoadingMore = false,
+    this.hasMore = true,
+    this.nextCursor,
+    this.error,
+  });
+
+  HeartState copyWith({
+    List<Poem>? poems,
+    bool? isLoading,
+    bool? isLoadingMore,
+    bool? hasMore,
+    String? nextCursor,
+    String? error,
+    bool clearError = false,
+  }) {
+    return HeartState(
+      poems: poems ?? this.poems,
+      isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      hasMore: hasMore ?? this.hasMore,
+      nextCursor: nextCursor ?? this.nextCursor,
+      error: clearError ? null : (error ?? this.error),
+    );
+  }
+}
+
+class HeartNotifier extends StateNotifier<HeartState> {
+  final PoemsRepository _repository;
+
+  HeartNotifier(this._repository) : super(const HeartState()) {
+    load();
+  }
+
+  Future<void> load() async {
+    if (state.isLoading) return;
+    state = state.copyWith(isLoading: true, clearError: true);
+    try {
+      final result = await _repository.getMyHeart(limit: 20);
+      state = state.copyWith(
+        poems: result.poems,
+        nextCursor: result.nextCursor,
+        hasMore: result.nextCursor != null,
+        isLoading: false,
+      );
+    } on PoemsException catch (e) {
+      state = state.copyWith(isLoading: false, error: e.message);
+    }
+  }
+
+  Future<void> loadMore() async {
+    if (state.isLoadingMore || !state.hasMore || state.nextCursor == null) return;
+    state = state.copyWith(isLoadingMore: true);
+    try {
+      final result = await _repository.getMyHeart(
+        cursor: state.nextCursor,
+        limit: 20,
+      );
+      state = state.copyWith(
+        poems: [...state.poems, ...result.poems],
+        nextCursor: result.nextCursor,
+        hasMore: result.nextCursor != null,
+        isLoadingMore: false,
+      );
+    } on PoemsException catch (e) {
+      state = state.copyWith(isLoadingMore: false, error: e.message);
+    }
+  }
+
+  Future<void> refresh() async {
+    state = const HeartState();
+    await load();
+  }
+}
+
+final heartProvider =
+    StateNotifierProvider.autoDispose<HeartNotifier, HeartState>((ref) {
+  return HeartNotifier(ref.watch(poemsRepositoryProvider));
 });
