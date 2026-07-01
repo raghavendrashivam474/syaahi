@@ -1,4 +1,4 @@
-enum PoemLanguage { english, hindi, urdu }
+﻿enum PoemLanguage { english, hindi, urdu }
 
 enum PoemEmotion { love, longing, hope, solitude, anger, gratitude }
 
@@ -15,8 +15,8 @@ extension PoemLanguageX on PoemLanguage {
   String get apiValue => name.toUpperCase();
   String get label => switch (this) {
         PoemLanguage.english => 'English',
-        PoemLanguage.hindi => '??????',
-        PoemLanguage.urdu => '????',
+        PoemLanguage.hindi => 'हिन्दी',
+        PoemLanguage.urdu => 'اردو',
       };
 
   static PoemLanguage fromApi(String value) =>
@@ -36,13 +36,14 @@ extension PoemEmotionX on PoemEmotion {
         PoemEmotion.anger => 'Anger',
         PoemEmotion.gratitude => 'Gratitude',
       };
+
   String get emoji => switch (this) {
-        PoemEmotion.love => '?',
-        PoemEmotion.longing => '??',
-        PoemEmotion.hope => '??',
-        PoemEmotion.solitude => '???',
-        PoemEmotion.anger => '??',
-        PoemEmotion.gratitude => '?',
+        PoemEmotion.love => '❤',
+        PoemEmotion.longing => '🌙',
+        PoemEmotion.hope => '🌱',
+        PoemEmotion.solitude => '🕊️',
+        PoemEmotion.anger => '🔥',
+        PoemEmotion.gratitude => '✨',
       };
 
   static PoemEmotion? fromApi(String? value) {

@@ -1,19 +1,39 @@
+# Node / Backend
 node_modules/
 dist/
+coverage/
+*.log
+
+# Environment files
 .env
 .env.local
 .env.production
 
-coverage/
-
-*.log
-
-.vscode/settings.json
-
+# Prisma
 .prisma/client
 
+# Generated files
 generated/
 
-.DS_Stored
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
 
+# Android / local machine files
+**/android/local.properties
+**/android/.gradle/
+
+# Vercel
+.vercel/
+
+# Editor
+.vscode/settings.json
+
+# OS files
+.DS_Store
+
+# Project-specific
 SEED_ACCOUNTS.md

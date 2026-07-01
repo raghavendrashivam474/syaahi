@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+﻿import 'package:dio/dio.dart';
 import '../../../core/network/api_client.dart';
 import '../../../shared/models/poem.dart';
 
@@ -155,6 +155,20 @@ class PoemsRepository {
     }
   }
 
+  Future<List<Poem>> getUserPoems(String username, {int limit = 50}) async {
+    try {
+      final response = await _dio.get('/users/$username/poems', queryParameters: {
+        'limit': limit,
+      });
+      final data = response.data['data'] as Map<String, dynamic>;
+      final list = data['poems'] as List<dynamic>;
+      return list
+          .map((j) => Poem.fromJson(j as Map<String, dynamic>))
+          .toList();
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
   Future<List<ReactionSummary>> getReactions(String poemId) async {
     try {
       final response = await _dio.get('/poems/$poemId/reactions');

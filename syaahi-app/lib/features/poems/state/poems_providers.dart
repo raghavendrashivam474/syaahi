@@ -285,3 +285,9 @@ final heartProvider =
     StateNotifierProvider.autoDispose<HeartNotifier, HeartState>((ref) {
   return HeartNotifier(ref.watch(poemsRepositoryProvider));
 });
+
+final userPoemsProvider =
+    FutureProvider.autoDispose.family<List<Poem>, String>((ref, username) async {
+  final repo = ref.watch(poemsRepositoryProvider);
+  return repo.getUserPoems(username, limit: 50);
+});
