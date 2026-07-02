@@ -120,5 +120,5 @@ export const deletePoem = async (req: Request, res: Response) => {
 
   await prisma.poem.delete({ where: { id } });
 
-  res.json({ success: true, data: { id, deleted: true } });
+  res.json({ success: true, message: "Poem deleted successfully." });
 };

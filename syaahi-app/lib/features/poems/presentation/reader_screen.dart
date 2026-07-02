@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:syaahi_app/core/constants/colors.dart';
 import 'package:syaahi_app/core/constants/sizes.dart';
 import 'package:syaahi_app/shared/models/poem.dart';
+import 'package:syaahi_app/features/auth/state/auth_providers.dart';
 import 'package:syaahi_app/features/poems/state/poems_providers.dart';
 
 class ReaderScreen extends ConsumerWidget {
@@ -14,6 +15,7 @@ class ReaderScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final poemAsync = ref.watch(poemByIdProvider(poemId));
+    final currentUser = ref.watch(authProvider).user;
 
     return Scaffold(
       backgroundColor: SyaahiColors.midnightDark,
@@ -24,6 +26,120 @@ class ReaderScreen extends ConsumerWidget {
           icon: const Icon(Icons.arrow_back, color: SyaahiColors.textPrimary),
           onPressed: () => context.pop(),
         ),
+        actions: [
+          poemAsync.when(
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+            data: (poem) {
+              final isOwner = currentUser?.id == poem.author.id;
+              if (!isOwner) return const SizedBox.shrink();
+              return PopupMenuButton<String>(
+                icon: const Icon(
+                  Icons.more_vert,
+                  color: SyaahiColors.textMuted,
+                ),
+                color: SyaahiColors.surfaceCard,
+                onSelected: (value) async {
+                  if (value == 'delete') {
+                    final confirmed = await showDialog<bool>(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        backgroundColor: SyaahiColors.midnightBase,
+                        title: Text(
+                          'Delete this poem?',
+                          style: GoogleFonts.cormorantGaramond(
+                            color: SyaahiColors.textPrimary,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        content: Text(
+                          'This action permanently removes the poem from Syaahi.\n\nThis cannot be undone.',
+                          style: GoogleFonts.inter(
+                            color: SyaahiColors.textSecondary,
+                            fontSize: 14,
+                            height: 1.5,
+                          ),
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(false),
+                            child: Text(
+                              'Cancel',
+                              style: GoogleFonts.inter(
+                                color: SyaahiColors.textMuted,
+                              ),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(true),
+                            child: Text(
+                              'Delete',
+                              style: GoogleFonts.inter(
+                                color: SyaahiColors.error,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirmed == true && context.mounted) {
+                      try {
+                        final repo = ref.read(poemsRepositoryProvider);
+                        await repo.deletePoem(poem.id);
+                        if (context.mounted) {
+                          ref.read(feedProvider.notifier).refresh();
+                          context.pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Poem deleted successfully.',
+                                style: GoogleFonts.inter(fontSize: 14),
+                              ),
+                              backgroundColor: SyaahiColors.midnightSoft,
+                            ),
+                          );
+                        }
+                      } catch (_) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Could not delete poem. Try again.'),
+                            ),
+                          );
+                        }
+                      }
+                    }
+                  }
+                },
+                itemBuilder: (_) => [
+                  PopupMenuItem<String>(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.delete_outline,
+                          color: SyaahiColors.error,
+                          size: 18,
+                        ),
+                        const SizedBox(width: SyaahiSizes.sm),
+                        Text(
+                          'Delete Poem',
+                          style: GoogleFonts.inter(
+                            color: SyaahiColors.error,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
       ),
       body: poemAsync.when(
         loading: () => const Center(

@@ -111,6 +111,13 @@ class PoemsRepository {
     }
   }
 
+  Future<void> deletePoem(String poemId) async {
+    try {
+      await _dio.delete('/poems/$poemId');
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
   Future<void> commitToHeart(String poemId) async {
     try {
       await _dio.post('/poems/$poemId/heart');
