@@ -36,13 +36,13 @@ The goal is emotional preservation.
 
 # Current Status
 
-**Version:** v0.3.0-beta
+**Version:** v0.3.1-beta
 
 **Status:** Internal Beta
 
-The platform has completed its MVP and Writer Experience milestones.
+Syaahi has completed its MVP, Writer Experience, and Ownership & Branding sprints.
 
-Core infrastructure, documentation, and user experience foundations are in place.
+The platform is now stable enough for internal beta testing and user feedback before larger features are introduced.
 
 ---
 
@@ -66,6 +66,7 @@ Core infrastructure, documentation, and user experience foundations are in place
 |---------|--------|
 | Publish Poem | ✅ |
 | Read Poem | ✅ |
+| Delete Own Poem | ✅ |
 | Infinite Feed | ✅ |
 | Cursor Pagination | ✅ |
 | Pull to Refresh | ✅ |
@@ -117,8 +118,10 @@ No popularity metrics.
 |---------|--------|
 | Seed Content System | ✅ |
 | Documentation Suite | ✅ |
-| Backend Deployment Ready | ✅ |
+| Android Branding | ✅ |
+| Custom Launcher Icon | ✅ |
 | Android APK (Internal Beta) | ✅ |
+| Backend Deployment Ready | ✅ |
 
 ---
 
@@ -141,8 +144,9 @@ If the answer is no, it probably does not belong in Syaahi.
 | Documentation Sprint | ✅ Complete |
 | Verification Sprint | ✅ Complete |
 | Writer Experience Sprint | ✅ Complete |
+| Ownership & Branding Sprint | ✅ Complete |
 | Internal Beta | ✅ Complete |
-| Testing & Feedback | ⏳ Next |
+| Testing & Feedback | ⏳ Current |
 | Journals | ⏳ Planned |
 | Personal Archive | ⏳ Planned |
 | Letters After Midnight | ⏳ Planned |
@@ -168,6 +172,7 @@ syaahi/
 │   ├── CONTRIBUTING.md
 │   ├── SEED_CONTENT.md
 │   ├── CHANGELOG.md
+│   ├── NEXT_ASSIGNMENT.md
 │   └── FOUNDER_HANDOVER.md
 ├── README.md
 └── LICENSE
@@ -228,11 +233,13 @@ Prisma ORM
 PostgreSQL (Supabase)
 ```
 
-Detailed documentation:
+See:
 
 ```text
 docs/ARCHITECTURE.md
 ```
+
+for a complete architectural overview.
 
 ---
 
@@ -240,16 +247,32 @@ docs/ARCHITECTURE.md
 
 One of Syaahi's defining engineering components is the **Syaahi Flow Literary Sequencing Engine**.
 
-Unlike traditional recommendation systems, Syaahi Flow does **not** rank poems using popularity, engagement, or reactions.
+Unlike traditional recommendation systems, Syaahi Flow does **not** rank poems using popularity, engagement, reactions, or follower counts.
 
-Instead, it focuses on creating a pleasant reading experience by:
+Instead, it creates a balanced reading experience by:
 
 - Preserving overall recency
 - Avoiding consecutive poems from the same author whenever possible
-- Maintaining the platform's natural distribution of writers and emotions
+- Maintaining diversity across writers
+- Preserving natural emotional variety
 - Remaining deterministic and engagement-independent
 
 Syaahi Flow is intentionally a **literary sequencing engine**, not a recommendation engine.
+
+---
+
+# Author Ownership
+
+Every writer owns their own words.
+
+Current ownership capabilities include:
+
+- Publish poems
+- Delete your own poems
+- Private "Commit to Heart" collection
+- Emotional acknowledgements without popularity metrics
+
+Future updates will expand ownership with editing, journals, archives, and time capsules.
 
 ---
 
@@ -267,11 +290,11 @@ cp .env.example .env
 # Configure environment variables
 
 npm run prisma:generate
-
+npm run prisma:push
 npm run dev
 ```
 
-Runs at:
+Runs locally at:
 
 ```text
 http://localhost:4000
@@ -289,10 +312,16 @@ flutter pub get
 flutter run
 ```
 
-To build an Android release APK:
+Build Android APK:
 
 ```bash
 flutter build apk --release
+```
+
+Build architecture-specific APKs:
+
+```bash
+flutter build apk --release --split-per-abi
 ```
 
 ---
@@ -317,6 +346,14 @@ Multiple Emotions
 Multiple Themes
 ```
 
+The dataset is designed for:
+
+- Feed validation
+- Pagination testing
+- Syaahi Flow verification
+- UI demonstrations
+- Internal beta testing
+
 ---
 
 # Documentation
@@ -332,24 +369,26 @@ Multiple Themes
 | CONTRIBUTING.md | Contributor guide |
 | SEED_CONTENT.md | Development dataset |
 | CHANGELOG.md | Version history |
+| NEXT_ASSIGNMENT.md | Current engineering sprint |
 | FOUNDER_HANDOVER.md | Long-term project continuity |
 
 ---
 
 # Current Development Focus
 
-The next milestone focuses on **real-world validation** rather than additional features.
+The next milestone prioritizes **real-world validation over new functionality**.
 
-Objectives:
+Current objectives:
 
 - Internal beta testing with writers
-- UX refinement
-- Stability improvements
-- Bug fixing
-- Feedback collection
-- Test coverage
+- Collect qualitative feedback
+- Improve reading experience
+- Polish UI and UX
+- Fix bugs and edge cases
+- Expand automated test coverage
+- Prepare production deployment
 
-Feature development for Journals will begin after the internal beta feedback cycle is complete.
+Major feature development (Journals, Personal Archive, Time Capsules) will begin after the internal beta feedback cycle concludes.
 
 ---
 
@@ -365,7 +404,7 @@ If the answer is no, rethink the feature.
 
 # License
 
-MIT License.
+Licensed under the MIT License.
 
 See `LICENSE` for details.
 
@@ -381,7 +420,13 @@ The most meaningful feature is not what someone writes today.
 
 It is the moment they reopen Syaahi years later, read their own words, and remember exactly who they were.
 
-Build every feature with that future moment in mind.
+Every architectural decision, every interface, and every feature should protect that future moment.
+
+Build carefully.
+
+Protect simplicity.
+
+Preserve meaning.
 
 ---
 
@@ -389,4 +434,4 @@ Build every feature with that future moment in mind.
 
 **— Raghavendra Singh**
 
-*"Where emotions become words."*
+*Where emotions become words.*
