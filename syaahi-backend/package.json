@@ -13,7 +13,8 @@
                     "prisma:studio":  "prisma studio",
                     "prisma:push":  "prisma db push",
                     "test:n1":  "npx tsx src/__tests__/notifications.foundation.test.ts",
-                    "test:n2":  "npx tsx src/__tests__/notifications.api.test.ts"
+                    "test:n2":  "npx tsx src/__tests__/notifications.api.test.ts",
+                    "test:n3":  "npx tsx src/__tests__/notifications.publication.test.ts"
                 },
     "keywords":  [
                      "poetry",
