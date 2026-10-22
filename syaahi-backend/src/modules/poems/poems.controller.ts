@@ -1,8 +1,9 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { prisma } from '../../config/prisma';
 import { ApiError } from '../../utils/ApiError';
 import { syaahiFlow, DEFAULT_FEED_OPTIONS } from '../../utils/feed';
 import { createPoemSchema, listPoemsSchema, updatePoemSchema } from './poems.schemas';
+import { createPublicationNotifications } from '../notifications/notification.service';
 
 export const createPoem = async (req: Request, res: Response) => {
   const data = createPoemSchema.parse(req.body);
@@ -13,6 +14,10 @@ export const createPoem = async (req: Request, res: Response) => {
       author: { select: { id: true, username: true, displayName: true, avatarUrl: true } },
     },
   });
+
+  // N3: Every createPoem is a publication (isPublished defaults to true,
+  // and createPoemSchema does not expose isPublished to the client).
+  await createPublicationNotifications(poem.id, req.user!.userId);
 
   res.status(201).json({ success: true, data: { poem } });
 };
@@ -48,7 +53,7 @@ export const listPoems = async (req: Request, res: Response) => {
 
   const hasMore = sequenced.length > limit;
   const items = hasMore ? sequenced.slice(0, -1) : sequenced;
-  const nextCursor = hasMore && items.length > 0 ? items[items.length - 1].id : null;
+  const nextCursor = hasMore && items.length > 0 ? sequenced.slice(-1)[0].id : null;
 
   res.json({ success: true, data: { poems: items, nextCursor } });
 };
@@ -78,7 +83,7 @@ export const updatePoem = async (req: Request, res: Response) => {
 
   const existing = await prisma.poem.findUnique({
     where: { id },
-    select: { authorId: true },
+    select: { authorId: true, isPublished: true },
   });
 
   if (!existing) throw new ApiError(404, 'Poem not found');
@@ -96,6 +101,13 @@ export const updatePoem = async (req: Request, res: Response) => {
       },
     },
   });
+
+  // N3: Detect false -> true publication transition.
+  // Only notify when an unpublished poem becomes published.
+  // Editing an already-published poem does NOT trigger notifications.
+  if (existing.isPublished === false && poem.isPublished === true) {
+    await createPublicationNotifications(poem.id, req.user!.userId);
+  }
 
   res.json({ success: true, data: { poem } });
 };
