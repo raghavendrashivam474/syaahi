@@ -8,6 +8,7 @@ import '../../../shared/models/poem.dart';
 import '../../../features/auth/state/auth_providers.dart';
 import '../data/poems_repository.dart';
 import '../state/poems_providers.dart';
+import '../../notifications/state/notifications_providers.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -24,6 +25,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    ref.read(unreadCountProvider.notifier).refresh();
   }
 
   @override
@@ -57,6 +59,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             tooltip: 'Filters',
             onPressed: () => setState(() => _showFilters = !_showFilters),
           ),
+          _BellButton(),
           IconButton(
             icon: const Icon(Icons.favorite_outline),
             tooltip: 'My Heart',
@@ -489,6 +492,52 @@ class _ErrorView extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+
+// ── Notification Bell (N4) ──────────────────────────────────────────
+
+class _BellButton extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadCountProvider);
+
+    return IconButton(
+      tooltip: 'Notifications',
+      onPressed: () => context.push('/notifications'),
+      icon: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          const Icon(Icons.notifications_none),
+          if (unread != null && unread > 0)
+            Positioned(
+              right: -4,
+              top: -2,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 4,
+                  vertical: 1,
+                ),
+                constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                decoration: BoxDecoration(
+                  color: SyaahiColors.goldBase,
+                  borderRadius: BorderRadius.circular(SyaahiSizes.radiusFull),
+                ),
+                child: Text(
+                  unread > 99 ? '99+' : '$unread',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: SyaahiColors.midnightDark,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

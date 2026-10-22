@@ -8,6 +8,7 @@ import 'package:syaahi_app/features/poems/presentation/reader_screen.dart';
 import 'package:syaahi_app/features/poems/presentation/writer_screen.dart';
 import 'package:syaahi_app/features/poems/presentation/heart_screen.dart';
 import 'package:syaahi_app/features/profile/profile_screen.dart';
+import 'package:syaahi_app/features/notifications/presentation/inbox_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -51,6 +52,10 @@ class AppRouter {
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const InboxScreen(),
       ),
     ],
   );
