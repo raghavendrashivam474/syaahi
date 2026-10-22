@@ -518,3 +518,193 @@ Independent modules improve maintainability, onboarding, testing, and long-term 
 ### Consequences
 
 Future features such as Journals, Time Capsules, Community Circles, Letters After Midnight, and Audio Poetry will follow the same architectural pattern.
+---
+
+## ADR-021: Application-Level Notification Isolation
+
+**Date:** 2026-10
+**Status:** Active
+
+### Context
+
+The notification system requires strict user isolation: User A must never access User B's notifications. The existing Syaahi architecture enforces all access control at the application layer (Express controllers), with no database-level Row-Level Security (RLS) policies.
+
+### Decision
+
+Notification isolation is enforced exclusively at the application layer. Every Prisma query in the notification controller includes `recipientId: req.user.userId` in the WHERE clause. No RLS policies are added for notification tables.
+
+### Reasoning
+
+- Consistent with the existing architecture (poem ownership, hearts, reactions all use application-level checks).
+- No RLS infrastructure exists in the repository (no SQL files, no `supabase/` directory).
+- Adding RLS for notifications alone would create an inconsistent security model.
+- Application-level isolation is sufficient when the backend is the sole database client.
+
+### Consequences
+
+- If a future bug omits the `recipientId` filter, data leaks are possible. Mitigated by code review and integration tests.
+- RLS should be considered as a defense-in-depth measure before production launch, applied to all user-scoped tables simultaneously.
+
+---
+
+## ADR-022: Synchronous In-Request Event Processing
+
+**Date:** 2026-10
+**Status:** Active
+
+### Context
+
+When a poem is published, notification records must be created for all opted-in recipients. The backend deploys on Vercel serverless with no background workers, message queues, or cron infrastructure.
+
+### Decision
+
+Notification creation is performed synchronously within the poem publication request, after the poem is successfully persisted. Push delivery (N5) is fire-and-forget within the same request.
+
+### Reasoning
+
+- Vercel serverless does not support long-running background processes.
+- Adding a worker (Railway, BullMQ, Vercel Cron) is disproportionate for v0.1 user counts.
+- For typical opted-in counts (<1000), bulk insert completes well within Vercel's 10s timeout.
+- The poem is the user's creative output and must not be rolled back due to notification failures.
+
+### Consequences
+
+- Notification creation is not transactional with poem creation. A crash between the two creates a gap.
+- If user count grows significantly, migrate to an outbox + worker pattern.
+- Push delivery failures are logged but not retried in v0.1.
+
+---
+
+## ADR-023: Strict Opt-In Notification Model
+
+**Date:** 2026-10
+**Status:** Active
+
+### Context
+
+The notification system needs a recipient eligibility model. Options include opt-out (all users receive by default), opt-in (users must explicitly enable), and followers-only.
+
+### Decision
+
+Strict opt-in. All users default to `newPoemAlerts: false`. No user receives notifications until they explicitly enable the preference. Existing users are not assumed to have consented.
+
+### Reasoning
+
+- Privacy-first approach aligns with Syaahi's emotional-first philosophy (ARCHITECTURE.md principle 10).
+- Avoids consent and regulatory issues.
+- No follow system exists in the application UI; building one solely for notifications is out of scope.
+- Users who want notifications will opt in; those who don't will not be disturbed.
+
+### Consequences
+
+- Initial notification volume will be low until users discover and enable the setting.
+- A prominent settings entry point is needed in the Flutter app to drive opt-in.
+- The preference default may be revisited after user feedback.
+
+---
+
+## ADR-024: Cascade Delete for Notification Records
+
+**Date:** 2026-10
+**Status:** Active
+
+### Context
+
+When a user or poem is deleted, the system must handle related notification records.
+
+### Decision
+
+Both the `recipientId` and `poemId` foreign keys on the `Notification` model use `onDelete: Cascade`. Deleting a user removes all their notifications. Deleting a poem removes all notifications referencing it.
+
+### Reasoning
+
+- Consistent with all existing relations in the Prisma schema (every FK uses Cascade).
+- Prevents orphan records and broken references.
+- Simplifies cleanup logic — no application-level cascade needed.
+
+### Consequences
+
+- If an author deletes a poem, recipients lose the notification. This is acceptable because the poem is no longer accessible.
+- If cascade behavior needs to change in the future (e.g., soft-delete poems), the notification model must be updated simultaneously.
+
+---
+
+## ADR-025: Author Self-Notification Policy
+
+**Date:** 2026-10
+**Status:** Pending Owner Approval
+
+### Context
+
+When a user publishes a poem, should they receive a notification about their own publication?
+
+### Decision (Proposed)
+
+No self-notification. The author is excluded from the recipient list during notification creation.
+
+### Reasoning
+
+- The author already sees a success snackbar ("Published. Your words are out there.") and the feed refreshes immediately.
+- A self-notification adds no informational value.
+- Reduces notification noise.
+
+### Consequences
+
+- If the product owner wants self-notifications (e.g., for cross-device awareness), the recipient query filter is trivially adjusted.
+- This decision must be explicitly approved before N3 implementation.
+
+---
+
+## ADR-026: Firebase Cloud Messaging as Push Provider
+
+**Date:** 2026-10
+**Status:** Active
+
+### Context
+
+The notification system requires a push delivery channel for Android.
+
+### Decision
+
+Firebase Cloud Messaging (FCM) via the HTTP v1 API. The Flutter app uses `firebase_messaging`. The backend sends push via HTTPS using a service account.
+
+### Reasoning
+
+- Android is the only target platform; FCM is the native Android push service.
+- Unlimited free push messages.
+- Simple HTTP API compatible with Vercel serverless.
+- Full control over payload content (privacy-safe).
+- Standard Flutter integration via `firebase_messaging`.
+
+### Consequences
+
+- Requires a Firebase project and service account key.
+- The `google-services.json` file must be added to the Flutter Android project.
+- FCM credentials must be stored as Vercel environment variables.
+
+---
+
+## ADR-027: Non-Transactional Poem and Notification Creation
+
+**Date:** 2026-10
+**Status:** Active
+
+### Context
+
+Poem creation and notification creation could be wrapped in a single database transaction for atomicity.
+
+### Decision
+
+Poem creation and notification creation are separate operations. The poem is persisted first. Notification creation follows as a best-effort step. A notification failure does not roll back the poem.
+
+### Reasoning
+
+- The poem is the user's creative output. Losing it due to a notification error is unacceptable.
+- The recipient query and bulk insert could involve many rows, holding a transaction open unnecessarily.
+- Notifications are derived data and can be regenerated from the poem.
+
+### Consequences
+
+- A crash between poem insert and notification insert creates a notification gap.
+- Gaps can be backfilled via a manual script or future cron job.
+- This is an acceptable trade-off for v0.1.
