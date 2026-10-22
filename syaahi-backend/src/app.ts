@@ -1,4 +1,4 @@
-import express from 'express';
+﻿import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -9,6 +9,7 @@ import poemRoutes from './modules/poems/poems.routes';
 import userRoutes from './modules/users/users.routes';
 import heartRoutes from './modules/heart/heart.routes';
 import reactionRoutes from './modules/reactions/reactions.routes';
+import { notificationRouter, preferenceRouter } from './modules/notifications/notifications.routes';
 import { globalLimiter } from './middleware/rateLimiter';
 
 const app = express();
@@ -54,6 +55,8 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/poems', heartRoutes);
 app.use('/api/v1/users', heartRoutes);
 app.use('/api/v1/poems', reactionRoutes);
+app.use('/api/v1/notifications', notificationRouter);
+app.use('/api/v1/notification-preferences', preferenceRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
