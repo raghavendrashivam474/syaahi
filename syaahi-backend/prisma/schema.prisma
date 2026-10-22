@@ -9,20 +9,22 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  username     String   @unique
+  id           String  @id @default(uuid())
+  email        String  @unique
+  username     String  @unique
   displayName  String
   passwordHash String
   bio          String?
   avatarUrl    String?
 
-  poems     Poem[]
-  reactions Reaction[]
-  hearts    Heart[]
-  followers Follow[]   @relation("following")
-  following Follow[]   @relation("follower")
-  rooms     RoomMember[]
+  poems                  Poem[]
+  reactions              Reaction[]
+  hearts                 Heart[]
+  followers              Follow[]                @relation("following")
+  following              Follow[]                @relation("follower")
+  rooms                  RoomMember[]
+  notifications          Notification[]
+  notificationPreference NotificationPreference?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -41,10 +43,11 @@ model Poem {
   audioUrl    String?
   isPublished Boolean  @default(true)
 
-  author    User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  reactions Reaction[]
-  hearts    Heart[]
-  rooms     PoemRoom[]
+  author        User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reactions     Reaction[]
+  hearts        Heart[]
+  rooms         PoemRoom[]
+  notifications Notification[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -163,4 +166,34 @@ enum ReactionType {
 enum RoomRole {
   MEMBER
   MODERATOR
+}
+
+enum NotificationType {
+  POEM_PUBLISHED
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  recipientId String
+  type        NotificationType
+  poemId      String
+  readAt      DateTime?
+
+  recipient User @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  poem      Poem @relation(fields: [poemId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([recipientId, poemId, type])
+  @@index([recipientId, createdAt])
+  @@index([recipientId, readAt])
+}
+
+model NotificationPreference {
+  userId        String  @id
+  newPoemAlerts Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  updatedAt DateTime @updatedAt
 }
