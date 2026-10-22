@@ -1,4 +1,4 @@
-# 🪶 Syaahi — Architecture Decision Records
+﻿# ðŸª¶ Syaahi â€” Architecture Decision Records
 
 This document records significant technical and product decisions made during Syaahi's development.
 
@@ -41,12 +41,12 @@ Shared concerns live only in middleware and utils.
 text
 
 modules/
-├── auth/
-│   ├── auth.routes.ts
-│   ├── auth.controller.ts
-│   └── auth.schemas.ts
-├── poems/
-└── users/
+â”œâ”€â”€ auth/
+â”‚   â”œâ”€â”€ auth.routes.ts
+â”‚   â”œâ”€â”€ auth.controller.ts
+â”‚   â””â”€â”€ auth.schemas.ts
+â”œâ”€â”€ poems/
+â””â”€â”€ users/
 Reasoning
 Feature-based structure means a developer working on journals
 does not need to understand the poems module.
@@ -212,7 +212,7 @@ Pooled URL is used for application queries.
 
 ADR-009: CORS Wildcard for Staging
 Date: 2026-06
-Status: Active — Staging Only
+Status: Active â€” Staging Only
 
 Context
 During initial deployment, the frontend URL is not known before
@@ -327,7 +327,7 @@ Frontend loads the next page when the user reaches approximately 85% of the curr
 End of feed displays:
 
 ```text
-— you have read everything —
+â€” you have read everything â€”
 ```
 
 ### Reasoning
@@ -463,11 +463,11 @@ Each seed account represents a specific writing style.
 Examples:
 
 ```text
-aarav_thinks     → Philosophical
-meera_writes     → Romantic
-kabir_outdoors   → Nature
-ananya_heals     → Healing
-rizwan_recalls   → Nostalgic
+aarav_thinks     â†’ Philosophical
+meera_writes     â†’ Romantic
+kabir_outdoors   â†’ Nature
+ananya_heals     â†’ Healing
+rizwan_recalls   â†’ Nostalgic
 ```
 
 ### Reasoning
@@ -620,7 +620,7 @@ Both the `recipientId` and `poemId` foreign keys on the `Notification` model use
 
 - Consistent with all existing relations in the Prisma schema (every FK uses Cascade).
 - Prevents orphan records and broken references.
-- Simplifies cleanup logic — no application-level cascade needed.
+- Simplifies cleanup logic â€” no application-level cascade needed.
 
 ### Consequences
 
@@ -632,7 +632,13 @@ Both the `recipientId` and `poemId` foreign keys on the `Notification` model use
 ## ADR-025: Author Self-Notification Policy
 
 **Date:** 2026-10
-**Status:** Pending Owner Approval
+**Status:** Approved
+
+**Approved by:** Project Owner
+**Approval date:** 2026-10-23
+
+> Owner confirmed: no self-notification. The author is excluded
+> from the recipient list during POEM_PUBLISHED notification creation.
 
 ### Context
 
