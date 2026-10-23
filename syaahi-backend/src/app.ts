@@ -1,4 +1,4 @@
-﻿import express from 'express';
+import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -20,18 +20,22 @@ app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile native apps, curl, Postman)
       if (!origin) return callback(null, true);
+
+      const allowed = env.CORS_ORIGIN.split(',').map((o) => o.trim());
+
+      // If '*' wildcard is set OR origin is explicitly in allowed list
+      if (allowed.includes('*') || allowed.includes(origin)) {
+        return callback(null, true);
+      }
 
       if (env.NODE_ENV === 'development' && origin.startsWith('http://localhost')) {
         return callback(null, true);
       }
 
-      const allowed = env.CORS_ORIGIN.split(',').map((o) => o.trim());
-      if (allowed.includes(origin)) {
-        return callback(null, true);
-      }
-
-      callback(new Error('CORS: origin ' + origin + ' not allowed'));
+      // Return null, false for clean CORS refusal instead of throwing 500
+      callback(null, false);
     },
     credentials: true,
   })
