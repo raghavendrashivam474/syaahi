@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+﻿import { PrismaClient } from '@prisma/client';
 import { env } from './env';
 
 export const prisma = new PrismaClient({
@@ -11,5 +11,5 @@ export const prisma = new PrismaClient({
 });
 
 process.on('beforeExit', async () => {
-  await prisma.\();
+  await prisma.$disconnect();
 });
