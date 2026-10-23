@@ -37,3 +37,4 @@ build/
 
 # Project-specific
 SEED_ACCOUNTS.md
+.env*
