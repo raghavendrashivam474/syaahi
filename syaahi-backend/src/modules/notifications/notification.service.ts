@@ -1,4 +1,4 @@
-﻿import { prisma } from '../../config/prisma';
+import { prisma } from '../../config/prisma';
 
 /**
  * Creates POEM_PUBLISHED notification records for all eligible recipients.

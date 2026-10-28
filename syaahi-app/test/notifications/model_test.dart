@@ -1,4 +1,4 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:syaahi_app/features/notifications/data/notifications_repository.dart';
 
 void main() {

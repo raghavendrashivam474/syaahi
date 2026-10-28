@@ -1,4 +1,4 @@
-﻿enum PoemLanguage { english, hindi, urdu }
+enum PoemLanguage { english, hindi, urdu }
 
 enum PoemEmotion { love, longing, hope, solitude, anger, gratitude }
 

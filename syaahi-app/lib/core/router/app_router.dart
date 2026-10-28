@@ -1,4 +1,4 @@
-﻿import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:syaahi_app/features/splash/splash_screen.dart';
 import 'package:syaahi_app/features/welcome/welcome_screen.dart';
 import 'package:syaahi_app/features/auth/presentation/signup_screen.dart';
