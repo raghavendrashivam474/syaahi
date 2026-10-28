@@ -12,7 +12,7 @@ const router = Router();
 
 /**
  * All heart routes require authentication.
- * Hearts are private — no public endpoints.
+ * Hearts are private â€” no public endpoints.
  */
 
 // My Heart collection

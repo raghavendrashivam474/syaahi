@@ -1,5 +1,5 @@
 /**
- * Syaahi Flow — Literary Sequencing Engine
+ * Syaahi Flow â€” Literary Sequencing Engine
  *
  * Syaahi Flow is not a recommendation engine.
  * It is a literary sequencing engine.
@@ -38,7 +38,7 @@ export const syaahiFlow: FeedStrategy = (
   if (poems.length === 0) return [];
   if (poems.length === 1) return [poems[0]];
 
-  // Work on a shallow copy — never mutate the original
+  // Work on a shallow copy â€” never mutate the original
   const pool = [...poems];
 
   // Group poems by author, each group sorted by createdAt DESC (most recent first)
