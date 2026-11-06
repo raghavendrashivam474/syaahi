@@ -301,12 +301,18 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
             runSpacing: SyaahiSizes.sm,
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text(
-                'by ${widget.poem.author.displayName}',
-                style: GoogleFonts.inter(
-                  color: SyaahiColors.textMuted,
-                  fontSize: 13,
-                  fontStyle: FontStyle.italic,
+              // UX-02: Tappable byline -> author profile
+              GestureDetector(
+                onTap: () => context.push('/profile/${widget.poem.author.username}'),
+                child: Text(
+                  'by ${widget.poem.author.displayName}',
+                  style: GoogleFonts.inter(
+                    color: SyaahiColors.textMuted,
+                    fontSize: 13,
+                    fontStyle: FontStyle.italic,
+                    decoration: TextDecoration.underline,
+                    decorationColor: SyaahiColors.textFaded,
+                  ),
                 ),
               ),
               if (widget.poem.emotion != null)
@@ -340,13 +346,19 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
             ),
           ),
           const SizedBox(height: SyaahiSizes.md),
+          // UX-02: Tappable attribution -> author profile
           Center(
-            child: Text(
-              '— ${widget.poem.author.displayName}',
-              style: GoogleFonts.cormorantGaramond(
-                color: SyaahiColors.textMuted,
-                fontSize: 16,
-                fontStyle: FontStyle.italic,
+            child: GestureDetector(
+              onTap: () => context.push('/profile/${widget.poem.author.username}'),
+              child: Text(
+                '— ${widget.poem.author.displayName}',
+                style: GoogleFonts.cormorantGaramond(
+                  color: SyaahiColors.textMuted,
+                  fontSize: 16,
+                  fontStyle: FontStyle.italic,
+                  decoration: TextDecoration.underline,
+                  decorationColor: SyaahiColors.textFaded,
+                ),
               ),
             ),
           ),

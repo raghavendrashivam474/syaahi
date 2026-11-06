@@ -351,30 +351,42 @@ class _PoemCard extends ConsumerWidget {
             const SizedBox(height: SyaahiSizes.md),
             Row(
               children: [
-                CircleAvatar(
-                  radius: 12,
-                  backgroundColor: SyaahiColors.midnightLight,
-                  child: Text(
-                    poem.author.displayName.isNotEmpty
-                        ? poem.author.displayName[0].toUpperCase()
-                        : '?',
-                    style: GoogleFonts.inter(
-                      fontSize: 11,
-                      color: SyaahiColors.goldBase,
-                      fontWeight: FontWeight.w600,
-                    ),
+                // UX-02: Tappable author identity -> author profile
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => context.push('/profile/${poem.author.username}'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 12,
+                        backgroundColor: SyaahiColors.midnightLight,
+                        child: Text(
+                          poem.author.displayName.isNotEmpty
+                              ? poem.author.displayName[0].toUpperCase()
+                              : '?',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: SyaahiColors.goldBase,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: SyaahiSizes.sm),
+                      Flexible(
+                        child: Text(
+                          'by ${poem.author.displayName}',
+                          style: GoogleFonts.inter(
+                            color: SyaahiColors.textMuted,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: SyaahiSizes.sm),
-                Expanded(
-                  child: Text(
-                    'by ${poem.author.displayName}',
-                    style: GoogleFonts.inter(
-                      color: SyaahiColors.textMuted,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
+                const Spacer(),
                 if (poem.emotion != null)
                   _EmotionBadge(emotion: poem.emotion!),
                 // ── UX-01: Heart control ──

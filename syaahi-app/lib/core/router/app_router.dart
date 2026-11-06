@@ -1,4 +1,4 @@
-import 'package:go_router/go_router.dart';
+﻿import 'package:go_router/go_router.dart';
 import 'package:syaahi_app/features/splash/splash_screen.dart';
 import 'package:syaahi_app/features/welcome/welcome_screen.dart';
 import 'package:syaahi_app/features/auth/presentation/signup_screen.dart';
@@ -8,6 +8,7 @@ import 'package:syaahi_app/features/poems/presentation/reader_screen.dart';
 import 'package:syaahi_app/features/poems/presentation/writer_screen.dart';
 import 'package:syaahi_app/features/poems/presentation/heart_screen.dart';
 import 'package:syaahi_app/features/profile/profile_screen.dart';
+import 'package:syaahi_app/features/profile/presentation/author_profile_screen.dart';
 import 'package:syaahi_app/features/notifications/presentation/inbox_screen.dart';
 
 class AppRouter {
@@ -49,9 +50,17 @@ class AppRouter {
         path: '/heart',
         builder: (context, state) => const HeartScreen(),
       ),
+      // Own profile — reads authProvider, delegates to AuthorProfileView
       GoRoute(
         path: '/profile',
         builder: (context, state) => const ProfileScreen(),
+      ),
+      // Public author profile — fetches by username
+      GoRoute(
+        path: '/profile/:username',
+        builder: (context, state) => AuthorProfileScreen(
+          username: state.pathParameters['username']!,
+        ),
       ),
       GoRoute(
         path: '/notifications',
