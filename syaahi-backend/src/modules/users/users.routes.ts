@@ -1,12 +1,13 @@
-import { Router } from 'express';
+﻿import { Router } from 'express';
 import { asyncHandler } from '../../utils/asyncHandler';
 import { authenticate } from '../../middleware/auth';
-import { getUserProfile, getUserPoems, updateMe } from './users.controller';
+import { getUserProfile, getUserPoems, updateMe, searchUsers } from './users.controller';
 
 const router = Router();
 
 // Order matters: /me before /:username
 router.patch('/me', authenticate, asyncHandler(updateMe));
+router.get('/search', asyncHandler(searchUsers));
 router.get('/:username', asyncHandler(getUserProfile));
 router.get('/:username/poems', asyncHandler(getUserPoems));
 
