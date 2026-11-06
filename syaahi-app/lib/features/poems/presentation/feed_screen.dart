@@ -115,7 +115,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       );
     }
     if (state.poems.isEmpty) {
-      return _EmptyFeed(onWrite: () => context.push('/write'));
+      return _EmptyFeed(
+        hasActiveFilters: !state.filters.isEmpty,
+        onWrite: () => context.push('/write'),
+        onClearFilters: () => ref.read(feedProvider.notifier).clearFilters(),
+      );
     }
     return RefreshIndicator(
       color: SyaahiColors.goldBase,
@@ -499,8 +503,14 @@ class _EmotionBadge extends StatelessWidget {
 }
 
 class _EmptyFeed extends StatelessWidget {
+  final bool hasActiveFilters;
   final VoidCallback onWrite;
-  const _EmptyFeed({required this.onWrite});
+  final VoidCallback? onClearFilters;
+  const _EmptyFeed({
+    this.hasActiveFilters = false,
+    required this.onWrite,
+    this.onClearFilters,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -525,7 +535,9 @@ class _EmptyFeed extends StatelessWidget {
         ),
         const SizedBox(height: SyaahiSizes.sm),
         Text(
-          'Be the first to write something beautiful.',
+          hasActiveFilters
+              ? 'No poems match your filters.'
+              : 'Be the first to write something beautiful.',
           textAlign: TextAlign.center,
           style: GoogleFonts.inter(
             color: SyaahiColors.textMuted,
@@ -534,11 +546,17 @@ class _EmptyFeed extends StatelessWidget {
         ),
         const SizedBox(height: SyaahiSizes.xl),
         Center(
-          child: ElevatedButton.icon(
-            onPressed: onWrite,
-            icon: const Icon(Icons.edit_outlined),
-            label: const Text('Write Your First Poem'),
-          ),
+          child: hasActiveFilters
+              ? ElevatedButton.icon(
+                  onPressed: onClearFilters,
+                  icon: const Icon(Icons.filter_list_off),
+                  label: const Text('Clear Filters'),
+                )
+              : ElevatedButton.icon(
+                  onPressed: onWrite,
+                  icon: const Icon(Icons.edit_outlined),
+                  label: const Text('Write Your First Poem'),
+                ),
         ),
       ],
     );
