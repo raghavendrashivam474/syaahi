@@ -49,6 +49,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         title: const Text('Syaahi'),
         actions: [
           IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Discover Writers',
+            onPressed: () => context.push('/discover'),
+          ),
+          IconButton(
             icon: Icon(
               _showFilters ? Icons.filter_list_off : Icons.filter_list,
               color: state.filters.isEmpty
