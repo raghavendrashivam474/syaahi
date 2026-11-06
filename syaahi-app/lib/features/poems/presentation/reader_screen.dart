@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -178,6 +178,9 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
   @override
   void initState() {
     super.initState();
+    // UX-01: Use feed cache as initial value to prevent flash
+    final cached = ref.read(feedProvider).heartStates[widget.poem.id];
+    if (cached == HeartStatus.hearted) _hearted = true;
     _loadInitialState();
   }
 
@@ -211,6 +214,8 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
         await repo.commitToHeart(widget.poem.id);
       }
       if (mounted) setState(() => _hearted = !_hearted);
+      // UX-01: Invalidate feed cache so it re-hydrates on return
+      ref.read(feedProvider.notifier).invalidateHeart(widget.poem.id);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
