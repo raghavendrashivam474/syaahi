@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,7 +44,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(feedProvider);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Syaahi'),
@@ -109,18 +108,15 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         child: CircularProgressIndicator(color: SyaahiColors.goldBase),
       );
     }
-
     if (state.error != null && state.poems.isEmpty) {
       return _ErrorView(
         message: state.error!,
         onRetry: () => ref.read(feedProvider.notifier).refresh(),
       );
     }
-
     if (state.poems.isEmpty) {
       return _EmptyFeed(onWrite: () => context.push('/write'));
     }
-
     return RefreshIndicator(
       color: SyaahiColors.goldBase,
       backgroundColor: SyaahiColors.midnightBase,
@@ -292,12 +288,26 @@ class _FilterBar extends StatelessWidget {
   }
 }
 
-class _PoemCard extends StatelessWidget {
+// ── UX-01: _PoemCard now watches heart state ──────────────────────────
+
+class _PoemCard extends ConsumerWidget {
   final Poem poem;
   const _PoemCard({required this.poem});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    // Watch only THIS poem's heart status (select prevents unrelated rebuilds)
+    final heartStatus = ref.watch(feedProvider.select(
+      (state) => state.heartStates[poem.id] ?? HeartStatus.unknown,
+    ));
+
+    // Hydrate on first display (deferred to avoid build-time side effects)
+    if (heartStatus == HeartStatus.unknown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref.read(feedProvider.notifier).hydrateHeart(poem.id);
+      });
+    }
+
     final preview = poem.content.length > 140
         ? '${poem.content.substring(0, 140)}...'
         : poem.content;
@@ -367,9 +377,79 @@ class _PoemCard extends StatelessWidget {
                 ),
                 if (poem.emotion != null)
                   _EmotionBadge(emotion: poem.emotion!),
+                // ── UX-01: Heart control ──
+                const SizedBox(width: SyaahiSizes.sm),
+                _HeartButton(
+                  status: heartStatus,
+                  onToggle: () => _onHeartToggle(context, ref),
+                ),
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onHeartToggle(BuildContext context, WidgetRef ref) async {
+    final user = ref.read(authProvider).user;
+    if (user == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Sign in to commit to heart.')),
+        );
+      }
+      return;
+    }
+
+    final success = await ref.read(feedProvider.notifier).toggleHeart(poem.id);
+    if (!success && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Something went wrong. Try again.')),
+      );
+    }
+  }
+}
+
+// ── UX-01: Heart button with gesture isolation ────────────────────────
+
+class _HeartButton extends StatelessWidget {
+  final HeartStatus status;
+  final VoidCallback onToggle;
+
+  const _HeartButton({
+    required this.status,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      // opaque ensures taps here do NOT reach the parent InkWell (FR-05)
+      behavior: HitTestBehavior.opaque,
+      onTap: status.isInteractive ? onToggle : null,
+      child: SizedBox(
+        width: 36,
+        height: 36,
+        child: Center(
+          child: status.isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: SyaahiColors.goldBase,
+                  ),
+                )
+              : Icon(
+                  status.isHearted
+                      ? Icons.favorite
+                      : Icons.favorite_outline,
+                  color: status.isHearted
+                      ? SyaahiColors.goldBase
+                      : SyaahiColors.textMuted,
+                  size: 20,
+                ),
         ),
       ),
     );
@@ -496,14 +576,12 @@ class _ErrorView extends StatelessWidget {
   }
 }
 
-
 // ── Notification Bell (N4) ──────────────────────────────────────────
 
 class _BellButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final unread = ref.watch(unreadCountProvider);
-
     return IconButton(
       tooltip: 'Notifications',
       onPressed: () => context.push('/notifications'),
