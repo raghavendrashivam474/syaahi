@@ -1,4 +1,4 @@
-# 🪶 Syaahi — API Contract
+﻿# 🪶 Syaahi — API Contract
 
 ## Version
 
@@ -129,6 +129,7 @@ Refresh tokens and token revocation are not yet implemented.
 
 | Method | Endpoint |
 |---------|----------|
+| GET | /users/search |
 | GET | /users/:username |
 | PATCH | /users/me |
 | GET | /users/:username/poems |
