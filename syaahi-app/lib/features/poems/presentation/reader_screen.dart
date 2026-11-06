@@ -6,9 +6,11 @@ import 'package:syaahi_app/core/constants/colors.dart';
 import 'package:syaahi_app/core/constants/sizes.dart';
 import 'package:syaahi_app/shared/models/poem.dart';
 import 'package:syaahi_app/features/auth/state/auth_providers.dart';
-import 'package:syaahi_app/features/poems/data/poems_repository.dart' show PoemsException;
+import 'package:syaahi_app/features/poems/data/poems_repository.dart'
+    show PoemsException;
 import 'package:syaahi_app/features/poems/state/poems_providers.dart';
 
+// ── Reader Screen ──────────────────────────────────────────────────
 class ReaderScreen extends ConsumerWidget {
   final String poemId;
   const ReaderScreen({super.key, required this.poemId});
@@ -24,14 +26,15 @@ class ReaderScreen extends ConsumerWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: SyaahiColors.textPrimary),
+          icon:
+              const Icon(Icons.arrow_back, color: SyaahiColors.textPrimary),
           onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/home');
-              }
-            },
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/home');
+            }
+          },
         ),
         actions: [
           poemAsync.when(
@@ -40,117 +43,13 @@ class ReaderScreen extends ConsumerWidget {
             data: (poem) {
               final isOwner = currentUser?.id == poem.author.id;
               if (!isOwner) return const SizedBox.shrink();
-              return PopupMenuButton<String>(
-                icon: const Icon(
-                  Icons.more_vert,
-                  color: SyaahiColors.textMuted,
-                ),
-                color: SyaahiColors.surfaceCard,
-                onSelected: (value) async {
-                  if (value == 'delete') {
-                    final confirmed = await showDialog<bool>(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        backgroundColor: SyaahiColors.midnightBase,
-                        title: Text(
-                          'Delete this poem?',
-                          style: GoogleFonts.cormorantGaramond(
-                            color: SyaahiColors.textPrimary,
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        content: Text(
-                          'This action permanently removes the poem from Syaahi.\n\nThis cannot be undone.',
-                          style: GoogleFonts.inter(
-                            color: SyaahiColors.textSecondary,
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(false),
-                            child: Text(
-                              'Cancel',
-                              style: GoogleFonts.inter(
-                                color: SyaahiColors.textMuted,
-                              ),
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(true),
-                            child: Text(
-                              'Delete',
-                              style: GoogleFonts.inter(
-                                color: SyaahiColors.error,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                    if (confirmed == true && context.mounted) {
-                      try {
-                        final repo = ref.read(poemsRepositoryProvider);
-                        await repo.deletePoem(poem.id);
-                        if (context.mounted) {
-                          ref.read(feedProvider.notifier).refresh();
-                          context.pop();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Poem deleted successfully.',
-                                style: GoogleFonts.inter(fontSize: 14),
-                              ),
-                              backgroundColor: SyaahiColors.midnightSoft,
-                            ),
-                          );
-                        }
-                      } catch (_) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Could not delete poem. Try again.'),
-                            ),
-                          );
-                        }
-                      }
-                    }
-                  }
-                },
-                itemBuilder: (_) => [
-                  PopupMenuItem<String>(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        const Icon(
-                          Icons.delete_outline,
-                          color: SyaahiColors.error,
-                          size: 18,
-                        ),
-                        const SizedBox(width: SyaahiSizes.sm),
-                        Text(
-                          'Delete Poem',
-                          style: GoogleFonts.inter(
-                            color: SyaahiColors.error,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
+              return _OwnerMenu(poem: poem);
             },
           ),
         ],
       ),
       body: poemAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: SyaahiColors.goldBase),
-        ),
+        loading: () => const _ReaderLoadingView(),
         error: (e, _) => _ReaderErrorView(
           error: e,
           onRetry: () => ref.invalidate(poemByIdProvider(poemId)),
@@ -161,7 +60,149 @@ class ReaderScreen extends ConsumerWidget {
   }
 }
 
-// ── Reader Error View (UX-03) ────────────────────────────────────
+// ── Owner Delete Menu (preserved from UX-04) ──────────────────────
+class _OwnerMenu extends ConsumerWidget {
+  final Poem poem;
+  const _OwnerMenu({required this.poem});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return PopupMenuButton<String>(
+      icon: const Icon(Icons.more_vert, color: SyaahiColors.textMuted),
+      color: SyaahiColors.surfaceCard,
+      onSelected: (value) async {
+        if (value == 'delete') {
+          final confirmed = await showDialog<bool>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              backgroundColor: SyaahiColors.midnightBase,
+              title: Text(
+                'Delete this poem?',
+                style: GoogleFonts.cormorantGaramond(
+                  color: SyaahiColors.textPrimary,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              content: Text(
+                'This action permanently removes the poem from Syaahi.\n\n'
+                'This cannot be undone.',
+                style: GoogleFonts.inter(
+                  color: SyaahiColors.textSecondary,
+                  fontSize: 14,
+                  height: 1.5,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: Text(
+                    'Cancel',
+                    style: GoogleFonts.inter(color: SyaahiColors.textMuted),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: Text(
+                    'Delete',
+                    style: GoogleFonts.inter(
+                      color: SyaahiColors.error,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+          if (confirmed == true && context.mounted) {
+            try {
+              final repo = ref.read(poemsRepositoryProvider);
+              await repo.deletePoem(poem.id);
+              if (context.mounted) {
+                ref.read(feedProvider.notifier).refresh();
+                context.pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Poem deleted successfully.',
+                      style: GoogleFonts.inter(fontSize: 14),
+                    ),
+                    backgroundColor: SyaahiColors.midnightSoft,
+                  ),
+                );
+              }
+            } catch (_) {
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Could not delete poem. Try again.')),
+                );
+              }
+            }
+          }
+        }
+      },
+      itemBuilder: (_) => [
+        PopupMenuItem<String>(
+          value: 'delete',
+          child: Row(
+            children: [
+              const Icon(Icons.delete_outline,
+                  color: SyaahiColors.error, size: 18),
+              const SizedBox(width: SyaahiSizes.sm),
+              Text(
+                'Delete Poem',
+                style:
+                    GoogleFonts.inter(color: SyaahiColors.error, fontSize: 14),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── UX-05: Calm Loading State ─────────────────────────────────────
+class _ReaderLoadingView extends StatelessWidget {
+  const _ReaderLoadingView();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.auto_stories_outlined,
+            size: 48,
+            color: SyaahiColors.goldDark.withValues(alpha: 0.4),
+          ),
+          const SizedBox(height: SyaahiSizes.lg),
+          const SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(
+              color: SyaahiColors.goldBase,
+              strokeWidth: 2,
+            ),
+          ),
+          const SizedBox(height: SyaahiSizes.md),
+          Text(
+            'Opening poem\u2026',
+            style: GoogleFonts.cormorantGaramond(
+              color: SyaahiColors.textMuted,
+              fontSize: 16,
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Reader Error View (UX-03, preserved) ──────────────────────────
 class _ReaderErrorView extends StatelessWidget {
   final Object error;
   final VoidCallback onRetry;
@@ -171,7 +212,6 @@ class _ReaderErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final is404 = error is PoemsException &&
         (error as PoemsException).statusCode == 404;
-
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(SyaahiSizes.xl),
@@ -179,7 +219,9 @@ class _ReaderErrorView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              is404 ? Icons.auto_stories_outlined : Icons.cloud_off_outlined,
+              is404
+                  ? Icons.auto_stories_outlined
+                  : Icons.cloud_off_outlined,
               size: 64,
               color: SyaahiColors.textFaded,
             ),
@@ -218,6 +260,7 @@ class _ReaderErrorView extends StatelessWidget {
   }
 }
 
+// ── Reader View (UX-05: improved reading surface) ─────────────────
 class _ReaderView extends ConsumerStatefulWidget {
   final Poem poem;
   const _ReaderView({required this.poem});
@@ -235,7 +278,6 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
   @override
   void initState() {
     super.initState();
-    // UX-01: Use feed cache as initial value to prevent flash
     final cached = ref.read(feedProvider).heartStates[widget.poem.id];
     if (cached == HeartStatus.hearted) _hearted = true;
     _loadInitialState();
@@ -271,12 +313,12 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
         await repo.commitToHeart(widget.poem.id);
       }
       if (mounted) setState(() => _hearted = !_hearted);
-      // UX-01: Invalidate feed cache so it re-hydrates on return
       ref.read(feedProvider.notifier).invalidateHeart(widget.poem.id);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Something went wrong. Try again.')),
+          const SnackBar(
+              content: Text('Something went wrong. Try again.')),
         );
       }
     } finally {
@@ -323,115 +365,336 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(
-        SyaahiSizes.xl, SyaahiSizes.md, SyaahiSizes.xl, SyaahiSizes.xxxl,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 40, height: 1,
-              color: SyaahiColors.goldDark.withValues(alpha: 0.4),
-            ),
-          ),
-          const SizedBox(height: SyaahiSizes.xl),
-          if (widget.poem.title != null && widget.poem.title!.isNotEmpty) ...[
-            Text(
-              widget.poem.title!,
-              style: GoogleFonts.cormorantGaramond(
-                color: SyaahiColors.goldBase,
-                fontSize: 38,
-                fontWeight: FontWeight.w600,
-                height: 1.15,
-              ),
-            ),
-            const SizedBox(height: SyaahiSizes.lg),
-          ],
-          Wrap(
-            spacing: SyaahiSizes.sm,
-            runSpacing: SyaahiSizes.sm,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              // UX-02: Tappable byline -> author profile
-              GestureDetector(
-                onTap: () => context.push('/profile/${widget.poem.author.username}'),
-                child: Text(
-                  'by ${widget.poem.author.displayName}',
-                  style: GoogleFonts.inter(
-                    color: SyaahiColors.textMuted,
-                    fontSize: 13,
-                    fontStyle: FontStyle.italic,
-                    decoration: TextDecoration.underline,
-                    decorationColor: SyaahiColors.textFaded,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isWide = constraints.maxWidth > 720;
+        final contentPadding = isWide
+            ? const EdgeInsets.symmetric(
+                horizontal: 48, vertical: 24)
+            : const EdgeInsets.fromLTRB(
+                SyaahiSizes.xl,
+                SyaahiSizes.md,
+                SyaahiSizes.xl,
+                SyaahiSizes.xxxl,
+              );
+
+        return SingleChildScrollView(
+          padding: contentPadding,
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 680),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top ornament
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 1,
+                      color: SyaahiColors.goldDark
+                          .withValues(alpha: 0.4),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: SyaahiSizes.xl),
+
+                  // UX-05: Responsive title
+                  if (widget.poem.title != null &&
+                      widget.poem.title!.isNotEmpty) ...[
+                    Text(
+                      widget.poem.title!,
+                      style: GoogleFonts.cormorantGaramond(
+                        color: SyaahiColors.goldBase,
+                        fontSize: isWide ? 42.0 : 34.0,
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                      ),
+                    ),
+                    const SizedBox(height: SyaahiSizes.lg),
+                  ],
+
+                  // UX-05: Author byline with avatar
+                  _AuthorByline(
+                    author: widget.poem.author,
+                    poem: widget.poem,
+                  ),
+
+                  const SizedBox(height: SyaahiSizes.xxl),
+
+                  // UX-05: Stanza-aware poem body
+                  _PoemBody(content: widget.poem.content),
+
+                  const SizedBox(height: SyaahiSizes.xxl),
+
+                  // Bottom ornament + attribution
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 1,
+                      color: SyaahiColors.goldDark
+                          .withValues(alpha: 0.4),
+                    ),
+                  ),
+                  const SizedBox(height: SyaahiSizes.md),
+                  Center(
+                    child: GestureDetector(
+                      onTap: () => context.push(
+                          '/profile/${widget.poem.author.username}'),
+                      child: Text(
+                        '\u2014 ${widget.poem.author.displayName}',
+                        style: GoogleFonts.cormorantGaramond(
+                          color: SyaahiColors.textMuted,
+                          fontSize: 16,
+                          fontStyle: FontStyle.italic,
+                          decoration: TextDecoration.underline,
+                          decorationColor: SyaahiColors.textFaded,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: SyaahiSizes.xxl),
+
+                  // Heart
+                  _HeartSection(
+                    hearted: _hearted,
+                    loading: _heartLoading,
+                    onToggle: _toggleHeart,
+                  ),
+                  const SizedBox(height: SyaahiSizes.xl),
+
+                  // Reactions
+                  if (_reactionsLoading)
+                    const Center(
+                      child: CircularProgressIndicator(
+                        color: SyaahiColors.goldBase,
+                        strokeWidth: 2,
+                      ),
+                    )
+                  else if (_reactions.isNotEmpty)
+                    _ReactionsSection(
+                      reactions: _reactions,
+                      onToggle: _toggleReaction,
+                    ),
+
+                  // UX-05: Author continuity
+                  const SizedBox(height: SyaahiSizes.xxl),
+                  _AuthorContinuity(author: widget.poem.author),
+                  const SizedBox(height: SyaahiSizes.xxl),
+                ],
               ),
-              if (widget.poem.emotion != null)
-                _MetaBadge(
-                  text: '${widget.poem.emotion!.emoji} ${widget.poem.emotion!.label}',
-                ),
-              if (widget.poem.theme != null && widget.poem.theme!.isNotEmpty)
-                _MetaBadge(text: '# ${widget.poem.theme}'),
-            ],
-          ),
-          const SizedBox(height: SyaahiSizes.xxl),
-          SelectableText(
-            widget.poem.content,
-            style: GoogleFonts.cormorantGaramond(
-              color: SyaahiColors.textPrimary,
-              fontSize: 22,
-              height: 1.7,
-              fontWeight: FontWeight.w400,
-              letterSpacing: 0.3,
             ),
           ),
-          const SizedBox(height: SyaahiSizes.xxl),
-          Center(
-            child: Container(
-              width: 40, height: 1,
-              color: SyaahiColors.goldDark.withValues(alpha: 0.4),
-            ),
-          ),
-          const SizedBox(height: SyaahiSizes.md),
-          // UX-02: Tappable attribution -> author profile
-          Center(
-            child: GestureDetector(
-              onTap: () => context.push('/profile/${widget.poem.author.username}'),
-              child: Text(
-                '— ${widget.poem.author.displayName}',
-                style: GoogleFonts.cormorantGaramond(
+        );
+      },
+    );
+  }
+}
+
+// ── UX-05: Author Byline with Avatar ──────────────────────────────
+class _AuthorByline extends StatelessWidget {
+  final PoemAuthor author;
+  final Poem poem;
+  const _AuthorByline({required this.author, required this.poem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: SyaahiSizes.sm,
+      runSpacing: SyaahiSizes.sm,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        GestureDetector(
+          onTap: () =>
+              context.push('/profile/${author.username}'),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 14,
+                backgroundColor: SyaahiColors.midnightLight,
+                backgroundImage: author.avatarUrl != null
+                    ? NetworkImage(author.avatarUrl!)
+                    : null,
+                child: author.avatarUrl == null
+                    ? Text(
+                        author.displayName.isNotEmpty
+                            ? author.displayName[0].toUpperCase()
+                            : '?',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: SyaahiColors.goldBase,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    : null,
+              ),
+              const SizedBox(width: SyaahiSizes.sm),
+              Text(
+                'by ${author.displayName}',
+                style: GoogleFonts.inter(
                   color: SyaahiColors.textMuted,
-                  fontSize: 16,
+                  fontSize: 14,
                   fontStyle: FontStyle.italic,
                   decoration: TextDecoration.underline,
                   decorationColor: SyaahiColors.textFaded,
                 ),
               ),
+            ],
+          ),
+        ),
+        if (poem.emotion != null)
+          _MetaBadge(
+            text:
+                '${poem.emotion!.emoji} ${poem.emotion!.label}',
+          ),
+        if (poem.theme != null && poem.theme!.isNotEmpty)
+          _MetaBadge(text: '# ${poem.theme}'),
+      ],
+    );
+  }
+}
+
+// ── UX-05: Stanza-Aware Poem Body ─────────────────────────────────
+class _PoemBody extends StatelessWidget {
+  final String content;
+  const _PoemBody({required this.content});
+
+  @override
+  Widget build(BuildContext context) {
+    if (content.trim().isEmpty) {
+      return Center(
+        child: Padding(
+          padding:
+              const EdgeInsets.symmetric(vertical: SyaahiSizes.xxl),
+          child: Text(
+            'This poem has no content.',
+            style: GoogleFonts.cormorantGaramond(
+              color: SyaahiColors.textFaded,
+              fontSize: 18,
+              fontStyle: FontStyle.italic,
             ),
           ),
-          const SizedBox(height: SyaahiSizes.xxl),
-          _HeartSection(
-            hearted: _hearted,
-            loading: _heartLoading,
-            onToggle: _toggleHeart,
+        ),
+      );
+    }
+
+    final stanzas = content.split(RegExp(r'\n\s*\n'));
+
+    if (stanzas.length <= 1) {
+      return SelectableText(
+        content,
+        style: GoogleFonts.cormorantGaramond(
+          color: SyaahiColors.textPrimary,
+          fontSize: 21,
+          height: 1.8,
+          fontWeight: FontWeight.w400,
+          letterSpacing: 0.3,
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (int i = 0; i < stanzas.length; i++) ...[
+          SelectableText(
+            stanzas[i].trim(),
+            style: GoogleFonts.cormorantGaramond(
+              color: SyaahiColors.textPrimary,
+              fontSize: 21,
+              height: 1.8,
+              fontWeight: FontWeight.w400,
+              letterSpacing: 0.3,
+            ),
           ),
-          const SizedBox(height: SyaahiSizes.xl),
-          if (_reactionsLoading)
-            const Center(
-              child: CircularProgressIndicator(
-                color: SyaahiColors.goldBase, strokeWidth: 2,
-              ),
-            )
-          else if (_reactions.isNotEmpty)
-            _ReactionsSection(reactions: _reactions, onToggle: _toggleReaction),
+          if (i < stanzas.length - 1)
+            const SizedBox(height: SyaahiSizes.lg),
         ],
+      ],
+    );
+  }
+}
+
+// ── UX-05: Author Continuity Link ─────────────────────────────────
+class _AuthorContinuity extends StatelessWidget {
+  final PoemAuthor author;
+  const _AuthorContinuity({required this.author});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () =>
+          context.push('/profile/${author.username}'),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: SyaahiSizes.lg,
+          vertical: SyaahiSizes.md,
+        ),
+        decoration: BoxDecoration(
+          color: SyaahiColors.surfaceCard,
+          borderRadius:
+              BorderRadius.circular(SyaahiSizes.radiusLg),
+          border:
+              Border.all(color: SyaahiColors.divider, width: 0.5),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: SyaahiColors.midnightLight,
+              backgroundImage: author.avatarUrl != null
+                  ? NetworkImage(author.avatarUrl!)
+                  : null,
+              child: author.avatarUrl == null
+                  ? Text(
+                      author.displayName.isNotEmpty
+                          ? author.displayName[0].toUpperCase()
+                          : '?',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        color: SyaahiColors.goldBase,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: SyaahiSizes.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'More from ${author.displayName}',
+                    style: GoogleFonts.cormorantGaramond(
+                      color: SyaahiColors.textPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    'Explore their poetry',
+                    style: GoogleFonts.inter(
+                      color: SyaahiColors.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(
+              Icons.arrow_forward_ios,
+              color: SyaahiColors.textFaded,
+              size: 16,
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+// ── Heart Section (preserved from UX-01) ──────────────────────────
 class _HeartSection extends StatelessWidget {
   final bool hearted;
   final bool loading;
@@ -452,7 +715,8 @@ class _HeartSection extends StatelessWidget {
           color: hearted
               ? SyaahiColors.goldBase.withValues(alpha: 0.08)
               : SyaahiColors.surfaceCard,
-          borderRadius: BorderRadius.circular(SyaahiSizes.radiusLg),
+          borderRadius:
+              BorderRadius.circular(SyaahiSizes.radiusLg),
           border: Border.all(
             color: hearted
                 ? SyaahiColors.goldBase.withValues(alpha: 0.4)
@@ -464,22 +728,32 @@ class _HeartSection extends StatelessWidget {
           children: [
             if (loading)
               const SizedBox(
-                height: 18, width: 18,
+                height: 18,
+                width: 18,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2, color: SyaahiColors.goldBase,
+                  strokeWidth: 2,
+                  color: SyaahiColors.goldBase,
                 ),
               )
             else
               Icon(
-                hearted ? Icons.favorite : Icons.favorite_outline,
-                color: hearted ? SyaahiColors.goldBase : SyaahiColors.textMuted,
+                hearted
+                    ? Icons.favorite
+                    : Icons.favorite_outline,
+                color: hearted
+                    ? SyaahiColors.goldBase
+                    : SyaahiColors.textMuted,
                 size: 20,
               ),
             const SizedBox(width: SyaahiSizes.sm),
             Text(
-              hearted ? 'Committed to Heart' : 'Commit to Heart',
+              hearted
+                  ? 'Committed to Heart'
+                  : 'Commit to Heart',
               style: GoogleFonts.inter(
-                color: hearted ? SyaahiColors.goldBase : SyaahiColors.textMuted,
+                color: hearted
+                    ? SyaahiColors.goldBase
+                    : SyaahiColors.textMuted,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -491,10 +765,14 @@ class _HeartSection extends StatelessWidget {
   }
 }
 
+// ── Reactions Section (preserved) ─────────────────────────────────
 class _ReactionsSection extends StatelessWidget {
   final List<ReactionSummary> reactions;
   final ValueChanged<ReactionType> onToggle;
-  const _ReactionsSection({required this.reactions, required this.onToggle});
+  const _ReactionsSection({
+    required this.reactions,
+    required this.onToggle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -525,12 +803,15 @@ class _ReactionsSection extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: r.reacted
-                      ? SyaahiColors.goldBase.withValues(alpha: 0.12)
+                      ? SyaahiColors.goldBase
+                          .withValues(alpha: 0.12)
                       : SyaahiColors.surfaceCard,
-                  borderRadius: BorderRadius.circular(SyaahiSizes.radiusFull),
+                  borderRadius:
+                      BorderRadius.circular(SyaahiSizes.radiusFull),
                   border: Border.all(
                     color: r.reacted
-                        ? SyaahiColors.goldBase.withValues(alpha: 0.5)
+                        ? SyaahiColors.goldBase
+                            .withValues(alpha: 0.5)
                         : SyaahiColors.divider,
                   ),
                 ),
@@ -541,7 +822,8 @@ class _ReactionsSection extends StatelessWidget {
                         ? SyaahiColors.goldLight
                         : SyaahiColors.textSecondary,
                     fontSize: 13,
-                    fontWeight: r.reacted ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight:
+                        r.reacted ? FontWeight.w600 : FontWeight.w400,
                   ),
                 ),
               ),
@@ -553,6 +835,7 @@ class _ReactionsSection extends StatelessWidget {
   }
 }
 
+// ── Meta Badge (preserved) ────────────────────────────────────────
 class _MetaBadge extends StatelessWidget {
   final String text;
   const _MetaBadge({required this.text});
@@ -560,11 +843,13 @@ class _MetaBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: SyaahiSizes.sm, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+          horizontal: SyaahiSizes.sm, vertical: 4),
       decoration: BoxDecoration(
         color: SyaahiColors.midnightSoft,
         border: Border.all(color: SyaahiColors.divider),
-        borderRadius: BorderRadius.circular(SyaahiSizes.radiusFull),
+        borderRadius:
+            BorderRadius.circular(SyaahiSizes.radiusFull),
       ),
       child: Text(
         text,
