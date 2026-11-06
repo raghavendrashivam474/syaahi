@@ -6,6 +6,7 @@ import 'package:syaahi_app/core/constants/colors.dart';
 import 'package:syaahi_app/core/constants/sizes.dart';
 import 'package:syaahi_app/shared/models/poem.dart';
 import 'package:syaahi_app/features/auth/state/auth_providers.dart';
+import 'package:syaahi_app/features/poems/data/poems_repository.dart' show PoemsException;
 import 'package:syaahi_app/features/poems/state/poems_providers.dart';
 
 class ReaderScreen extends ConsumerWidget {
@@ -24,7 +25,13 @@ class ReaderScreen extends ConsumerWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: SyaahiColors.textPrimary),
-          onPressed: () => context.pop(),
+          onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
         ),
         actions: [
           poemAsync.when(
@@ -84,7 +91,6 @@ class ReaderScreen extends ConsumerWidget {
                         ],
                       ),
                     );
-
                     if (confirmed == true && context.mounted) {
                       try {
                         final repo = ref.read(poemsRepositoryProvider);
@@ -145,17 +151,68 @@ class ReaderScreen extends ConsumerWidget {
         loading: () => const Center(
           child: CircularProgressIndicator(color: SyaahiColors.goldBase),
         ),
-        error: (e, _) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(SyaahiSizes.xl),
-            child: Text(
-              'Could not load poem.\n$e',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(color: SyaahiColors.textMuted),
-            ),
-          ),
+        error: (e, _) => _ReaderErrorView(
+          error: e,
+          onRetry: () => ref.invalidate(poemByIdProvider(poemId)),
         ),
         data: (poem) => _ReaderView(poem: poem),
+      ),
+    );
+  }
+}
+
+// ── Reader Error View (UX-03) ────────────────────────────────────
+class _ReaderErrorView extends StatelessWidget {
+  final Object error;
+  final VoidCallback onRetry;
+  const _ReaderErrorView({required this.error, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    final is404 = error is PoemsException &&
+        (error as PoemsException).statusCode == 404;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(SyaahiSizes.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              is404 ? Icons.auto_stories_outlined : Icons.cloud_off_outlined,
+              size: 64,
+              color: SyaahiColors.textFaded,
+            ),
+            const SizedBox(height: SyaahiSizes.lg),
+            Text(
+              is404 ? 'Poem not found.' : 'Could not load this poem.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.cormorantGaramond(
+                color: SyaahiColors.textPrimary,
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: SyaahiSizes.sm),
+            Text(
+              is404
+                  ? 'This poem may have been removed or never existed.'
+                  : 'Something went wrong. Please try again.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: SyaahiColors.textMuted,
+                fontSize: 14,
+              ),
+            ),
+            if (!is404) ...[
+              const SizedBox(height: SyaahiSizes.xl),
+              ElevatedButton(
+                onPressed: onRetry,
+                child: const Text('Try Again'),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }
@@ -230,7 +287,6 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
   Future<void> _toggleReaction(ReactionType type) async {
     final repo = ref.read(poemsRepositoryProvider);
     final existing = _reactions.firstWhere((r) => r.type == type);
-
     setState(() {
       _reactions = _reactions.map((r) {
         if (r.type != type) return r;
@@ -242,7 +298,6 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
         );
       }).toList();
     });
-
     try {
       if (existing.reacted) {
         await repo.removeReaction(widget.poem.id, type);
@@ -282,7 +337,6 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
             ),
           ),
           const SizedBox(height: SyaahiSizes.xl),
-
           if (widget.poem.title != null && widget.poem.title!.isNotEmpty) ...[
             Text(
               widget.poem.title!,
@@ -295,7 +349,6 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
             ),
             const SizedBox(height: SyaahiSizes.lg),
           ],
-
           Wrap(
             spacing: SyaahiSizes.sm,
             runSpacing: SyaahiSizes.sm,
@@ -323,9 +376,7 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
                 _MetaBadge(text: '# ${widget.poem.theme}'),
             ],
           ),
-
           const SizedBox(height: SyaahiSizes.xxl),
-
           SelectableText(
             widget.poem.content,
             style: GoogleFonts.cormorantGaramond(
@@ -336,9 +387,7 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
               letterSpacing: 0.3,
             ),
           ),
-
           const SizedBox(height: SyaahiSizes.xxl),
-
           Center(
             child: Container(
               width: 40, height: 1,
@@ -362,17 +411,13 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
               ),
             ),
           ),
-
           const SizedBox(height: SyaahiSizes.xxl),
-
           _HeartSection(
             hearted: _hearted,
             loading: _heartLoading,
             onToggle: _toggleHeart,
           ),
-
           const SizedBox(height: SyaahiSizes.xl),
-
           if (_reactionsLoading)
             const Center(
               child: CircularProgressIndicator(
@@ -391,7 +436,6 @@ class _HeartSection extends StatelessWidget {
   final bool hearted;
   final bool loading;
   final VoidCallback onToggle;
-
   const _HeartSection({
     required this.hearted,
     required this.loading,
@@ -450,7 +494,6 @@ class _HeartSection extends StatelessWidget {
 class _ReactionsSection extends StatelessWidget {
   final List<ReactionSummary> reactions;
   final ValueChanged<ReactionType> onToggle;
-
   const _ReactionsSection({required this.reactions, required this.onToggle});
 
   @override
