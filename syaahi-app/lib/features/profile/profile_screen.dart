@@ -31,7 +31,13 @@ class ProfileScreen extends ConsumerWidget {
         title: const Text('Profile'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/home');
+              }
+            },
         ),
       ),
       body: AuthorProfileView(
