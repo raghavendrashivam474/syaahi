@@ -1,8 +1,35 @@
-import { Request, Response } from 'express';
+﻿import { Request, Response } from 'express';
 import { prisma } from '../../config/prisma';
 import { ApiError } from '../../utils/ApiError';
-import { updateMeSchema, userPoemsQuerySchema } from './users.schemas';
+import { updateMeSchema, userPoemsQuerySchema, searchUsersQuerySchema } from './users.schemas';
 
+/**
+ * GET /api/v1/users/search?q=...&limit=...
+ * Search users by username or displayName (public, no auth required).
+ * Must be registered BEFORE /:username to avoid route collision.
+ */
+export const searchUsers = async (req: Request, res: Response) => {
+  const { q, limit } = searchUsersQuerySchema.parse(req.query);
+
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [
+        { username: { contains: q, mode: 'insensitive' } },
+        { displayName: { contains: q, mode: 'insensitive' } },
+      ],
+    },
+    select: {
+      username: true,
+      displayName: true,
+      bio: true,
+      avatarUrl: true,
+    },
+    take: limit,
+    orderBy: { username: 'asc' },
+  });
+
+  res.json({ success: true, data: { users } });
+};
 /**
  * GET /api/v1/users/:username
  * Public profile of any user
@@ -29,7 +56,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
 
   res.json({ success: true, data: { user } });
 };
-
 /**
  * GET /api/v1/users/:username/poems
  * Paginated poems by a specific user

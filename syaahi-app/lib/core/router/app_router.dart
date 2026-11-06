@@ -15,6 +15,7 @@ import 'package:syaahi_app/features/poems/presentation/heart_screen.dart';
 import 'package:syaahi_app/features/profile/profile_screen.dart';
 import 'package:syaahi_app/features/profile/presentation/author_profile_screen.dart';
 import 'package:syaahi_app/features/notifications/presentation/inbox_screen.dart';
+import 'package:syaahi_app/features/discovery/presentation/discovery_screen.dart';
 import 'package:syaahi_app/features/auth/state/auth_providers.dart';
 
 class AppRouter {
@@ -69,6 +70,10 @@ class AppRouter {
         builder: (context, state) => AuthorProfileScreen(
           username: state.pathParameters['username']!,
         ),
+      ),
+      GoRoute(
+        path: '/discover',
+        builder: (context, state) => const DiscoveryScreen(),
       ),
       GoRoute(
         path: '/notifications',

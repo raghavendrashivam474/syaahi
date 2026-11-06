@@ -1,4 +1,4 @@
-import { z } from 'zod';
+﻿import { z } from 'zod';
 
 export const updateMeSchema = z.object({
   displayName: z.string().min(1).max(60).optional(),
@@ -12,3 +12,10 @@ export const userPoemsQuerySchema = z.object({
 });
 
 export type UpdateMeInput = z.infer<typeof updateMeSchema>;
+
+export const searchUsersQuerySchema = z.object({
+  q: z.string().min(2).max(50).trim(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+
+export type SearchUsersInput = z.infer<typeof searchUsersQuerySchema>;
