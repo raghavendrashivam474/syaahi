@@ -66,6 +66,40 @@ class ProfileRepository {
     }
   }
 
+  /// Search for authors by username or display name.
+  ///
+  /// Maps to GET /api/v1/users/search?q=...&limit=....
+  Future<List<AuthorProfile>> searchAuthors(
+    String query, {
+    int limit = 20,
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/users/search',
+        queryParameters: {
+          'q': query,
+          'limit': limit,
+        },
+      );
+      final data = response.data['data'] as Map<String, dynamic>;
+      final list = data['users'] as List<dynamic>;
+      return list.map((j) {
+        final map = j as Map<String, dynamic>;
+        return AuthorProfile(
+          id: map['username'] as String,
+          username: map['username'] as String,
+          displayName: map['displayName'] as String,
+          bio: map['bio'] as String?,
+          avatarUrl: map['avatarUrl'] as String?,
+          createdAt: DateTime.now(),
+          poemCount: 0,
+        );
+      }).toList();
+    } on DioException catch (e) {
+      throw _handle(e);
+    }
+  }
+
   /// Distinguish 404 (author not found) from network/server errors.
   PoemsException _handle(DioException e) {
     final response = e.response;
