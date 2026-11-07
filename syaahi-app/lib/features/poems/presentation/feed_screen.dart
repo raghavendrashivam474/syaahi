@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -400,7 +400,10 @@ class _PoemCard extends ConsumerWidget {
                   _EmotionBadge(emotion: poem.emotion!),
                 // ── UX-01: Heart control ──
                 const SizedBox(width: SyaahiSizes.sm),
-                Row(
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => context.push('/poem/${poem.id}?focus=resonance'),
+                  child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
@@ -417,6 +420,7 @@ class _PoemCard extends ConsumerWidget {
                       ),
                     ),
                   ],
+                ),
                 ),
                 const SizedBox(width: SyaahiSizes.md),
                 _HeartButton(
