@@ -6,6 +6,8 @@ import 'package:syaahi_app/shared/models/poem.dart';
 import 'package:syaahi_app/features/poems/state/poems_providers.dart';
 import 'package:syaahi_app/features/poems/data/poems_repository.dart';
 import 'package:syaahi_app/features/poems/presentation/reader_screen.dart';
+import 'package:syaahi_app/features/resonance/data/resonance_repository.dart';
+import 'package:syaahi_app/features/resonance/state/resonance_providers.dart';
 
 // ── Fake Repository ───────────────────────────────────────────────
 // Overrides the network methods that _ReaderViewState calls in
@@ -26,6 +28,17 @@ class _FakePoemsRepository extends PoemsRepository {
     int limit = 10,
     FeedFilters? filters,
   }) async => const PoemFeedResult(poems: []);
+}
+
+class _FakeResonanceRepository extends ResonanceRepository {
+  _FakeResonanceRepository() : super(dio: Dio());
+
+  @override
+  Future<ResonanceListResult> listResponses(
+    String poemId, {
+    String? cursor,
+    int limit = 20,
+  }) async => const ResonanceListResult(responses: []);
 }
 
 // ── Test Data ─────────────────────────────────────────────────────
@@ -100,6 +113,7 @@ Widget _buildReader(String poemId, Poem poem) {
   return ProviderScope(
     overrides: [
       poemsRepositoryProvider.overrideWithValue(_FakePoemsRepository()),
+      resonanceRepositoryProvider.overrideWithValue(_FakeResonanceRepository()),
       poemByIdProvider(poemId).overrideWith((ref) => Future.value(poem)),
     ],
     child: MaterialApp(home: ReaderScreen(poemId: poemId)),
@@ -111,6 +125,7 @@ Widget _buildReaderError(String poemId, Object error) {
     overrides: [
       poemsRepositoryProvider.overrideWithValue(_FakePoemsRepository()),
       poemByIdProvider(poemId).overrideWith((ref) => Future.error(error)),
+      resonanceRepositoryProvider.overrideWithValue(_FakeResonanceRepository()),
     ],
     child: MaterialApp(home: ReaderScreen(poemId: poemId)),
   );
@@ -120,6 +135,7 @@ Widget _buildReaderLoading(String poemId) {
   return ProviderScope(
     overrides: [
       poemsRepositoryProvider.overrideWithValue(_FakePoemsRepository()),
+      resonanceRepositoryProvider.overrideWithValue(_FakeResonanceRepository()),
       poemByIdProvider(poemId).overrideWith(
         (ref) => Future.delayed(const Duration(seconds: 10), () => _testPoem),
       ),
