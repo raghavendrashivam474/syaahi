@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,12 +9,13 @@ import 'package:syaahi_app/features/auth/state/auth_providers.dart';
 import 'package:syaahi_app/features/poems/data/poems_repository.dart'
     show PoemsException;
 import 'package:syaahi_app/features/poems/state/poems_providers.dart';
+import 'package:syaahi_app/features/resonance/presentation/resonance_section.dart';
 
 // ── Reader Screen ──────────────────────────────────────────────────
 class ReaderScreen extends ConsumerWidget {
   final String poemId;
-  const ReaderScreen({super.key, required this.poemId});
-
+  final String? focusSection;
+  const ReaderScreen({super.key, required this.poemId, this.focusSection});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final poemAsync = ref.watch(poemByIdProvider(poemId));
@@ -54,7 +55,7 @@ class ReaderScreen extends ConsumerWidget {
           error: e,
           onRetry: () => ref.invalidate(poemByIdProvider(poemId)),
         ),
-        data: (poem) => _ReaderView(poem: poem),
+        data: (poem) => _ReaderView(poem: poem, focusSection: focusSection),
       ),
     );
   }
@@ -263,13 +264,15 @@ class _ReaderErrorView extends StatelessWidget {
 // ── Reader View (UX-05: improved reading surface) ─────────────────
 class _ReaderView extends ConsumerStatefulWidget {
   final Poem poem;
-  const _ReaderView({required this.poem});
-
+  final String? focusSection;
+  const _ReaderView({required this.poem, this.focusSection});
   @override
   ConsumerState<_ReaderView> createState() => _ReaderViewState();
 }
 
 class _ReaderViewState extends ConsumerState<_ReaderView> {
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _resonanceKey = GlobalKey();
   bool _hearted = false;
   bool _heartLoading = false;
   List<ReactionSummary> _reactions = [];
@@ -281,6 +284,29 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
     final cached = ref.read(feedProvider).heartStates[widget.poem.id];
     if (cached == HeartStatus.hearted) _hearted = true;
     _loadInitialState();
+    if (widget.focusSection == 'resonance') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToResonance();
+      });
+    }
+  }
+
+  void _scrollToResonance() {
+    final ctx = _resonanceKey.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(
+        ctx,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+        alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadInitialState() async {
@@ -379,6 +405,7 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
               );
 
         return SingleChildScrollView(
+          controller: _scrollController,
           padding: contentPadding,
           child: Center(
             child: ConstrainedBox(
@@ -479,6 +506,10 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
                   // UX-05: Author continuity
                   const SizedBox(height: SyaahiSizes.xxl),
                   _AuthorContinuity(author: widget.poem.author),
+
+                  // UX-06: Resonance Section
+                  const SizedBox(height: SyaahiSizes.xxl),
+                  ResonanceSection(key: _resonanceKey, poem: widget.poem),
                   const SizedBox(height: SyaahiSizes.xxl),
                 ],
               ),

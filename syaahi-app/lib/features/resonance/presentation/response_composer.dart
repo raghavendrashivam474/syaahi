@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/colors.dart';
@@ -121,11 +121,12 @@ class _ResponseComposerState extends ConsumerState<ResponseComposer> {
                 onPressed:
                     isValid && !state.isSubmitting ? _submit : null,
                 style: ElevatedButton.styleFrom(
+                  minimumSize: Size.zero,
                   backgroundColor: SyaahiColors.goldBase,
                   foregroundColor: SyaahiColors.midnightDark,
                   disabledBackgroundColor:
                       SyaahiColors.goldBase.withValues(alpha: 0.3),
-                  padding: const EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
                     horizontal: SyaahiSizes.lg,
                     vertical: SyaahiSizes.sm,
                   ),
