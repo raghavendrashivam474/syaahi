@@ -25,6 +25,8 @@ model User {
   rooms                  RoomMember[]
   notifications          Notification[]
   notificationPreference NotificationPreference?
+  resonances           ResonanceResponse[]
+  resonanceReplies     ResonanceReply[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,6 +50,7 @@ model Poem {
   hearts        Heart[]
   rooms         PoemRoom[]
   notifications Notification[]
+  resonances    ResonanceResponse[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -170,12 +173,15 @@ enum RoomRole {
 
 enum NotificationType {
   POEM_PUBLISHED
+  RESONANCE_RESPONSE
+  AUTHOR_REPLY
 }
 
 model Notification {
   id          String           @id @default(uuid())
   recipientId String
   type        NotificationType
+  sourceId    String?
   poemId      String
   readAt      DateTime?
 
@@ -184,7 +190,7 @@ model Notification {
 
   createdAt DateTime @default(now())
 
-  @@unique([recipientId, poemId, type])
+  @@unique([recipientId, poemId, type, sourceId])
   @@index([recipientId, createdAt])
   @@index([recipientId, readAt])
 }
@@ -196,4 +202,34 @@ model NotificationPreference {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   updatedAt DateTime @updatedAt
+}
+
+model ResonanceResponse {
+  id        String   @id @default(uuid())
+  poemId    String
+  userId    String
+  content   String   @db.VarChar(280)
+
+  poem      Poem     @relation(fields: [poemId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reply     ResonanceReply?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([poemId])
+  @@index([userId])
+}
+
+model ResonanceReply {
+  id         String   @id @default(uuid())
+  responseId String   @unique
+  authorId   String
+  content    String   @db.VarChar(280)
+
+  response   ResonanceResponse @relation(fields: [responseId], references: [id], onDelete: Cascade)
+  author     User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

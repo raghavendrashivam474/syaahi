@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -237,7 +237,11 @@ class _NotificationCard extends StatelessWidget {
                   ),
                   const SizedBox(height: SyaahiSizes.xs),
                   Text(
-                    'New poem published',
+                    notification.type == 'RESONANCE_RESPONSE'
+                        ? 'New resonance response on your poem'
+                        : notification.type == 'AUTHOR_REPLY'
+                            ? 'Author replied to your response'
+                            : 'New poem published',
                     style: GoogleFonts.inter(
                       color: SyaahiColors.textMuted,
                       fontSize: 12,
