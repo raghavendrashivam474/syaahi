@@ -53,7 +53,10 @@ class AppRouter {
       GoRoute(
         path: '/poem/:id',
         builder: (context, state) =>
-            ReaderScreen(poemId: state.pathParameters['id']!),
+            ReaderScreen(
+              poemId: state.pathParameters['id']!,
+              focusSection: state.uri.queryParameters['focus'],
+            ),
       ),
       GoRoute(
         path: '/heart',
