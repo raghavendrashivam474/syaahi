@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -400,6 +400,25 @@ class _PoemCard extends ConsumerWidget {
                   _EmotionBadge(emotion: poem.emotion!),
                 // ── UX-01: Heart control ──
                 const SizedBox(width: SyaahiSizes.sm),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.chat_bubble_outline,
+                      size: 16,
+                      color: SyaahiColors.textFaded,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Respond',
+                      style: GoogleFonts.inter(
+                        color: SyaahiColors.textFaded,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(width: SyaahiSizes.md),
                 _HeartButton(
                   status: heartStatus,
                   onToggle: () => _onHeartToggle(context, ref),

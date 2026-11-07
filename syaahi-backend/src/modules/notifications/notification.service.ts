@@ -2,22 +2,6 @@ import { prisma } from '../../config/prisma';
 
 /**
  * Creates POEM_PUBLISHED notification records for all eligible recipients.
- *
- * Eligibility rules (ADR-025 approved):
- *   - User has a NotificationPreference row with newPoemAlerts = true
- *   - User is NOT the poem author (no self-notification)
- *
- * Duplicate protection:
- *   - createMany with skipDuplicates: true
- *   - Relies on @@unique([recipientId, poemId, type]) constraint
- *
- * Failure handling (best-effort, synchronous):
- *   - Notification failure does NOT roll back the already-persisted poem
- *   - Failures are logged to console.error (visible in Vercel function logs)
- *   - No automatic retry — this is a documented limitation
- *
- * @param poemId  - The ID of the newly published poem
- * @param authorId - The ID of the poem's author (excluded from recipients)
  */
 export const createPublicationNotifications = async (
   poemId: string,
@@ -54,10 +38,66 @@ export const createPublicationNotifications = async (
       );
     }
   } catch (error) {
-    // Best-effort: the poem is already persisted.
-    // Log the failure for observability but do not throw.
     console.error(
       `[N3] Failed to create publication notifications for poem ${poemId}:`,
+      error
+    );
+  }
+};
+
+/**
+ * Creates a RESONANCE_RESPONSE notification for the poem author.
+ * Skips self-notifications if responder is the author.
+ */
+export const createResonanceNotification = async (
+  poemId: string,
+  authorId: string,
+  responderId: string,
+  responseId: string
+): Promise<void> => {
+  if (authorId === responderId) return;
+
+  try {
+    await prisma.notification.create({
+      data: {
+        recipientId: authorId,
+        poemId,
+        type: 'RESONANCE_RESPONSE',
+        sourceId: responseId,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[UX-06] Failed to create resonance notification for poem ${poemId}:`,
+      error
+    );
+  }
+};
+
+/**
+ * Creates an AUTHOR_REPLY notification for the original responder.
+ * Skips self-notifications if author is the responder.
+ */
+export const createReplyNotification = async (
+  poemId: string,
+  responderId: string,
+  authorId: string,
+  replyId: string
+): Promise<void> => {
+  if (responderId === authorId) return;
+
+  try {
+    await prisma.notification.create({
+      data: {
+        recipientId: responderId,
+        poemId,
+        type: 'AUTHOR_REPLY',
+        sourceId: replyId,
+      },
+    });
+  } catch (error) {
+    console.error(
+      `[UX-06] Failed to create reply notification for poem ${poemId}:`,
       error
     );
   }

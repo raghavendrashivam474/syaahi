@@ -9,6 +9,7 @@ import poemRoutes from './modules/poems/poems.routes';
 import userRoutes from './modules/users/users.routes';
 import heartRoutes from './modules/heart/heart.routes';
 import reactionRoutes from './modules/reactions/reactions.routes';
+import resonanceRoutes from './modules/resonance/resonance.routes';
 import { notificationRouter, preferenceRouter } from './modules/notifications/notifications.routes';
 import { globalLimiter } from './middleware/rateLimiter';
 
@@ -59,6 +60,7 @@ app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/poems', heartRoutes);
 app.use('/api/v1/users', heartRoutes);
 app.use('/api/v1/poems', reactionRoutes);
+app.use('/api/v1', resonanceRoutes);
 app.use('/api/v1/notifications', notificationRouter);
 app.use('/api/v1/notification-preferences', preferenceRouter);
 
