@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/sizes.dart';
 import '../../core/constants/strings.dart';
 import '../../core/storage/token_storage.dart';
+import '../../core/storage/onboarding_storage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -49,7 +50,16 @@ class _SplashScreenState extends State<SplashScreen>
     if (token != null && token.isNotEmpty) {
       context.go('/home');
     } else {
-      context.go('/welcome');
+      // Returning guests skip the welcome and go to public exploration.
+      final onboarding = OnboardingStorage();
+      final welcomeSeen = await onboarding.isWelcomeSeen();
+      if (!mounted) return;
+
+      if (welcomeSeen) {
+        context.go('/discover');
+      } else {
+        context.go('/welcome');
+      }
     }
   }
 
