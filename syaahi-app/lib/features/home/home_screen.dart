@@ -1,9 +1,10 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/colors.dart';
 import '../../core/constants/sizes.dart';
 import '../auth/state/auth_providers.dart';
+import '../../core/widgets/syaahi_brand_mark.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -14,7 +15,7 @@ class HomeScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Syaahi'),
+        title: const SyaahiBrandMark(),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
