@@ -10,6 +10,8 @@ import 'package:syaahi_app/features/poems/data/poems_repository.dart'
     show PoemsException;
 import 'package:syaahi_app/features/poems/state/poems_providers.dart';
 import 'package:syaahi_app/features/resonance/presentation/resonance_section.dart';
+import 'package:syaahi_app/features/onboarding/presentation/auth_prompt.dart';
+import 'package:syaahi_app/features/onboarding/presentation/contextual_tip.dart';
 
 // ── Reader Screen ──────────────────────────────────────────────────
 class ReaderScreen extends ConsumerWidget {
@@ -330,6 +332,13 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
 
   Future<void> _toggleHeart() async {
     if (_heartLoading) return;
+
+    // UX-07: Guest auth guard
+    final user = ref.read(authProvider).user;
+    if (user == null) {
+      if (mounted) AuthPrompt.show(context, action: 'appreciate this poem');
+      return;
+    }
     setState(() => _heartLoading = true);
     final repo = ref.read(poemsRepositoryProvider);
     try {
@@ -481,11 +490,15 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
 
                   const SizedBox(height: SyaahiSizes.xxl),
 
-                  // Heart
-                  _HeartSection(
-                    hearted: _hearted,
-                    loading: _heartLoading,
-                    onToggle: _toggleHeart,
+                  // Heart (UX-07: contextual tip)
+                  ContextualTip(
+                    feature: 'heart',
+                    message: 'Tap the heart to appreciate a poem you love.',
+                    child: _HeartSection(
+                      hearted: _hearted,
+                      loading: _heartLoading,
+                      onToggle: _toggleHeart,
+                    ),
                   ),
                   const SizedBox(height: SyaahiSizes.xl),
 
@@ -509,7 +522,12 @@ class _ReaderViewState extends ConsumerState<_ReaderView> {
 
                   // UX-06: Resonance Section
                   const SizedBox(height: SyaahiSizes.xxl),
-                  ResonanceSection(key: _resonanceKey, poem: widget.poem),
+                  // UX-07: contextual tip for resonance
+                  ContextualTip(
+                    feature: 'resonance',
+                    message: 'Resonance is where readers respond with their own words.',
+                    child: ResonanceSection(key: _resonanceKey, poem: widget.poem),
+                  ),
                   const SizedBox(height: SyaahiSizes.xxl),
                 ],
               ),
@@ -893,3 +911,4 @@ class _MetaBadge extends StatelessWidget {
     );
   }
 }
+
