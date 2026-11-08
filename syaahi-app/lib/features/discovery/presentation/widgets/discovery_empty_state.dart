@@ -25,7 +25,7 @@ class DiscoveryEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: SyaahiSizes.md),
             Text(
-              'No writers found',
+              'No writers found yet',
               style: GoogleFonts.cormorantGaramond(
                 color: SyaahiColors.textPrimary,
                 fontSize: 20,
@@ -48,3 +48,4 @@ class DiscoveryEmptyState extends StatelessWidget {
     );
   }
 }
+
