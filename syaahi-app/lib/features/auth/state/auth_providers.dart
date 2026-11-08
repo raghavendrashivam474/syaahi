@@ -1,6 +1,7 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/user.dart';
 import '../data/auth_repository.dart';
+import '../../../core/storage/onboarding_storage.dart';
 
 // Repository singleton
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
@@ -77,7 +78,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    // UX-07: Capture userId before clearing auth state.
+    final userId = state.user?.id;
     await _repository.logout();
+    if (userId != null) {
+      await OnboardingStorage().clearUserStates(userId);
+    }
     state = const AuthState();
   }
 }

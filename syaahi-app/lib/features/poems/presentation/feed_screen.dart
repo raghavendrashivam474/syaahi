@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -9,6 +9,8 @@ import '../../../features/auth/state/auth_providers.dart';
 import '../data/poems_repository.dart';
 import '../state/poems_providers.dart';
 import '../../notifications/state/notifications_providers.dart';
+import 'package:syaahi_app/features/onboarding/presentation/auth_prompt.dart';
+import 'package:syaahi_app/features/onboarding/presentation/onboarding_walkthrough.dart';
 import '../../../core/widgets/syaahi_brand_mark.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
@@ -70,6 +72,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             icon: const Icon(Icons.favorite_outline),
             tooltip: 'My Heart',
             onPressed: () => context.push('/heart'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.help_outline),
+            tooltip: 'How Syaahi works',
+            onPressed: () => OnboardingWalkthrough.show(context),
           ),
           IconButton(
             icon: const Icon(Icons.person_outline),
@@ -441,9 +448,7 @@ class _PoemCard extends ConsumerWidget {
     final user = ref.read(authProvider).user;
     if (user == null) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sign in to commit to heart.')),
-        );
+        AuthPrompt.show(context, action: 'appreciate this poem');
       }
       return;
     }
@@ -679,3 +684,4 @@ class _BellButton extends ConsumerWidget {
     );
   }
 }
+

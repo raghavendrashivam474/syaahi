@@ -100,8 +100,16 @@ class AppRouter {
     final isPublicProfile =
         path.startsWith('/profile/') && path.length > '/profile/'.length;
 
+    final isDiscover = path == '/discover';
+
+
+    
+
+
     final isPublic =
-        isSplash || isWelcome || isAuth || isPoem || isPublicProfile;
+
+
+        isSplash || isWelcome || isAuth || isPoem || isPublicProfile || isDiscover;
 
     // Protected routes: /home, /write, /heart, /profile, /notifications
     final isProtected = !isPublic;
@@ -174,3 +182,4 @@ class _NotFoundScreen extends StatelessWidget {
     );
   }
 }
+

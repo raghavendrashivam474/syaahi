@@ -6,6 +6,7 @@ import '../../../core/constants/colors.dart';
 import '../../../core/constants/sizes.dart';
 import '../../../shared/models/poem.dart';
 import '../state/poems_providers.dart';
+import '../../onboarding/presentation/contextual_tip.dart';
 
 class WriterScreen extends ConsumerStatefulWidget {
   const WriterScreen({super.key});
@@ -185,6 +186,14 @@ class _WriterScreenState extends ConsumerState<WriterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // UX-07: First-time writing guidance
+                ContextualTip(
+                  feature: 'write',
+                  message: 'Write freely. Add a title if you like. Tap Publish when ready.',
+                  child: const SizedBox.shrink(),
+                ),
+                const SizedBox(height: SyaahiSizes.sm),
+
                 // Title (optional, looks like a manuscript)
                 TextField(
                   controller: _titleCtrl,
@@ -367,3 +376,4 @@ class _SectionLabel extends StatelessWidget {
     );
   }
 }
+

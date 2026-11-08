@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/colors.dart';
@@ -8,6 +8,7 @@ import '../../auth/state/auth_providers.dart';
 import '../state/resonance_providers.dart';
 import 'response_composer.dart';
 import 'response_item.dart';
+import '../../onboarding/presentation/auth_prompt.dart';
 
 class ResonanceSection extends ConsumerWidget {
   final Poem poem;
@@ -47,22 +48,7 @@ class ResonanceSection extends ConsumerWidget {
         if (currentUser != null)
           ResponseComposer(poemId: poem.id)
         else
-          Container(
-            padding: const EdgeInsets.all(SyaahiSizes.md),
-            decoration: BoxDecoration(
-              color: SyaahiColors.surfaceCard,
-              borderRadius: BorderRadius.circular(SyaahiSizes.radiusLg),
-              border: Border.all(color: SyaahiColors.divider, width: 0.5),
-            ),
-            child: Text(
-              'Sign in to share what this poem meant to you.',
-              style: GoogleFonts.inter(
-                color: SyaahiColors.textMuted,
-                fontSize: 13,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),
+          _GuestResonancePrompt(poemTitle: poem.title ?? 'this poem'),
 
         const SizedBox(height: SyaahiSizes.lg),
 
@@ -95,7 +81,7 @@ class ResonanceSection extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(vertical: SyaahiSizes.md),
             child: Center(
               child: Text(
-                'No resonance responses yet. Be the first to share.',
+                'No responses yet. Every conversation starts with a single word.',
                 style: GoogleFonts.cormorantGaramond(
                   color: SyaahiColors.textFaded,
                   fontSize: 16,
@@ -122,3 +108,55 @@ class ResonanceSection extends ConsumerWidget {
     );
   }
 }
+
+// ── UX-07: Guest Resonance Prompt ──────────────────────────────
+class _GuestResonancePrompt extends StatelessWidget {
+  final String poemTitle;
+  const _GuestResonancePrompt({required this.poemTitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => AuthPrompt.show(context, action: 'respond to this poem'),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(
+          horizontal: SyaahiSizes.lg,
+          vertical: SyaahiSizes.md,
+        ),
+        decoration: BoxDecoration(
+          color: SyaahiColors.goldDark.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: SyaahiColors.goldDark.withValues(alpha: 0.15),
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.edit_outlined,
+              size: 18,
+              color: SyaahiColors.goldLight.withValues(alpha: 0.6),
+            ),
+            const SizedBox(width: SyaahiSizes.sm),
+            Expanded(
+              child: Text(
+                'Sign in to share your response',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: SyaahiColors.textMuted,
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 12,
+              color: SyaahiColors.textFaded,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
