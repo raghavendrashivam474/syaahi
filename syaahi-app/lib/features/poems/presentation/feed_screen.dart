@@ -9,6 +9,7 @@ import '../../../features/auth/state/auth_providers.dart';
 import '../data/poems_repository.dart';
 import '../state/poems_providers.dart';
 import '../../notifications/state/notifications_providers.dart';
+import '../../../core/widgets/syaahi_brand_mark.dart';
 
 class FeedScreen extends ConsumerStatefulWidget {
   const FeedScreen({super.key});
@@ -46,7 +47,8 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
     final state = ref.watch(feedProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Syaahi'),
+        centerTitle: false,
+        title: const SyaahiBrandMark(),
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
