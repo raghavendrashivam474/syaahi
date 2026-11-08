@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/constants/colors.dart';
@@ -18,6 +18,7 @@ class OnboardingWalkthrough extends ConsumerStatefulWidget {
     return showDialog(
       context: context,
       barrierDismissible: true,
+      barrierColor: Colors.black54,
       builder: (_) => const OnboardingWalkthrough(),
     );
   }
@@ -88,7 +89,7 @@ class _OnboardingWalkthroughState
     final isLast = _step == _steps.length - 1;
 
     return Dialog(
-      backgroundColor: Colors.transparent,
+      backgroundColor: SyaahiColors.midnightBase,
       insetPadding: const EdgeInsets.all(SyaahiSizes.xl),
       child: Container(
         padding: const EdgeInsets.all(SyaahiSizes.xl),
@@ -96,7 +97,7 @@ class _OnboardingWalkthroughState
           color: SyaahiColors.midnightBase,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: SyaahiColors.goldDark.withValues(alpha: 0.2),
+            color: SyaahiColors.goldBase.withValues(alpha: 0.4),
           ),
         ),
         child: Column(
