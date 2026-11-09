@@ -91,6 +91,11 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               if (context.mounted) context.go('/welcome');
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.help_outline, color: SyaahiColors.textMuted),
+            tooltip: 'How Syaahi works',
+            onPressed: () => OnboardingWalkthrough.show(context),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
