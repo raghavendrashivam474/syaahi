@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/colors.dart';
@@ -29,9 +29,22 @@ class _ResponseItemState extends ConsumerState<ResponseItem> {
 
   bool _isReplying = false;
   final _replyController = TextEditingController();
+  int _replyCharCount = 0;
 
   bool _isEditingReply = false;
   final _editReplyController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _replyController.addListener(() {
+      if (mounted) {
+        setState(() {
+          _replyCharCount = _replyController.text.trim().length;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -124,7 +137,19 @@ class _ResponseItemState extends ConsumerState<ResponseItem> {
       _replyController.clear();
       setState(() {
         _isReplying = false;
+        _replyCharCount = 0;
       });
+    } else if (mounted) {
+      final err = ref.read(resonanceProvider(widget.poemId)).actionError;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            err ?? 'Failed to post reply. Please try again.',
+            style: GoogleFonts.inter(fontSize: 13),
+          ),
+          backgroundColor: SyaahiColors.error,
+        ),
+      );
     }
   }
 
@@ -436,7 +461,7 @@ class _ResponseItemState extends ConsumerState<ResponseItem> {
             ),
           ],
 
-          // Author Reply Button (if isPoemAuthor and no reply exists)
+          // Author Reply Composer Container
           if (isPoemAuthor && reply == null) ...[
             const SizedBox(height: SyaahiSizes.sm),
             if (!_isReplying)
@@ -452,45 +477,126 @@ class _ResponseItemState extends ConsumerState<ResponseItem> {
               )
             else ...[
               const SizedBox(height: SyaahiSizes.xs),
-              TextField(
-                controller: _replyController,
-                maxLength: 280,
-                maxLines: 2,
-                style: GoogleFonts.inter(
-                  color: SyaahiColors.textPrimary,
-                  fontSize: 13,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Write a thoughtful reply...',
-                  hintStyle: GoogleFonts.inter(
-                    color: SyaahiColors.textFaded,
-                    fontSize: 12,
+              Container(
+                padding: const EdgeInsets.all(SyaahiSizes.sm),
+                decoration: BoxDecoration(
+                  color: SyaahiColors.midnightLight.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(SyaahiSizes.radiusMd),
+                  border: Border.all(
+                    color: SyaahiColors.divider,
+                    width: 0.5,
                   ),
-                  border: const OutlineInputBorder(),
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => setState(() => _isReplying = false),
-                    child: Text(
-                      'Cancel',
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _replyController,
+                      maxLength: 280,
+                      maxLines: 3,
+                      minLines: 2,
                       style: GoogleFonts.inter(
-                        color: SyaahiColors.textMuted,
-                        fontSize: 12,
+                        color: SyaahiColors.textPrimary,
+                        fontSize: 13,
+                        height: 1.4,
+                      ),
+                      decoration: InputDecoration(
+                        hintText: 'Write a thoughtful reply...',
+                        hintStyle: GoogleFonts.inter(
+                          color: SyaahiColors.textFaded,
+                          fontSize: 13,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        counterText: '',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.zero,
                       ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: _submitReply,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: SyaahiColors.goldBase,
-                      foregroundColor: SyaahiColors.midnightDark,
+                    const SizedBox(height: SyaahiSizes.xs),
+                    Row(
+                      children: [
+                        Text(
+                          '$_replyCharCount / 280',
+                          style: GoogleFonts.inter(
+                            color: _replyCharCount > 280
+                                ? SyaahiColors.error
+                                : SyaahiColors.textFaded,
+                            fontSize: 11,
+                          ),
+                        ),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => setState(() {
+                            _isReplying = false;
+                            _replyController.clear();
+                            _replyCharCount = 0;
+                          }),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: SyaahiSizes.sm,
+                              vertical: 4,
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            'Cancel',
+                            style: GoogleFonts.inter(
+                              color: SyaahiColors.textMuted,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: SyaahiSizes.xs),
+                        Consumer(
+                          builder: (context, ref, child) {
+                            final rState = ref.watch(
+                              resonanceProvider(widget.poemId),
+                            );
+                            final canSubmit = _replyCharCount > 0 &&
+                                _replyCharCount <= 280 &&
+                                !rState.isSubmitting;
+                            return ElevatedButton(
+                              onPressed: canSubmit ? _submitReply : null,
+                              style: ElevatedButton.styleFrom(
+                                minimumSize: Size.zero,
+                                backgroundColor: SyaahiColors.goldBase,
+                                foregroundColor: SyaahiColors.midnightDark,
+                                disabledBackgroundColor: SyaahiColors.goldBase
+                                    .withValues(alpha: 0.3),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: SyaahiSizes.md,
+                                  vertical: 6,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    SyaahiSizes.radiusFull,
+                                  ),
+                                ),
+                              ),
+                              child: rState.isSubmitting
+                                  ? const SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: SyaahiColors.midnightDark,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Post Reply',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                    child: const Text('Post Reply'),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
           ],
