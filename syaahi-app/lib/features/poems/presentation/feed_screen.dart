@@ -91,11 +91,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               if (context.mounted) context.go('/welcome');
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.help_outline, color: SyaahiColors.textMuted),
-            tooltip: 'How Syaahi works',
-            onPressed: () => OnboardingWalkthrough.show(context),
-          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -481,7 +476,6 @@ class _HeartButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      // opaque ensures taps here do NOT reach the parent InkWell (FR-05)
       behavior: HitTestBehavior.opaque,
       onTap: status.isInteractive ? onToggle : null,
       child: SizedBox(
@@ -689,4 +683,3 @@ class _BellButton extends ConsumerWidget {
     );
   }
 }
-
