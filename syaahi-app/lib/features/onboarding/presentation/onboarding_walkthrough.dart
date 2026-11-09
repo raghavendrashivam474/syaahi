@@ -5,186 +5,146 @@ import '../../../core/constants/colors.dart';
 import '../../../core/constants/sizes.dart';
 import '../state/onboarding_providers.dart';
 
-/// A short, skippable walkthrough that introduces Syaahi's
-/// interaction model. Not a compulsory tutorial — the user
-/// can exit at any time.
-///
-/// Triggered from the feed screen via a help icon or menu.
-class OnboardingWalkthrough extends ConsumerStatefulWidget {
-  const OnboardingWalkthrough({super.key});
+class OnboardingWalkthrough {
+  OnboardingWalkthrough._();
 
-  /// Shows the walkthrough as a full-screen dialog.
   static Future<void> show(BuildContext context) {
-    return showDialog(
+    return showModalBottomSheet(
       context: context,
-      barrierDismissible: true,
-      barrierColor: Colors.black54,
-      builder: (_) => const OnboardingWalkthrough(),
+      backgroundColor: Colors.transparent,
+      builder: (_) => const _WalkthroughSheet(),
     );
   }
-
-  @override
-  ConsumerState<OnboardingWalkthrough> createState() =>
-      _OnboardingWalkthroughState();
 }
 
-class _OnboardingWalkthroughState
-    extends ConsumerState<OnboardingWalkthrough> {
+class _WalkthroughSheet extends ConsumerStatefulWidget {
+  const _WalkthroughSheet();
+
+  @override
+  ConsumerState<_WalkthroughSheet> createState() => _WalkthroughSheetState();
+}
+
+class _WalkthroughSheetState extends ConsumerState<_WalkthroughSheet> {
   int _step = 0;
 
-  static const _steps = <_WalkStep>[
-    _WalkStep(
-      icon: Icons.auto_stories_outlined,
-      title: 'Discover',
-      body:
-          'Browse poems from writers around the world. '
-          'Each poem is a window into someone else\'s experience.',
-    ),
-    _WalkStep(
-      icon: Icons.favorite_border_rounded,
-      title: 'Appreciate',
-      body:
-          'When a poem moves you, tap the heart. '
-          'It is a quiet way of saying "this mattered to me."',
-    ),
-    _WalkStep(
-      icon: Icons.chat_bubble_outline_rounded,
-      title: 'Respond',
-      body:
-          'Share your own words in response to a poem. '
-          'A thoughtful reply can mean more than a hundred likes.',
-    ),
-    _WalkStep(
-      icon: Icons.waves_outlined,
-      title: 'Resonance',
-      body:
-          'Resonance is the space where readers and writers '
-          'meet through honest conversation.',
-    ),
-    _WalkStep(
-      icon: Icons.edit_outlined,
-      title: 'Express',
-      body:
-          'When you are ready, write your own poem. '
-          'There is no rush. Your words will wait for you.',
-    ),
+  static const _steps = [
+    {'icon': Icons.auto_stories_outlined, 'title': 'Discover',
+     'body': 'Browse poems from writers around the world. Each poem is a window into someone else\'s experience.'},
+    {'icon': Icons.favorite_border_rounded, 'title': 'Appreciate',
+     'body': 'When a poem moves you, tap the heart. It is a quiet way of saying "this mattered to me."'},
+    {'icon': Icons.chat_bubble_outline_rounded, 'title': 'Respond',
+     'body': 'Share your own words in response to a poem. A thoughtful reply can mean more than a hundred likes.'},
+    {'icon': Icons.waves_outlined, 'title': 'Resonance',
+     'body': 'Resonance is the space where readers and writers meet through honest conversation.'},
+    {'icon': Icons.edit_outlined, 'title': 'Express',
+     'body': 'When you are ready, write your own poem. There is no rush. Your words will wait for you.'},
   ];
-
-  void _next() {
-    if (_step < _steps.length - 1) {
-      setState(() => _step++);
-    } else {
-      _finish();
-    }
-  }
-
-  void _finish() {
-    markWalkthroughCompleted(ref);
-    Navigator.pop(context);
-  }
 
   @override
   Widget build(BuildContext context) {
     final step = _steps[_step];
     final isLast = _step == _steps.length - 1;
 
-    return Dialog(
-      backgroundColor: SyaahiColors.midnightBase,
-      insetPadding: const EdgeInsets.all(SyaahiSizes.xl),
-      child: Container(
-        padding: const EdgeInsets.all(SyaahiSizes.xl),
-        decoration: BoxDecoration(
-          color: SyaahiColors.midnightBase,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: SyaahiColors.goldBase.withValues(alpha: 0.4),
+    return Container(
+      decoration: const BoxDecoration(
+        color: SyaahiColors.midnightBase,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      padding: EdgeInsets.only(
+        left: SyaahiSizes.xl,
+        right: SyaahiSizes.xl,
+        top: SyaahiSizes.md,
+        bottom: SyaahiSizes.xl,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: SyaahiColors.textFaded.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Progress dots
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(_steps.length, (i) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 3),
-                  width: i == _step ? 16 : 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(3),
-                    color: i == _step
-                        ? SyaahiColors.goldBase
-                        : SyaahiColors.textFaded.withValues(alpha: 0.3),
-                  ),
-                );
-              }),
+          const SizedBox(height: SyaahiSizes.xl),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(_steps.length, (i) {
+              return AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                margin: const EdgeInsets.symmetric(horizontal: 3),
+                width: i == _step ? 16 : 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                  color: i == _step
+                      ? SyaahiColors.goldBase
+                      : SyaahiColors.textFaded.withValues(alpha: 0.3),
+                ),
+              );
+            }),
+          ),
+          const SizedBox(height: SyaahiSizes.xl),
+          Icon(
+            step['icon'] as IconData,
+            size: 40,
+            color: SyaahiColors.goldLight,
+          ),
+          const SizedBox(height: SyaahiSizes.md),
+          Text(
+            step['title'] as String,
+            style: GoogleFonts.cormorantGaramond(
+              fontSize: 26,
+              fontWeight: FontWeight.w600,
+              color: SyaahiColors.textPrimary,
             ),
-            const SizedBox(height: SyaahiSizes.xl),
-
-            // Icon
-            Icon(step.icon, size: 40, color: SyaahiColors.goldLight),
-            const SizedBox(height: SyaahiSizes.md),
-
-            // Title
-            Text(
-              step.title,
-              style: GoogleFonts.cormorantGaramond(
-                fontSize: 26,
-                fontWeight: FontWeight.w600,
-                color: SyaahiColors.textPrimary,
-              ),
+          ),
+          const SizedBox(height: SyaahiSizes.sm),
+          Text(
+            step['body'] as String,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: SyaahiColors.textMuted,
+              height: 1.6,
             ),
-            const SizedBox(height: SyaahiSizes.sm),
-
-            // Body
-            Text(
-              step.body,
-              textAlign: TextAlign.center,
-              style: GoogleFonts.inter(
-                fontSize: 14,
-                color: SyaahiColors.textMuted,
-                height: 1.6,
-              ),
-            ),
-            const SizedBox(height: SyaahiSizes.xl),
-
-            // Actions
-            Row(
-              children: [
-                // Skip / Back
-                TextButton(
-                  onPressed: _finish,
-                  child: Text(
-                    isLast ? 'Done' : 'Skip',
-                    style: GoogleFonts.inter(
-                      fontSize: 13,
-                      color: SyaahiColors.textFaded,
-                    ),
+          ),
+          const SizedBox(height: SyaahiSizes.xl),
+          Row(
+            children: [
+              TextButton(
+                onPressed: () {
+                  markWalkthroughCompleted(ref);
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  isLast ? 'Done' : 'Skip',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: SyaahiColors.textFaded,
                   ),
                 ),
-                const Spacer(),
-                // Next
-                ElevatedButton(
-                  onPressed: _next,
-                  child: Text(isLast ? 'Get Started' : 'Next'),
+              ),
+              const Spacer(),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(0, 44),
                 ),
-              ],
-            ),
-          ],
-        ),
+                onPressed: () {
+                  if (_step < _steps.length - 1) {
+                    setState(() => _step++);
+                  } else {
+                    markWalkthroughCompleted(ref);
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(isLast ? 'Get Started' : 'Next'),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
-}
-
-class _WalkStep {
-  final IconData icon;
-  final String title;
-  final String body;
-  const _WalkStep({
-    required this.icon,
-    required this.title,
-    required this.body,
-  });
 }
