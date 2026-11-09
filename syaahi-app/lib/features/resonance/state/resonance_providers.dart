@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/resonance_repository.dart';
 
 final resonanceRepositoryProvider = Provider<ResonanceRepository>((ref) {
@@ -84,6 +84,7 @@ class ResonanceNotifier extends StateNotifier<ResonanceState> {
         responses: state.responses.map((r) {
           return r.id == responseId ? updated : r;
         }).toList(),
+        isSubmitting: false,
       );
       return true;
     } on ResonanceException catch (e) {
@@ -106,6 +107,8 @@ class ResonanceNotifier extends StateNotifier<ResonanceState> {
   }
 
   Future<bool> submitReply(String responseId, String content) async {
+    if (state.isSubmitting) return false;
+    state = state.copyWith(isSubmitting: true, clearActionError: true);
     try {
       final reply = await _repository.createReply(responseId, content);
       state = state.copyWith(
@@ -122,10 +125,11 @@ class ResonanceNotifier extends StateNotifier<ResonanceState> {
             updatedAt: r.updatedAt,
           );
         }).toList(),
+        isSubmitting: false,
       );
       return true;
     } on ResonanceException catch (e) {
-      state = state.copyWith(actionError: e.message);
+      state = state.copyWith(isSubmitting: false, actionError: e.message);
       return false;
     }
   }
@@ -151,6 +155,7 @@ class ResonanceNotifier extends StateNotifier<ResonanceState> {
             updatedAt: r.updatedAt,
           );
         }).toList(),
+        isSubmitting: false,
       );
       return true;
     } on ResonanceException catch (e) {
@@ -176,6 +181,7 @@ class ResonanceNotifier extends StateNotifier<ResonanceState> {
             updatedAt: r.updatedAt,
           );
         }).toList(),
+        isSubmitting: false,
       );
       return true;
     } on ResonanceException catch (e) {
