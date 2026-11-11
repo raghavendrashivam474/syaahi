@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:syaahi_app/core/constants/colors.dart';
 import 'package:syaahi_app/core/constants/sizes.dart';
+import 'package:syaahi_app/core/navigation/presentation/app_navigation_shell.dart';
 import 'package:syaahi_app/features/splash/splash_screen.dart';
 import 'package:syaahi_app/features/welcome/welcome_screen.dart';
 import 'package:syaahi_app/features/auth/presentation/signup_screen.dart';
@@ -21,11 +22,20 @@ import 'package:syaahi_app/features/auth/state/auth_providers.dart';
 class AppRouter {
   AppRouter._();
 
+  // Shell branch navigator keys (for StatefulShellRoute)
+  static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static final _homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
+  static final _discoverNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'discover');
+  static final _heartNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'heart');
+  static final _profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
+
   static final router = GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     redirect: _redirect,
     errorBuilder: (context, state) => _NotFoundScreen(path: state.uri.path),
     routes: [
+      // ── Auth & Onboarding (outside shell) ──────────────────────
       GoRoute(
         path: '/',
         builder: (context, state) => const SplashScreen(),
@@ -42,44 +52,80 @@ class AppRouter {
         path: '/auth/login',
         builder: (context, state) => const LoginScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const FeedScreen(),
+
+      // ── Primary Navigation Shell (4 branches) ──────────────────
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return AppNavigationShell(navigationShell: navigationShell);
+        },
+        branches: [
+          // Branch 0: Home / Feed
+          StatefulShellBranch(
+            navigatorKey: _homeNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/home',
+                builder: (context, state) => const FeedScreen(),
+              ),
+            ],
+          ),
+          // Branch 1: Discover
+          StatefulShellBranch(
+            navigatorKey: _discoverNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/discover',
+                builder: (context, state) => const DiscoveryScreen(),
+              ),
+            ],
+          ),
+          // Branch 2: My Heart
+          StatefulShellBranch(
+            navigatorKey: _heartNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/heart',
+                builder: (context, state) => const HeartScreen(),
+              ),
+            ],
+          ),
+          // Branch 3: Profile
+          StatefulShellBranch(
+            navigatorKey: _profileNavigatorKey,
+            routes: [
+              GoRoute(
+                path: '/profile',
+                builder: (context, state) => const ProfileScreen(),
+              ),
+            ],
+          ),
+        ],
       ),
+
+      // ── Pushed routes (on top of shell) ────────────────────────
       GoRoute(
         path: '/write',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const WriterScreen(),
       ),
       GoRoute(
         path: '/poem/:id',
-        builder: (context, state) =>
-            ReaderScreen(
-              poemId: state.pathParameters['id']!,
-              focusSection: state.uri.queryParameters['focus'],
-            ),
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => ReaderScreen(
+          poemId: state.pathParameters['id']!,
+          focusSection: state.uri.queryParameters['focus'],
+        ),
       ),
-      GoRoute(
-        path: '/heart',
-        builder: (context, state) => const HeartScreen(),
-      ),
-      // Own profile — reads authProvider, delegates to AuthorProfileView
-      GoRoute(
-        path: '/profile',
-        builder: (context, state) => const ProfileScreen(),
-      ),
-      // Public author profile — fetches by username
       GoRoute(
         path: '/profile/:username',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => AuthorProfileScreen(
           username: state.pathParameters['username']!,
         ),
       ),
       GoRoute(
-        path: '/discover',
-        builder: (context, state) => const DiscoveryScreen(),
-      ),
-      GoRoute(
         path: '/notifications',
+        parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const InboxScreen(),
       ),
     ],
@@ -99,16 +145,9 @@ class AppRouter {
     // /profile/:username is public; exact /profile is protected
     final isPublicProfile =
         path.startsWith('/profile/') && path.length > '/profile/'.length;
-
     final isDiscover = path == '/discover';
 
-
-    
-
-
     final isPublic =
-
-
         isSplash || isWelcome || isAuth || isPoem || isPublicProfile || isDiscover;
 
     // Protected routes: /home, /write, /heart, /profile, /notifications
@@ -182,4 +221,3 @@ class _NotFoundScreen extends StatelessWidget {
     );
   }
 }
-
