@@ -8,7 +8,6 @@ import 'package:syaahi_app/features/resonance/data/resonance_repository.dart';
 import 'package:syaahi_app/features/resonance/state/resonance_providers.dart';
 import 'package:syaahi_app/features/resonance/presentation/response_item.dart';
 import 'package:syaahi_app/features/auth/state/auth_providers.dart';
-import 'package:syaahi_app/features/auth/data/auth_repository.dart';
 
 // ── Fakes ─────────────────────────────────────────────────────────
 
@@ -54,7 +53,7 @@ class _FakeResonanceRepo extends ResonanceRepository {
 }
 
 class _TestAuthNotifier extends AuthNotifier {
-  _TestAuthNotifier(AuthRepository repo) : super(repo) {
+  _TestAuthNotifier(super.repo) {
     state = const AuthState(
       user: User(
         id: 'author-100',
@@ -287,3 +286,5 @@ void main() {
     });
   });
 }
+
+
