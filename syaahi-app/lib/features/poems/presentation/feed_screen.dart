@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -53,11 +53,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
         title: const SyaahiBrandMark(),
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            tooltip: 'Discover Writers',
-            onPressed: () => context.push('/discover'),
-          ),
-          IconButton(
             icon: Icon(
               _showFilters ? Icons.filter_list_off : Icons.filter_list,
               color: state.filters.isEmpty
@@ -68,36 +63,34 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
             onPressed: () => setState(() => _showFilters = !_showFilters),
           ),
           _BellButton(),
-          IconButton(
-            icon: const Icon(Icons.favorite_outline),
-            tooltip: 'My Heart',
-            onPressed: () => context.push('/heart'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            tooltip: 'How Syaahi works',
-            onPressed: () => OnboardingWalkthrough.show(context),
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline),
-            tooltip: 'Profile',
-            onPressed: () => context.push('/profile'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign out',
-            onPressed: () async {
-              await ref.read(authProvider.notifier).logout();
-              if (context.mounted) context.go('/welcome');
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            color: SyaahiColors.midnightSoft,
+            onSelected: (value) {
+              if (value == 'walkthrough') {
+                OnboardingWalkthrough.show(context);
+              }
             },
+            itemBuilder: (context) => [
+              PopupMenuItem<String>(
+                value: 'walkthrough',
+                child: Row(
+                  children: [
+                    const Icon(Icons.help_outline, color: SyaahiColors.textSecondary, size: 20),
+                    const SizedBox(width: SyaahiSizes.sm),
+                    Text(
+                      'How Syaahi Works',
+                      style: GoogleFonts.inter(
+                        color: SyaahiColors.textPrimary,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/write'),
-        backgroundColor: SyaahiColors.goldBase,
-        foregroundColor: SyaahiColors.midnightDark,
-        child: const Icon(Icons.edit_outlined),
       ),
       body: Column(
         children: [

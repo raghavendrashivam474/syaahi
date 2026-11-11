@@ -43,16 +43,6 @@ class _HeartScreenState extends ConsumerState<HeartScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('My Heart'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.go('/home');
-              }
-            },
-        ),
       ),
       body: _buildBody(state),
     );
@@ -270,3 +260,4 @@ class _HeartPoemCard extends StatelessWidget {
     );
   }
 }
+

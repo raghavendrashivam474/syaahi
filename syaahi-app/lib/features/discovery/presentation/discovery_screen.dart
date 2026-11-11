@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,16 +29,6 @@ class DiscoveryScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: SyaahiColors.textPrimary),
-          onPressed: () {
-            if (GoRouter.of(context).canPop()) {
-              context.pop();
-            } else {
-              context.go('/welcome');
-            }
-          },
-        ),
         title: Text(
           'Discover Writers',
           style: GoogleFonts.cormorantGaramond(
@@ -134,3 +124,5 @@ class DiscoveryScreen extends ConsumerWidget {
     }
   }
 }
+
+
