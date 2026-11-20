@@ -1,9 +1,9 @@
 # STMS-1 Handover Report: Syaahi Studio Web Compatibility & Stabilization
 
 - **Sprint ID**: STMS-1
-- **Baseline Tag**: -ST-ST1
+- **Baseline Tag**: v-ST-ST1
 - **Baseline Commit**: 3cccf0a9fe28b9b72754d0ed09d63e249791a477
-- **Working Branch**: ix/studio-web-compatibility
+- **Working Branch**: fix/studio-web-compatibility
 - **Target Platform**: Flutter Web (Chrome)
 - **Regression Platform**: Android
 
@@ -15,7 +15,7 @@ During initial deployment to Flutter Web (Chrome), Syaahi Studio experienced com
 
 STMS-1 has resolved all compilation errors and introduced platform-aware persistence architecture for Syaahi Studio. Android retains its native SQLite database (syaahi_studio.sqlite), while Web targets utilize browser IndexedDB via Drift's platform abstraction (WebDatabase).
 
-All 82 unit and journey tests pass without regressions, and lutter build web compiles cleanly to produce a production web release bundle.
+All 82 unit and journey tests pass without regressions, and flutter build web compiles cleanly to produce a production web release bundle.
 
 ---
 
@@ -33,8 +33,8 @@ All 82 unit and journey tests pass without regressions, and lutter build web co
 ---
 
 ## C. System Architecture
-text
 
+```text
                    +-----------------------------------+
                    |         Syaahi Studio UI          |
                    | (HomeScreen / StudioEditorScreen) |
@@ -72,9 +72,7 @@ text
      | Drift + NativeDatabase   |   | Drift + WebDatabase      |
      | (SQLite FFI for Android) |   | (IndexedDB for Chrome)   |
      +--------------------------+   +--------------------------+
-text
-
-
+```
 ---
 
 ## D. Modified & Created Files Summary
