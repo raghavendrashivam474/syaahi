@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,7 +20,7 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
 
   @override
   void initState() {
-    super.override;
+    super.initState();
     final current = ref.read(studioProvider).currentDraft;
     _titleController = TextEditingController(text: current?.title ?? '');
     _contentController = TextEditingController(text: current?.content ?? '');
@@ -93,12 +93,12 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
                       Container(
                         padding: const EdgeInsets.all(SyaahiSizes.sm),
                         decoration: BoxDecoration(
-                          color: SyaahiColors.errorRed.withOpacity(0.1),
+                          color: SyaahiColors.error.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(SyaahiSizes.radiusSm),
                         ),
                         child: Text(
                           state.error!,
-                          style: const TextStyle(color: SyaahiColors.errorRed, fontSize: 12),
+                          style: const TextStyle(color: SyaahiColors.error, fontSize: 12),
                         ),
                       ),
                       const SizedBox(height: SyaahiSizes.md),

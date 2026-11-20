@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -71,7 +71,7 @@ class StudioHomeScreen extends ConsumerWidget {
                                 ),
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx, true),
-                                  child: const Text('Delete', style: TextStyle(color: SyaahiColors.errorRed)),
+                                  child: const Text('Delete', style: TextStyle(color: SyaahiColors.error)),
                                 ),
                               ],
                             ),
@@ -174,7 +174,7 @@ class _DraftCard extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(SyaahiSizes.md),
           child: Column(
-            crossAxisAlignment: Start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,8 +239,8 @@ class _SyncBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final (color, icon) = switch (status) {
       SyncStatus.synced => (SyaahiColors.goldBase, Icons.cloud_done),
-      SyncStatus.pendingSync => (SyaahiColors.accentSecondary, Icons.cloud_upload),
-      SyncStatus.syncFailed => (SyaahiColors.errorRed, Icons.cloud_off),
+      SyncStatus.pendingSync => (SyaahiColors.goldLight, Icons.cloud_upload),
+      SyncStatus.syncFailed => (SyaahiColors.error, Icons.cloud_off),
       SyncStatus.localOnly => (SyaahiColors.textFaded, Icons.smartphone),
     };
 
