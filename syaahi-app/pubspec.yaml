@@ -21,6 +21,10 @@ dependencies:
   dio: ^5.7.0
 
   # Storage
+  drift: ^2.20.0
+  path_provider: ^2.1.4
+  path: ^1.9.0
+  sqlite3_flutter_libs: ^0.5.24
   flutter_secure_storage: ^9.2.2
   shared_preferences: ^2.3.3
 
