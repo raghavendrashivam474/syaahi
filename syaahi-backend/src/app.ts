@@ -1,10 +1,11 @@
-import express from 'express';
+﻿import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
-import authRoutes from './modules/auth/auth.routes';
+import studioRoutes from './modules/studio/studio.routes';
+
 import poemRoutes from './modules/poems/poems.routes';
 import userRoutes from './modules/users/users.routes';
 import heartRoutes from './modules/heart/heart.routes';
@@ -54,7 +55,8 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/studio/drafts', studioRoutes);
+
 app.use('/api/v1/poems', poemRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/poems', heartRoutes);
