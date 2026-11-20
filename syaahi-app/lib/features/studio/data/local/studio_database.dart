@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'connection.dart';
+import 'connection/connection.dart';
 
 part 'studio_database.g.dart';
 
