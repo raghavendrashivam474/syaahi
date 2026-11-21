@@ -4,8 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './config/env';
 import { errorHandler } from './middleware/errorHandler';
+import authRoutes from './modules/auth/auth.routes';
 import studioRoutes from './modules/studio/studio.routes';
-
 import poemRoutes from './modules/poems/poems.routes';
 import userRoutes from './modules/users/users.routes';
 import heartRoutes from './modules/heart/heart.routes';
@@ -17,31 +17,24 @@ import { globalLimiter } from './middleware/rateLimiter';
 const app = express();
 
 app.set('trust proxy', 1);
-
 app.use(helmet());
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile native apps, curl, Postman)
       if (!origin) return callback(null, true);
-
       const allowed = env.CORS_ORIGIN.split(',').map((o) => o.trim());
-
-      // If '*' wildcard is set OR origin is explicitly in allowed list
       if (allowed.includes('*') || allowed.includes(origin)) {
         return callback(null, true);
       }
-
       if (env.NODE_ENV === 'development' && origin.startsWith('http://localhost')) {
         return callback(null, true);
       }
-
-      // Return null, false for clean CORS refusal instead of throwing 500
       callback(null, false);
     },
     credentials: true,
   })
 );
+
 app.use(express.json({ limit: '1mb' }));
 app.use(morgan(env.NODE_ENV === 'development' ? 'dev' : 'combined'));
 
@@ -55,8 +48,8 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
+app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/studio/drafts', studioRoutes);
-
 app.use('/api/v1/poems', poemRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/poems', heartRoutes);
