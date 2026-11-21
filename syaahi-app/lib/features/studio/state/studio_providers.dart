@@ -1,4 +1,5 @@
-﻿import 'dart:async';
+﻿import 'package:uuid/uuid.dart';
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/models/poem.dart';
 import '../../auth/state/auth_providers.dart';
@@ -91,6 +92,7 @@ class StudioState {
 
 // Studio State Notifier
 class StudioNotifier extends StateNotifier<StudioState> {
+  static const _uuid = Uuid();
   final LocalDraftRepository _localRepo;
   final RemoteDraftRepository _remoteRepo;
   final DraftSyncService _syncService;
@@ -126,7 +128,7 @@ class StudioNotifier extends StateNotifier<StudioState> {
   void createNewDraft() {
     final userId = _currentUserId;
     final newDraft = DraftPoem(
-      id: DateTime.now().microsecondsSinceEpoch.toString(), // or UUID
+      id: _uuid.v4(), // or UUID
       ownerId: userId,
       title: '',
       content: '',
@@ -199,6 +201,14 @@ class StudioNotifier extends StateNotifier<StudioState> {
     _scheduleAutosave();
   }
 
+
+  /// Immediately flushes any pending debounced autosave operation
+  Future<void> flushPendingAutosave() async {
+    if (_debounceTimer?.isActive ?? false) {
+      _debounceTimer?.cancel();
+      await _executeSave();
+    }
+  }
   void _scheduleAutosave() {
     state = state.copyWith(saveStatus: SaveStatus.savingLocally);
     _debounceTimer?.cancel();
@@ -308,3 +318,5 @@ final studioProvider = StateNotifierProvider<StudioNotifier, StudioState>((ref) 
     ref,
   );
 });
+
+
