@@ -6,6 +6,8 @@ import '../../../../core/constants/colors.dart';
 import '../../../../core/constants/sizes.dart';
 import '../../../../shared/models/poem.dart';
 import '../../state/studio_providers.dart';
+import '../../state/writing_intelligence_providers.dart';
+import '../widgets/writing_intelligence_sheet.dart';
 
 class StudioEditorScreen extends ConsumerStatefulWidget {
   const StudioEditorScreen({super.key});
@@ -33,6 +35,35 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
     super.dispose();
   }
 
+  void _openWritingIntelligence() {
+    final text = _contentController.text;
+    ref.read(writingIntelligenceProvider.notifier).analyzeDocument(text);
+
+    WritingIntelligenceSheet.show(
+      context,
+      currentText: text,
+      onApplyReplacement: (start, end, replacement) {
+        _applyTextReplacement(start, end, replacement);
+      },
+    );
+  }
+
+  void _applyTextReplacement(int start, int end, String replacement) {
+    final currentText = _contentController.text;
+
+    // Offset range safety verification
+    if (start < 0 || end > currentText.length || start > end) return;
+
+    final newText = currentText.replaceRange(start, end, replacement);
+    _contentController.value = TextEditingValue(
+      text: newText,
+      selection: TextSelection.collapsed(offset: start + replacement.length),
+    );
+
+    // Wire replacement into StudioNotifier -> 500ms debounced persistence
+    ref.read(studioProvider.notifier).updateContent(newText);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(studioProvider);
@@ -53,6 +84,12 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
           style: GoogleFonts.inter(fontSize: 12, color: SyaahiColors.goldBase),
         ),
         actions: [
+          // Writing Intelligence Action
+          IconButton(
+            icon: const Icon(Icons.auto_awesome, color: SyaahiColors.goldBase, size: 20),
+            tooltip: 'Writing Intelligence',
+            onPressed: (draft == null || state.isPublishing) ? null : _openWritingIntelligence,
+          ),
           if (state.isPublishing)
             const Padding(
               padding: EdgeInsets.all(16.0),
@@ -93,7 +130,7 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
                       Container(
                         padding: const EdgeInsets.all(SyaahiSizes.sm),
                         decoration: BoxDecoration(
-                          color: SyaahiColors.error.withOpacity(0.1),
+                          color: SyaahiColors.error.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(SyaahiSizes.radiusSm),
                         ),
                         child: Text(
@@ -103,7 +140,6 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
                       ),
                       const SizedBox(height: SyaahiSizes.md),
                     ],
-
                     // Language Selector
                     Row(
                       children: [
@@ -122,9 +158,7 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: SyaahiSizes.sm),
-
                     // Title Input
                     TextField(
                       controller: _titleController,
@@ -143,10 +177,8 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
                       ),
                       onChanged: (val) => notifier.updateTitle(val),
                     ),
-
                     const Divider(color: SyaahiColors.divider, height: 1),
                     const SizedBox(height: SyaahiSizes.md),
-
                     // Main Content Canvas
                     TextField(
                       controller: _contentController,
@@ -174,4 +206,3 @@ class _StudioEditorScreenState extends ConsumerState<StudioEditorScreen> {
     );
   }
 }
-
