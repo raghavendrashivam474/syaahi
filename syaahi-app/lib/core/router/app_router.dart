@@ -18,6 +18,8 @@ import 'package:syaahi_app/features/profile/presentation/author_profile_screen.d
 import 'package:syaahi_app/features/notifications/presentation/inbox_screen.dart';
 import 'package:syaahi_app/features/discovery/presentation/discovery_screen.dart';
 import 'package:syaahi_app/features/auth/state/auth_providers.dart';
+import 'package:syaahi_app/features/studio/presentation/screens/studio_home_screen.dart';
+import 'package:syaahi_app/features/studio/presentation/screens/studio_editor_screen.dart';
 
 class AppRouter {
   AppRouter._();
@@ -104,6 +106,16 @@ class AppRouter {
 
       // ── Pushed routes (on top of shell) ────────────────────────
       GoRoute(
+        path: '/studio',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const StudioHomeScreen(),
+      ),
+      GoRoute(
+        path: '/studio/editor',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const StudioEditorScreen(),
+      ),
+      GoRoute(
         path: '/write',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const WriterScreen(),
@@ -142,15 +154,15 @@ class AppRouter {
     final isWelcome = path == '/welcome';
     final isAuth = path.startsWith('/auth/');
     final isPoem = path.startsWith('/poem/');
+
     // /profile/:username is public; exact /profile is protected
     final isPublicProfile =
         path.startsWith('/profile/') && path.length > '/profile/'.length;
     final isDiscover = path == '/discover';
-
     final isPublic =
         isSplash || isWelcome || isAuth || isPoem || isPublicProfile || isDiscover;
 
-    // Protected routes: /home, /write, /heart, /profile, /notifications
+    // Protected routes: /home, /write, /heart, /profile, /notifications, /studio, /studio/editor
     final isProtected = !isPublic;
 
     // Unauthenticated user trying to reach a protected route
@@ -221,4 +233,3 @@ class _NotFoundScreen extends StatelessWidget {
     );
   }
 }
-
