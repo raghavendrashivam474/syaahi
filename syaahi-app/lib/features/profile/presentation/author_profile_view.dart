@@ -87,6 +87,10 @@ class _AuthorProfileViewState extends ConsumerState<AuthorProfileView> {
         padding: const EdgeInsets.all(SyaahiSizes.xl),
         children: [
           _ProfileHeader(profile: profile),
+          if (widget.isOwnProfile) ...[
+            const SizedBox(height: SyaahiSizes.lg),
+            _StudioBannerCard(onTap: () => context.push('/studio')),
+          ],
           const SizedBox(height: SyaahiSizes.xxl),
           Container(height: 0.5, color: SyaahiColors.divider),
           const SizedBox(height: SyaahiSizes.xxl),
@@ -102,8 +106,75 @@ class _AuthorProfileViewState extends ConsumerState<AuthorProfileView> {
   }
 }
 
-// ── Profile Header ────────────────────────────────────────────────
+class _StudioBannerCard extends StatelessWidget {
+  final VoidCallback onTap;
+  const _StudioBannerCard({required this.onTap});
 
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: SyaahiColors.midnightBase,
+        borderRadius: BorderRadius.circular(SyaahiSizes.radiusMd),
+        border: Border.all(color: SyaahiColors.goldBase.withValues(alpha: 0.3), width: 1),
+      ),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(SyaahiSizes.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.all(SyaahiSizes.md),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: SyaahiColors.goldBase.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.history_edu,
+                  color: SyaahiColors.goldBase,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: SyaahiSizes.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Syaahi Studio',
+                      style: GoogleFonts.cormorantGaramond(
+                        color: SyaahiColors.goldBase,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Manage drafts, autosave & Writing Intelligence',
+                      style: GoogleFonts.inter(
+                        color: SyaahiColors.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(
+                Icons.arrow_forward_ios,
+                color: SyaahiColors.goldBase,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Profile Header ────────────────────────────────────────────────
 class _ProfileHeader extends StatelessWidget {
   final AuthorProfile profile;
   const _ProfileHeader({required this.profile});
@@ -205,7 +276,6 @@ class _MetaChip extends StatelessWidget {
 }
 
 // ── Poems Section (ConsumerWidget — needs ref for provider reads) ─
-
 class _PoemsSection extends ConsumerWidget {
   final AuthorPoemsState poemsState;
   final bool isOwnProfile;
@@ -290,7 +360,6 @@ class _PoemsSection extends ConsumerWidget {
 }
 
 // ── Poem Tile (ConsumerWidget — needs ref for delete) ─────────────
-
 class _AuthorPoemTile extends ConsumerWidget {
   final Poem poem;
   final bool isOwnProfile;
@@ -440,6 +509,7 @@ class _AuthorPoemTile extends ConsumerWidget {
                     ],
                   ),
                 );
+
                 if (confirmed == true && context.mounted) {
                   try {
                     await ref
@@ -491,7 +561,6 @@ class _AuthorPoemTile extends ConsumerWidget {
 }
 
 // ── State Views ───────────────────────────────────────────────────
-
 class _EmptyPoemsView extends StatelessWidget {
   final bool isOwnProfile;
   const _EmptyPoemsView({required this.isOwnProfile});
@@ -516,10 +585,21 @@ class _EmptyPoemsView extends StatelessWidget {
           ),
           if (isOwnProfile) ...[
             const SizedBox(height: SyaahiSizes.md),
-            TextButton.icon(
-              onPressed: () => context.push('/write'),
-              icon: const Icon(Icons.edit_outlined, size: 16),
-              label: const Text('Write your first poem'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => context.push('/studio'),
+                  icon: const Icon(Icons.history_edu, size: 16),
+                  label: const Text('Open Syaahi Studio'),
+                ),
+                const SizedBox(width: SyaahiSizes.md),
+                ElevatedButton.icon(
+                  onPressed: () => context.push('/write'),
+                  icon: const Icon(Icons.edit_outlined, size: 16),
+                  label: const Text('Write Poem'),
+                ),
+              ],
             ),
           ],
         ],

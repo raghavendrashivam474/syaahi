@@ -16,7 +16,6 @@ class ProfileScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).user;
-
     if (user == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Profile')),
@@ -30,6 +29,11 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.history_edu),
+            tooltip: 'Syaahi Studio',
+            onPressed: () => context.push('/studio'),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             tooltip: 'Sign out',

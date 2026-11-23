@@ -97,6 +97,11 @@ class _WriterScreenState extends ConsumerState<WriterScreen> {
           ),
         ),
         actions: [
+            IconButton(
+              icon: const Icon(Icons.history_edu, color: SyaahiColors.goldBase),
+              tooltip: 'Open Syaahi Studio',
+              onPressed: () => context.push('/studio'),
+            ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             child: Text(
@@ -148,6 +153,11 @@ class _WriterScreenState extends ConsumerState<WriterScreen> {
             },
           ),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.history_edu, color: SyaahiColors.goldBase),
+              tooltip: 'Open Syaahi Studio',
+              onPressed: () => context.push('/studio'),
+            ),
             Padding(
               padding: const EdgeInsets.only(right: SyaahiSizes.md),
               child: TextButton(
@@ -376,4 +386,5 @@ class _SectionLabel extends StatelessWidget {
     );
   }
 }
+
 
